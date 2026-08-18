@@ -1,0 +1,69 @@
+AMD Kernel Code for "matmul_via_L2"
+
+Disassembly for "matmul_via_L2":
+
+@kernel matmul_via_L2:
+	s_load_dword s9, s[0:1], 0x2c                              // 000000002E00: C0020240 0000002C
+	s_load_dwordx4 s[4:7], s[0:1], 0x48                        // 000000002E08: C00A0100 00000048
+	s_load_dword s8, s[0:1], 0x18                              // 000000002E10: C0020200 00000018
+	v_bfe_u32 v1, v0, 10, 10                                   // 000000002E18: D1C80001 02291500
+	v_and_b32_e32 v0, 0x3ff, v0                                // 000000002E20: 260000FF 000003FF
+	s_waitcnt lgkmcnt(0)                                       // 000000002E28: BF8CC07F
+	s_lshr_b32 s5, s9, 16                                      // 000000002E2C: 8F059009
+	s_mul_i32 s3, s3, s5                                       // 000000002E30: 92030503
+	s_add_i32 s3, s6, s3                                       // 000000002E34: 81030306
+	v_add_u32_e32 v1, s3, v1                                   // 000000002E38: 68020203
+	s_and_b32 s3, s9, 0xffff                                   // 000000002E3C: 8603FF09 0000FFFF
+	s_mul_i32 s2, s2, s3                                       // 000000002E44: 92020302
+	s_add_i32 s2, s4, s2                                       // 000000002E48: 81020204
+	v_add_u32_e32 v6, s2, v0                                   // 000000002E4C: 680C0002
+	v_max_i32_e32 v0, v1, v6                                   // 000000002E50: 1A000D01
+	v_cmp_gt_i32_e32 vcc, s8, v0                               // 000000002E54: 7D880008
+	s_mov_b32 s33, 0                                           // 000000002E58: BEA10080
+	s_and_saveexec_b64 s[2:3], vcc                             // 000000002E5C: BE82206A
+	s_cbranch_execz L7                                         // 000000002E60: BF88002D
+	s_load_dwordx4 s[4:7], s[0:1], 0x0                         // 000000002E64: C00A0100 00000000
+	s_load_dwordx2 s[2:3], s[0:1], 0x10                        // 000000002E6C: C0060080 00000010
+	s_cmp_lt_i32 s8, 1                                         // 000000002E74: BF048108
+	v_mul_lo_u32 v0, v1, s8                                    // 000000002E78: D2850000 00001101
+	s_cbranch_scc1 L5                                          // 000000002E80: BF85001A
+	s_waitcnt lgkmcnt(0)                                       // 000000002E84: BF8CC07F
+	v_mov_b32_e32 v2, s4                                       // 000000002E88: 7E040204
+	v_mov_b32_e32 v3, s5                                       // 000000002E8C: 7E060205
+	v_ashrrev_i32_e32 v1, 31, v0                               // 000000002E90: 2202009F
+	v_lshl_add_u64 v[2:3], v[0:1], 2, v[2:3]                   // 000000002E94: D2080002 04090500
+	v_mov_b32_e32 v1, 0                                        // 000000002E9C: 7E020280
+	v_mov_b32_e32 v4, v6                                       // 000000002EA0: 7E080306
+	s_mov_b32 s0, s8                                           // 000000002EA4: BE800008
+
+L4:
+	v_ashrrev_i32_e32 v5, 31, v4                               // 000000002EA8: 220A089F
+	v_lshl_add_u64 v[8:9], v[4:5], 2, s[6:7]                   // 000000002EAC: D2080008 00190504
+	global_load_dword v7, v[2:3], off sc0 sc1                  // 000000002EB4: DE518000 077F0002
+	s_waitcnt vmcnt(0)                                         // 000000002EBC: BF8C0F70
+	global_load_dword v5, v[8:9], off sc0 sc1                  // 000000002EC0: DE518000 057F0008
+	s_waitcnt vmcnt(0)                                         // 000000002EC8: BF8C0F70
+	s_add_i32 s0, s0, -1                                       // 000000002ECC: 8100C100
+	v_lshl_add_u64 v[2:3], v[2:3], 0, 4                        // 000000002ED0: D2080002 02110102
+	v_add_u32_e32 v4, s8, v4                                   // 000000002ED8: 68080808
+	s_cmp_eq_u32 s0, 0                                         // 000000002EDC: BF068000
+	v_fmac_f32_e32 v1, v7, v5                                  // 000000002EE0: 76020B07
+	s_cbranch_scc0 L4                                          // 000000002EE4: BF84FFF0
+	s_branch L6                                                // 000000002EE8: BF820001
+
+L5:
+	v_mov_b32_e32 v1, 0                                        // 000000002EEC: 7E020280
+
+L6:
+	v_add_u32_e32 v4, v6, v0                                   // 000000002EF0: 68080106
+	s_waitcnt lgkmcnt(0)                                       // 000000002EF4: BF8CC07F
+	v_mov_b32_e32 v2, s2                                       // 000000002EF8: 7E040202
+	v_mov_b32_e32 v3, s3                                       // 000000002EFC: 7E060203
+	v_ashrrev_i32_e32 v5, 31, v4                               // 000000002F00: 220A089F
+	v_lshl_add_u64 v[2:3], v[4:5], 2, v[2:3]                   // 000000002F04: D2080002 04090504
+	global_store_dword v[2:3], v1, off sc0 sc1                 // 000000002F0C: DE718000 007F0102
+	s_waitcnt vmcnt(0)                                         // 000000002F14: BF8C0F70
+
+L7:
+	s_endpgm                                                   // 000000002F18: BF810000
+

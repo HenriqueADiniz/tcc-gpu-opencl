@@ -1,0 +1,62 @@
+================================================================
+ Isolamento do efeito GLC=1 — desenho fatorial 2x2
+ Matriz 1024x1024 | workgroup 16x16 | warmup 3 | runs 10
+================================================================
+
+Plataforma: AMD Accelerated Parallel Processing
+Dispositivo: gfx803
+Cache global reportado: 16 KB | LDS: 64 KB
+
+[ISA] isa/rocm_gfx803_glc_factorial.bin (18120 bytes)
+      verificar com:
+      llvm-objdump -d --triple=amdgcn-amd-amdhsa --mcpu=gfx803 \
+        isa/rocm_gfx803_glc_factorial.bin > isa/glc_factorial_disasm.txt
+      python3 isa/analyze_disasm.py isa/glc_factorial_disasm.txt
+
+--- (1) asm GLC=0, sobreposto  [baseline fatorial]  (mm_glc0_overlap) ---
+    media 10.204 ms  (dp 0.215)  min 9.858 ms  |  210.5 GFLOPS  |  OK (maxdiff 0.00000)
+
+--- (2) asm GLC=0, serializado [so serializacao]  (mm_glc0_serial) ---
+    media 11.285 ms  (dp 0.398)  min 10.708 ms  |  190.3 GFLOPS  |  OK (maxdiff 0.00000)
+
+--- (3) asm GLC=1, sobreposto  [so bypass L1]  (mm_glc1_overlap) ---
+    media 13.850 ms  (dp 0.801)  min 11.920 ms  |  155.1 GFLOPS  |  OK (maxdiff 0.00000)
+
+--- (4) asm GLC=1, serializado [ambos fatores]  (mm_glc1_serial) ---
+    media 15.696 ms  (dp 0.696)  min 14.916 ms  |  136.8 GFLOPS  |  OK (maxdiff 0.00000)
+
+--- (0) C puro, sem asm        [ref. externa]  (mm_plain_c) ---
+    media 7.469 ms  (dp 0.350)  min 7.099 ms  |  287.5 GFLOPS  |  OK (maxdiff 0.00000)
+
+--- (5) volatile puro          [controle]  (mm_volatile) ---
+    media 14.275 ms  (dp 0.527)  min 13.344 ms  |  150.4 GFLOPS  |  OK (maxdiff 0.00000)
+
+================================================================
+ TABELA — tempos absolutos
+================================================================
+ celula                                  media(ms)       dp     GFLOPS
+ (1) asm GLC=0, sobreposto  [baseline fatorial]     10.204    0.215      210.5
+ (2) asm GLC=0, serializado [so serializacao]     11.285    0.398      190.3
+ (3) asm GLC=1, sobreposto  [so bypass L1]     13.850    0.801      155.1
+ (4) asm GLC=1, serializado [ambos fatores]     15.696    0.696      136.8
+ (0) C puro, sem asm        [ref. externa]      7.469    0.350      287.5
+ (5) volatile puro          [controle]      14.275    0.527      150.4
+
+================================================================
+ DECOMPOSICAO DOS EFEITOS
+ (todas as celulas do fatorial usam inline asm; so os fatores mudam)
+================================================================
+ serializacao isolada  (2)/(1) = 1.11x
+ bypass do L1 isolado  (3)/(1) = 1.36x   <-- efeito do L1
+ combinado             (4)/(1) = 1.54x
+ produto dos isolados          = 1.50x
+ interacao (combinado / produto) = 1.02x  -> efeitos aproximadamente multiplicativos
+
+ custo de construir os loads por asm, sem mudar fator nenhum:
+   (1) asm GLC=0 sobreposto / (0) C puro = 10.204 / 7.469 = 1.37x
+ controle: (5) volatile / (4) asm GLC=1 serializado = 14.275 / 15.696 = 0.91x
+
+ Leitura: o unico numero atribuivel ao bypass do L1, com todos os demais
+ fatores fixos, e (3)/(1) = 1.36x. Ou seja, nesta carga o L1 responde por
+ uma reducao de tempo de 26% em relacao a executar sem ele.
+================================================================

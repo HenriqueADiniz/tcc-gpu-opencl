@@ -1,0 +1,40 @@
+elementos,bytes,rotulo,variante,flags,latencia_ns
+256,1024,"1 KB",pchase_L1,"sem flags",171.0711
+256,1024,"1 KB",pchase_L2,"glc",243.3601
+256,1024,"1 KB",pchase_VRAM,"glc slc",244.5414
+1024,4096,"4 KB",pchase_L1,"sem flags",171.8661
+1024,4096,"4 KB",pchase_L2,"glc",244.9033
+1024,4096,"4 KB",pchase_VRAM,"glc slc",245.0932
+2048,8192,"8 KB",pchase_L1,"sem flags",172.6373
+2048,8192,"8 KB",pchase_L2,"glc",246.0769
+2048,8192,"8 KB",pchase_VRAM,"glc slc",245.7414
+4096,16384,"16 KB",pchase_L1,"sem flags",173.9517
+4096,16384,"16 KB",pchase_L2,"glc",247.1295
+4096,16384,"16 KB",pchase_VRAM,"glc slc",246.8196
+5120,20480,"20 KB",pchase_L1,"sem flags",189.3477
+5120,20480,"20 KB",pchase_L2,"glc",247.7224
+5120,20480,"20 KB",pchase_VRAM,"glc slc",247.9806
+8192,32768,"32 KB",pchase_L1,"sem flags",213.5667
+8192,32768,"32 KB",pchase_L2,"glc",249.4983
+8192,32768,"32 KB",pchase_VRAM,"glc slc",249.7611
+16384,65536,"64 KB",pchase_L1,"sem flags",237.0806
+16384,65536,"64 KB",pchase_L2,"glc",254.0578
+16384,65536,"64 KB",pchase_VRAM,"glc slc",253.9096
+65536,262144,"256 KB",pchase_L1,"sem flags",268.5596
+65536,262144,"256 KB",pchase_L2,"glc",273.6689
+65536,262144,"256 KB",pchase_VRAM,"glc slc",273.3625
+131072,524288,"512 KB",pchase_L1,"sem flags",287.7716
+131072,524288,"512 KB",pchase_L2,"glc",291.9839
+131072,524288,"512 KB",pchase_VRAM,"glc slc",294.0210
+262144,1048576,"1 MB",pchase_L1,"sem flags",300.3981
+262144,1048576,"1 MB",pchase_L2,"glc",302.6189
+262144,1048576,"1 MB",pchase_VRAM,"glc slc",301.3481
+524288,2097152,"2 MB",pchase_L1,"sem flags",306.2970
+524288,2097152,"2 MB",pchase_L2,"glc",306.4735
+524288,2097152,"2 MB",pchase_VRAM,"glc slc",304.7511
+1048576,4194304,"4 MB",pchase_L1,"sem flags",304.6281
+1048576,4194304,"4 MB",pchase_L2,"glc",308.8779
+1048576,4194304,"4 MB",pchase_VRAM,"glc slc",308.2209
+2097152,8388608,"8 MB",pchase_L1,"sem flags",307.3980
+2097152,8388608,"8 MB",pchase_L2,"glc",310.8393
+2097152,8388608,"8 MB",pchase_VRAM,"glc slc",313.4471

@@ -1,0 +1,29 @@
+# Executáveis compilados — regeneráveis a partir do código-fonte
+output/
+
+# Auxiliares do LaTeX (o main.pdf É versionado, por ser o entregável)
+*.aux
+*.log
+*.out
+*.bbl
+*.blg
+*.toc
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+
+# Configuração de IDE específica da máquina
+.idea/
+.vscode/settings.json
+
+# Permissões locais do agente — contêm caminhos absolutos da máquina
+.claude/settings.local.json
+
+# Python
+__pycache__/
+*.pyc
+
+# Temporários
+*~
+*.swp
+*.bak

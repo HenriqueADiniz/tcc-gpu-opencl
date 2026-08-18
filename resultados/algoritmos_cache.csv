@@ -1,0 +1,10 @@
+algoritmo,perfil,nivel,media_ms,dp_ms,mediana_ms,razao_mediana_sobre_L1,verificado
+scan,"reuso global ~1, LDS interno","L1 (normal)",1.468442,0.127164,1.422926,1.000000,1
+scan,"reuso global ~1, LDS interno","L2 (glc)",1.458769,0.076221,1.423408,1.000339,1
+scan,"reuso global ~1, LDS interno","VRAM (glc slc)",1.484741,0.126054,1.427566,1.003261,1
+primos,"compute-bound, 1 load/work-item","L1 (normal)",1.718231,0.006171,1.715416,1.000000,1
+primos,"compute-bound, 1 load/work-item","L2 (glc)",1.735095,0.046080,1.716054,1.000372,1
+primos,"compute-bound, 1 load/work-item","VRAM (glc slc)",1.716631,0.002996,1.715895,1.000279,1
+crivo,"tabela de primos com reuso alto","L1 (normal)",10.231252,0.143613,10.224169,1.000000,1
+crivo,"tabela de primos com reuso alto","L2 (glc)",10.205364,0.198973,10.160967,0.993818,1
+crivo,"tabela de primos com reuso alto","VRAM (glc slc)",10.168639,0.201390,10.210889,0.998701,1

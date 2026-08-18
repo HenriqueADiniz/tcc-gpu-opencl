@@ -1,0 +1,21 @@
+{
+  "configurations": [
+    {
+      "name": "Linux",
+      "includePath": [
+        "${workspaceFolder}/**",
+        "/opt/rocm/include",
+        "/usr/include"
+      ],
+      "defines": [
+        "CL_TARGET_OPENCL_VERSION=120",
+        "CL_USE_DEPRECATED_OPENCL_1_2_APIS"
+      ],
+      "compilerPath": "/usr/bin/g++",
+      "cStandard": "c11",
+      "cppStandard": "gnu++14",
+      "intelliSenseMode": "linux-gcc-x64"
+    }
+  ],
+  "version": 4
+}

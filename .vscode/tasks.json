@@ -1,0 +1,78 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Artigo: compilar (LaTeX + bibliografia)",
+      "type": "shell",
+      "command": "pdflatex -interaction=nonstopmode -file-line-error main.tex && bibtex main && pdflatex -interaction=nonstopmode main.tex && pdflatex -interaction=nonstopmode -file-line-error main.tex && rm -f main.aux main.log main.out main.blg && echo '--- OK: main.pdf gerado ---'",
+      "options": {
+        "cwd": "${workspaceFolder}/Documentação"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      },
+      "problemMatcher": {
+        "owner": "latex",
+        "fileLocation": ["relative", "${workspaceFolder}/Documentação"],
+        "pattern": {
+          "regexp": "^(.*):(\\d+):\\s+(.*)$",
+          "file": 1,
+          "line": 2,
+          "message": 3
+        }
+      },
+      "detail": "Roda pdflatex, bibtex e mais dois passes (necessários para resolver referências cruzadas e citações)."
+    },
+    {
+      "label": "Artigo: contar páginas",
+      "type": "shell",
+      "command": "pdfinfo main.pdf | grep Pages && echo '(limite SBC: 10 a 16 páginas)'",
+      "options": {
+        "cwd": "${workspaceFolder}/Documentação"
+      },
+      "presentation": { "reveal": "always", "panel": "shared" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Experimentos: compilar todos",
+      "type": "shell",
+      "command": "mkdir -p output && for f in experimentos/*.cpp; do n=$(basename \"$f\" .cpp); printf '%-20s ' \"$n\"; if g++ -Wall -O2 \"$f\" -o \"output/$n\" -lOpenCL 2>/dev/null; then echo OK; else echo FALHOU; fi; done",
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": ["$gcc"],
+      "detail": "Compila todos os experimentos em experimentos/ para output/."
+    },
+    {
+      "label": "Experimentos: rodar (escolher)",
+      "type": "shell",
+      "command": "ROC_ENABLE_PRE_VEGA=1 ./output/${input:experimento}",
+      "options": { "cwd": "${workspaceFolder}" },
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+      "problemMatcher": [],
+      "detail": "ROC_ENABLE_PRE_VEGA=1 é obrigatório: sem ele o ROCm 5.2 não enumera o gfx803."
+    }
+  ],
+  "inputs": [
+    {
+      "id": "experimento",
+      "type": "pickString",
+      "description": "Qual experimento rodar?",
+      "options": [
+        "matmul",
+        "glc_factorial",
+        "glc_scaling",
+        "niveis_cache",
+        "pchase_flags",
+        "mem_hierarchy",
+        "asm_probe"
+      ],
+      "default": "pchase_flags"
+    }
+  ]
+}
