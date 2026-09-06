@@ -1,0 +1,1001 @@
+kernel,flags_isa,execucao,tempo_ms
+matmul_via_L1,GLC=0 SLC=0,1,452.224589
+matmul_via_L1,GLC=0 SLC=0,2,452.438839
+matmul_via_L1,GLC=0 SLC=0,3,452.036058
+matmul_via_L1,GLC=0 SLC=0,4,452.011462
+matmul_via_L1,GLC=0 SLC=0,5,452.132272
+matmul_via_L1,GLC=0 SLC=0,6,452.470369
+matmul_via_L1,GLC=0 SLC=0,7,451.836258
+matmul_via_L1,GLC=0 SLC=0,8,448.726913
+matmul_via_L1,GLC=0 SLC=0,9,448.190753
+matmul_via_L1,GLC=0 SLC=0,10,448.184062
+matmul_via_L1,GLC=0 SLC=0,11,448.193164
+matmul_via_L1,GLC=0 SLC=0,12,447.685793
+matmul_via_L1,GLC=0 SLC=0,13,448.149801
+matmul_via_L1,GLC=0 SLC=0,14,448.154575
+matmul_via_L1,GLC=0 SLC=0,15,448.702923
+matmul_via_L1,GLC=0 SLC=0,16,449.238283
+matmul_via_L1,GLC=0 SLC=0,17,449.332522
+matmul_via_L1,GLC=0 SLC=0,18,449.203101
+matmul_via_L1,GLC=0 SLC=0,19,449.768692
+matmul_via_L1,GLC=0 SLC=0,20,449.848689
+matmul_via_L1,GLC=0 SLC=0,21,449.160215
+matmul_via_L1,GLC=0 SLC=0,22,449.381022
+matmul_via_L1,GLC=0 SLC=0,23,448.947066
+matmul_via_L1,GLC=0 SLC=0,24,449.405489
+matmul_via_L1,GLC=0 SLC=0,25,449.245650
+matmul_via_L1,GLC=0 SLC=0,26,449.283405
+matmul_via_L1,GLC=0 SLC=0,27,449.006586
+matmul_via_L1,GLC=0 SLC=0,28,449.267710
+matmul_via_L1,GLC=0 SLC=0,29,449.351071
+matmul_via_L1,GLC=0 SLC=0,30,450.309015
+matmul_via_L1,GLC=0 SLC=0,31,449.269788
+matmul_via_L1,GLC=0 SLC=0,32,448.799854
+matmul_via_L1,GLC=0 SLC=0,33,448.506087
+matmul_via_L1,GLC=0 SLC=0,34,450.773183
+matmul_via_L1,GLC=0 SLC=0,35,453.107158
+matmul_via_L1,GLC=0 SLC=0,36,452.877554
+matmul_via_L1,GLC=0 SLC=0,37,452.999634
+matmul_via_L1,GLC=0 SLC=0,38,452.890353
+matmul_via_L1,GLC=0 SLC=0,39,449.751392
+matmul_via_L1,GLC=0 SLC=0,40,447.979669
+matmul_via_L1,GLC=0 SLC=0,41,450.377968
+matmul_via_L1,GLC=0 SLC=0,42,448.728805
+matmul_via_L1,GLC=0 SLC=0,43,448.663525
+matmul_via_L1,GLC=0 SLC=0,44,448.480159
+matmul_via_L1,GLC=0 SLC=0,45,448.630560
+matmul_via_L1,GLC=0 SLC=0,46,448.177908
+matmul_via_L1,GLC=0 SLC=0,47,448.185589
+matmul_via_L1,GLC=0 SLC=0,48,448.398553
+matmul_via_L1,GLC=0 SLC=0,49,448.474074
+matmul_via_L1,GLC=0 SLC=0,50,448.373752
+matmul_via_L1,GLC=0 SLC=0,51,448.677916
+matmul_via_L1,GLC=0 SLC=0,52,449.949627
+matmul_via_L1,GLC=0 SLC=0,53,450.069950
+matmul_via_L1,GLC=0 SLC=0,54,448.351668
+matmul_via_L1,GLC=0 SLC=0,55,448.816956
+matmul_via_L1,GLC=0 SLC=0,56,448.401424
+matmul_via_L1,GLC=0 SLC=0,57,449.034239
+matmul_via_L1,GLC=0 SLC=0,58,448.925116
+matmul_via_L1,GLC=0 SLC=0,59,448.696152
+matmul_via_L1,GLC=0 SLC=0,60,448.142856
+matmul_via_L1,GLC=0 SLC=0,61,448.535984
+matmul_via_L1,GLC=0 SLC=0,62,448.442380
+matmul_via_L1,GLC=0 SLC=0,63,449.528167
+matmul_via_L1,GLC=0 SLC=0,64,450.253783
+matmul_via_L1,GLC=0 SLC=0,65,448.718064
+matmul_via_L1,GLC=0 SLC=0,66,448.735184
+matmul_via_L1,GLC=0 SLC=0,67,448.982228
+matmul_via_L1,GLC=0 SLC=0,68,448.655500
+matmul_via_L1,GLC=0 SLC=0,69,448.533574
+matmul_via_L1,GLC=0 SLC=0,70,448.652138
+matmul_via_L1,GLC=0 SLC=0,71,448.711658
+matmul_via_L1,GLC=0 SLC=0,72,448.676776
+matmul_via_L1,GLC=0 SLC=0,73,448.630053
+matmul_via_L1,GLC=0 SLC=0,74,449.784001
+matmul_via_L1,GLC=0 SLC=0,75,450.451695
+matmul_via_L1,GLC=0 SLC=0,76,448.879496
+matmul_via_L1,GLC=0 SLC=0,77,448.801733
+matmul_via_L1,GLC=0 SLC=0,78,448.323160
+matmul_via_L1,GLC=0 SLC=0,79,449.228141
+matmul_via_L1,GLC=0 SLC=0,80,448.947974
+matmul_via_L1,GLC=0 SLC=0,81,448.657725
+matmul_via_L1,GLC=0 SLC=0,82,449.066696
+matmul_via_L1,GLC=0 SLC=0,83,449.744311
+matmul_via_L1,GLC=0 SLC=0,84,449.346700
+matmul_via_L1,GLC=0 SLC=0,85,450.079358
+matmul_via_L1,GLC=0 SLC=0,86,450.393284
+matmul_via_L1,GLC=0 SLC=0,87,449.662065
+matmul_via_L1,GLC=0 SLC=0,88,449.155811
+matmul_via_L1,GLC=0 SLC=0,89,448.796441
+matmul_via_L1,GLC=0 SLC=0,90,448.748600
+matmul_via_L1,GLC=0 SLC=0,91,448.945563
+matmul_via_L1,GLC=0 SLC=0,92,448.774517
+matmul_via_L1,GLC=0 SLC=0,93,448.940762
+matmul_via_L1,GLC=0 SLC=0,94,449.083804
+matmul_via_L1,GLC=0 SLC=0,95,448.431466
+matmul_via_L1,GLC=0 SLC=0,96,449.663495
+matmul_via_L1,GLC=0 SLC=0,97,450.692320
+matmul_via_L1,GLC=0 SLC=0,98,449.798377
+matmul_via_L1,GLC=0 SLC=0,99,449.142520
+matmul_via_L1,GLC=0 SLC=0,100,448.773551
+matmul_via_L2,GLC=1 SLC=0 *,1,744.607662
+matmul_via_L2,GLC=1 SLC=0 *,2,745.665602
+matmul_via_L2,GLC=1 SLC=0 *,3,744.023640
+matmul_via_L2,GLC=1 SLC=0 *,4,746.647863
+matmul_via_L2,GLC=1 SLC=0 *,5,744.451488
+matmul_via_L2,GLC=1 SLC=0 *,6,744.388601
+matmul_via_L2,GLC=1 SLC=0 *,7,743.687463
+matmul_via_L2,GLC=1 SLC=0 *,8,744.391958
+matmul_via_L2,GLC=1 SLC=0 *,9,742.759916
+matmul_via_L2,GLC=1 SLC=0 *,10,742.293502
+matmul_via_L2,GLC=1 SLC=0 *,11,745.526859
+matmul_via_L2,GLC=1 SLC=0 *,12,745.492456
+matmul_via_L2,GLC=1 SLC=0 *,13,743.357522
+matmul_via_L2,GLC=1 SLC=0 *,14,744.079296
+matmul_via_L2,GLC=1 SLC=0 *,15,743.516401
+matmul_via_L2,GLC=1 SLC=0 *,16,742.450293
+matmul_via_L2,GLC=1 SLC=0 *,17,744.296736
+matmul_via_L2,GLC=1 SLC=0 *,18,745.601085
+matmul_via_L2,GLC=1 SLC=0 *,19,743.314149
+matmul_via_L2,GLC=1 SLC=0 *,20,742.827575
+matmul_via_L2,GLC=1 SLC=0 *,21,745.131948
+matmul_via_L2,GLC=1 SLC=0 *,22,746.372296
+matmul_via_L2,GLC=1 SLC=0 *,23,744.273362
+matmul_via_L2,GLC=1 SLC=0 *,24,743.523903
+matmul_via_L2,GLC=1 SLC=0 *,25,745.333063
+matmul_via_L2,GLC=1 SLC=0 *,26,744.883931
+matmul_via_L2,GLC=1 SLC=0 *,27,744.528081
+matmul_via_L2,GLC=1 SLC=0 *,28,745.552903
+matmul_via_L2,GLC=1 SLC=0 *,29,746.418043
+matmul_via_L2,GLC=1 SLC=0 *,30,745.489379
+matmul_via_L2,GLC=1 SLC=0 *,31,745.293211
+matmul_via_L2,GLC=1 SLC=0 *,32,746.621562
+matmul_via_L2,GLC=1 SLC=0 *,33,745.818820
+matmul_via_L2,GLC=1 SLC=0 *,34,743.896373
+matmul_via_L2,GLC=1 SLC=0 *,35,743.705325
+matmul_via_L2,GLC=1 SLC=0 *,36,744.783270
+matmul_via_L2,GLC=1 SLC=0 *,37,744.811590
+matmul_via_L2,GLC=1 SLC=0 *,38,744.581822
+matmul_via_L2,GLC=1 SLC=0 *,39,744.489339
+matmul_via_L2,GLC=1 SLC=0 *,40,744.508218
+matmul_via_L2,GLC=1 SLC=0 *,41,743.681797
+matmul_via_L2,GLC=1 SLC=0 *,42,744.228208
+matmul_via_L2,GLC=1 SLC=0 *,43,745.907607
+matmul_via_L2,GLC=1 SLC=0 *,44,742.023992
+matmul_via_L2,GLC=1 SLC=0 *,45,744.714935
+matmul_via_L2,GLC=1 SLC=0 *,46,745.719118
+matmul_via_L2,GLC=1 SLC=0 *,47,744.870456
+matmul_via_L2,GLC=1 SLC=0 *,48,743.766906
+matmul_via_L2,GLC=1 SLC=0 *,49,743.996831
+matmul_via_L2,GLC=1 SLC=0 *,50,744.472682
+matmul_via_L2,GLC=1 SLC=0 *,51,745.013492
+matmul_via_L2,GLC=1 SLC=0 *,52,741.428283
+matmul_via_L2,GLC=1 SLC=0 *,53,744.914128
+matmul_via_L2,GLC=1 SLC=0 *,54,743.544014
+matmul_via_L2,GLC=1 SLC=0 *,55,742.972797
+matmul_via_L2,GLC=1 SLC=0 *,56,743.986420
+matmul_via_L2,GLC=1 SLC=0 *,57,743.839536
+matmul_via_L2,GLC=1 SLC=0 *,58,743.390564
+matmul_via_L2,GLC=1 SLC=0 *,59,743.765933
+matmul_via_L2,GLC=1 SLC=0 *,60,745.513493
+matmul_via_L2,GLC=1 SLC=0 *,61,743.735528
+matmul_via_L2,GLC=1 SLC=0 *,62,743.722726
+matmul_via_L2,GLC=1 SLC=0 *,63,742.694861
+matmul_via_L2,GLC=1 SLC=0 *,64,744.864513
+matmul_via_L2,GLC=1 SLC=0 *,65,744.354259
+matmul_via_L2,GLC=1 SLC=0 *,66,743.625120
+matmul_via_L2,GLC=1 SLC=0 *,67,742.839338
+matmul_via_L2,GLC=1 SLC=0 *,68,744.636822
+matmul_via_L2,GLC=1 SLC=0 *,69,743.618076
+matmul_via_L2,GLC=1 SLC=0 *,70,743.465270
+matmul_via_L2,GLC=1 SLC=0 *,71,743.660634
+matmul_via_L2,GLC=1 SLC=0 *,72,741.766028
+matmul_via_L2,GLC=1 SLC=0 *,73,744.068642
+matmul_via_L2,GLC=1 SLC=0 *,74,742.901252
+matmul_via_L2,GLC=1 SLC=0 *,75,743.753913
+matmul_via_L2,GLC=1 SLC=0 *,76,745.446113
+matmul_via_L2,GLC=1 SLC=0 *,77,745.444991
+matmul_via_L2,GLC=1 SLC=0 *,78,745.174423
+matmul_via_L2,GLC=1 SLC=0 *,79,744.277440
+matmul_via_L2,GLC=1 SLC=0 *,80,745.858598
+matmul_via_L2,GLC=1 SLC=0 *,81,745.519228
+matmul_via_L2,GLC=1 SLC=0 *,82,743.070207
+matmul_via_L2,GLC=1 SLC=0 *,83,745.282099
+matmul_via_L2,GLC=1 SLC=0 *,84,745.855074
+matmul_via_L2,GLC=1 SLC=0 *,85,745.094254
+matmul_via_L2,GLC=1 SLC=0 *,86,745.162413
+matmul_via_L2,GLC=1 SLC=0 *,87,743.361249
+matmul_via_L2,GLC=1 SLC=0 *,88,745.537621
+matmul_via_L2,GLC=1 SLC=0 *,89,745.801466
+matmul_via_L2,GLC=1 SLC=0 *,90,746.509802
+matmul_via_L2,GLC=1 SLC=0 *,91,745.758262
+matmul_via_L2,GLC=1 SLC=0 *,92,739.574431
+matmul_via_L2,GLC=1 SLC=0 *,93,745.921464
+matmul_via_L2,GLC=1 SLC=0 *,94,745.635535
+matmul_via_L2,GLC=1 SLC=0 *,95,744.619990
+matmul_via_L2,GLC=1 SLC=0 *,96,743.428600
+matmul_via_L2,GLC=1 SLC=0 *,97,746.792201
+matmul_via_L2,GLC=1 SLC=0 *,98,746.334589
+matmul_via_L2,GLC=1 SLC=0 *,99,745.527207
+matmul_via_L2,GLC=1 SLC=0 *,100,742.386171
+matmul_direto_VRAM,GLC=1 SLC=0 *,1,743.809079
+matmul_direto_VRAM,GLC=1 SLC=0 *,2,746.546745
+matmul_direto_VRAM,GLC=1 SLC=0 *,3,744.517415
+matmul_direto_VRAM,GLC=1 SLC=0 *,4,744.463012
+matmul_direto_VRAM,GLC=1 SLC=0 *,5,745.451995
+matmul_direto_VRAM,GLC=1 SLC=0 *,6,744.851819
+matmul_direto_VRAM,GLC=1 SLC=0 *,7,745.016782
+matmul_direto_VRAM,GLC=1 SLC=0 *,8,744.376766
+matmul_direto_VRAM,GLC=1 SLC=0 *,9,745.261747
+matmul_direto_VRAM,GLC=1 SLC=0 *,10,744.727013
+matmul_direto_VRAM,GLC=1 SLC=0 *,11,743.900111
+matmul_direto_VRAM,GLC=1 SLC=0 *,12,744.261239
+matmul_direto_VRAM,GLC=1 SLC=0 *,13,744.764610
+matmul_direto_VRAM,GLC=1 SLC=0 *,14,744.751810
+matmul_direto_VRAM,GLC=1 SLC=0 *,15,745.426545
+matmul_direto_VRAM,GLC=1 SLC=0 *,16,744.443800
+matmul_direto_VRAM,GLC=1 SLC=0 *,17,746.055999
+matmul_direto_VRAM,GLC=1 SLC=0 *,18,745.846551
+matmul_direto_VRAM,GLC=1 SLC=0 *,19,746.276161
+matmul_direto_VRAM,GLC=1 SLC=0 *,20,746.105596
+matmul_direto_VRAM,GLC=1 SLC=0 *,21,747.444988
+matmul_direto_VRAM,GLC=1 SLC=0 *,22,743.146642
+matmul_direto_VRAM,GLC=1 SLC=0 *,23,745.844627
+matmul_direto_VRAM,GLC=1 SLC=0 *,24,743.990021
+matmul_direto_VRAM,GLC=1 SLC=0 *,25,746.884011
+matmul_direto_VRAM,GLC=1 SLC=0 *,26,745.415174
+matmul_direto_VRAM,GLC=1 SLC=0 *,27,746.221913
+matmul_direto_VRAM,GLC=1 SLC=0 *,28,742.723107
+matmul_direto_VRAM,GLC=1 SLC=0 *,29,744.166822
+matmul_direto_VRAM,GLC=1 SLC=0 *,30,745.239326
+matmul_direto_VRAM,GLC=1 SLC=0 *,31,745.544613
+matmul_direto_VRAM,GLC=1 SLC=0 *,32,743.301199
+matmul_direto_VRAM,GLC=1 SLC=0 *,33,745.039799
+matmul_direto_VRAM,GLC=1 SLC=0 *,34,745.770057
+matmul_direto_VRAM,GLC=1 SLC=0 *,35,744.354822
+matmul_direto_VRAM,GLC=1 SLC=0 *,36,742.629019
+matmul_direto_VRAM,GLC=1 SLC=0 *,37,744.219616
+matmul_direto_VRAM,GLC=1 SLC=0 *,38,745.937577
+matmul_direto_VRAM,GLC=1 SLC=0 *,39,746.567831
+matmul_direto_VRAM,GLC=1 SLC=0 *,40,746.133260
+matmul_direto_VRAM,GLC=1 SLC=0 *,41,745.885414
+matmul_direto_VRAM,GLC=1 SLC=0 *,42,746.544628
+matmul_direto_VRAM,GLC=1 SLC=0 *,43,744.537699
+matmul_direto_VRAM,GLC=1 SLC=0 *,44,745.474841
+matmul_direto_VRAM,GLC=1 SLC=0 *,45,747.190882
+matmul_direto_VRAM,GLC=1 SLC=0 *,46,745.505400
+matmul_direto_VRAM,GLC=1 SLC=0 *,47,745.925730
+matmul_direto_VRAM,GLC=1 SLC=0 *,48,744.456574
+matmul_direto_VRAM,GLC=1 SLC=0 *,49,744.472732
+matmul_direto_VRAM,GLC=1 SLC=0 *,50,744.533054
+matmul_direto_VRAM,GLC=1 SLC=0 *,51,745.090507
+matmul_direto_VRAM,GLC=1 SLC=0 *,52,746.634383
+matmul_direto_VRAM,GLC=1 SLC=0 *,53,745.393392
+matmul_direto_VRAM,GLC=1 SLC=0 *,54,745.348911
+matmul_direto_VRAM,GLC=1 SLC=0 *,55,746.400134
+matmul_direto_VRAM,GLC=1 SLC=0 *,56,745.803320
+matmul_direto_VRAM,GLC=1 SLC=0 *,57,746.116607
+matmul_direto_VRAM,GLC=1 SLC=0 *,58,745.377867
+matmul_direto_VRAM,GLC=1 SLC=0 *,59,745.974681
+matmul_direto_VRAM,GLC=1 SLC=0 *,60,744.821212
+matmul_direto_VRAM,GLC=1 SLC=0 *,61,742.153467
+matmul_direto_VRAM,GLC=1 SLC=0 *,62,745.435946
+matmul_direto_VRAM,GLC=1 SLC=0 *,63,746.555492
+matmul_direto_VRAM,GLC=1 SLC=0 *,64,746.129722
+matmul_direto_VRAM,GLC=1 SLC=0 *,65,744.336397
+matmul_direto_VRAM,GLC=1 SLC=0 *,66,744.293356
+matmul_direto_VRAM,GLC=1 SLC=0 *,67,744.311595
+matmul_direto_VRAM,GLC=1 SLC=0 *,68,746.530368
+matmul_direto_VRAM,GLC=1 SLC=0 *,69,746.066196
+matmul_direto_VRAM,GLC=1 SLC=0 *,70,743.773179
+matmul_direto_VRAM,GLC=1 SLC=0 *,71,743.564534
+matmul_direto_VRAM,GLC=1 SLC=0 *,72,745.114330
+matmul_direto_VRAM,GLC=1 SLC=0 *,73,746.047792
+matmul_direto_VRAM,GLC=1 SLC=0 *,74,744.585356
+matmul_direto_VRAM,GLC=1 SLC=0 *,75,744.935604
+matmul_direto_VRAM,GLC=1 SLC=0 *,76,743.362124
+matmul_direto_VRAM,GLC=1 SLC=0 *,77,745.549536
+matmul_direto_VRAM,GLC=1 SLC=0 *,78,746.389716
+matmul_direto_VRAM,GLC=1 SLC=0 *,79,746.292113
+matmul_direto_VRAM,GLC=1 SLC=0 *,80,744.760235
+matmul_direto_VRAM,GLC=1 SLC=0 *,81,746.356433
+matmul_direto_VRAM,GLC=1 SLC=0 *,82,745.696577
+matmul_direto_VRAM,GLC=1 SLC=0 *,83,746.862843
+matmul_direto_VRAM,GLC=1 SLC=0 *,84,745.336086
+matmul_direto_VRAM,GLC=1 SLC=0 *,85,745.462808
+matmul_direto_VRAM,GLC=1 SLC=0 *,86,744.608227
+matmul_direto_VRAM,GLC=1 SLC=0 *,87,744.748230
+matmul_direto_VRAM,GLC=1 SLC=0 *,88,745.203600
+matmul_direto_VRAM,GLC=1 SLC=0 *,89,747.626377
+matmul_direto_VRAM,GLC=1 SLC=0 *,90,744.016530
+matmul_direto_VRAM,GLC=1 SLC=0 *,91,747.249886
+matmul_direto_VRAM,GLC=1 SLC=0 *,92,745.464083
+matmul_direto_VRAM,GLC=1 SLC=0 *,93,744.781986
+matmul_direto_VRAM,GLC=1 SLC=0 *,94,744.794626
+matmul_direto_VRAM,GLC=1 SLC=0 *,95,745.011749
+matmul_direto_VRAM,GLC=1 SLC=0 *,96,744.092686
+matmul_direto_VRAM,GLC=1 SLC=0 *,97,745.621363
+matmul_direto_VRAM,GLC=1 SLC=0 *,98,743.773637
+matmul_direto_VRAM,GLC=1 SLC=0 *,99,745.401516
+matmul_direto_VRAM,GLC=1 SLC=0 *,100,745.133989
+matmul_asm_baseline,GLC=0 SLC=0,1,675.428142
+matmul_asm_baseline,GLC=0 SLC=0,2,675.522064
+matmul_asm_baseline,GLC=0 SLC=0,3,675.368620
+matmul_asm_baseline,GLC=0 SLC=0,4,675.292457
+matmul_asm_baseline,GLC=0 SLC=0,5,675.606384
+matmul_asm_baseline,GLC=0 SLC=0,6,675.307016
+matmul_asm_baseline,GLC=0 SLC=0,7,675.324936
+matmul_asm_baseline,GLC=0 SLC=0,8,675.345096
+matmul_asm_baseline,GLC=0 SLC=0,9,675.388297
+matmul_asm_baseline,GLC=0 SLC=0,10,675.403176
+matmul_asm_baseline,GLC=0 SLC=0,11,675.325574
+matmul_asm_baseline,GLC=0 SLC=0,12,675.351814
+matmul_asm_baseline,GLC=0 SLC=0,13,675.365893
+matmul_asm_baseline,GLC=0 SLC=0,14,675.169729
+matmul_asm_baseline,GLC=0 SLC=0,15,675.284290
+matmul_asm_baseline,GLC=0 SLC=0,16,675.503495
+matmul_asm_baseline,GLC=0 SLC=0,17,675.453733
+matmul_asm_baseline,GLC=0 SLC=0,18,675.512294
+matmul_asm_baseline,GLC=0 SLC=0,19,675.513253
+matmul_asm_baseline,GLC=0 SLC=0,20,675.454212
+matmul_asm_baseline,GLC=0 SLC=0,21,675.580454
+matmul_asm_baseline,GLC=0 SLC=0,22,675.350368
+matmul_asm_baseline,GLC=0 SLC=0,23,675.451170
+matmul_asm_baseline,GLC=0 SLC=0,24,675.344126
+matmul_asm_baseline,GLC=0 SLC=0,25,675.330206
+matmul_asm_baseline,GLC=0 SLC=0,26,675.495969
+matmul_asm_baseline,GLC=0 SLC=0,27,675.619332
+matmul_asm_baseline,GLC=0 SLC=0,28,675.565730
+matmul_asm_baseline,GLC=0 SLC=0,29,675.407005
+matmul_asm_baseline,GLC=0 SLC=0,30,675.353563
+matmul_asm_baseline,GLC=0 SLC=0,31,675.455324
+matmul_asm_baseline,GLC=0 SLC=0,32,674.991473
+matmul_asm_baseline,GLC=0 SLC=0,33,675.384602
+matmul_asm_baseline,GLC=0 SLC=0,34,675.094035
+matmul_asm_baseline,GLC=0 SLC=0,35,674.972431
+matmul_asm_baseline,GLC=0 SLC=0,36,675.448442
+matmul_asm_baseline,GLC=0 SLC=0,37,675.417401
+matmul_asm_baseline,GLC=0 SLC=0,38,675.526524
+matmul_asm_baseline,GLC=0 SLC=0,39,675.539642
+matmul_asm_baseline,GLC=0 SLC=0,40,675.370678
+matmul_asm_baseline,GLC=0 SLC=0,41,675.439159
+matmul_asm_baseline,GLC=0 SLC=0,42,675.372117
+matmul_asm_baseline,GLC=0 SLC=0,43,675.383476
+matmul_asm_baseline,GLC=0 SLC=0,44,675.372595
+matmul_asm_baseline,GLC=0 SLC=0,45,675.374995
+matmul_asm_baseline,GLC=0 SLC=0,46,675.683963
+matmul_asm_baseline,GLC=0 SLC=0,47,675.326672
+matmul_asm_baseline,GLC=0 SLC=0,48,675.630200
+matmul_asm_baseline,GLC=0 SLC=0,49,675.390673
+matmul_asm_baseline,GLC=0 SLC=0,50,675.439474
+matmul_asm_baseline,GLC=0 SLC=0,51,675.527316
+matmul_asm_baseline,GLC=0 SLC=0,52,675.619637
+matmul_asm_baseline,GLC=0 SLC=0,53,676.095168
+matmul_asm_baseline,GLC=0 SLC=0,54,675.377390
+matmul_asm_baseline,GLC=0 SLC=0,55,675.534193
+matmul_asm_baseline,GLC=0 SLC=0,56,675.452111
+matmul_asm_baseline,GLC=0 SLC=0,57,675.484271
+matmul_asm_baseline,GLC=0 SLC=0,58,675.380908
+matmul_asm_baseline,GLC=0 SLC=0,59,675.475790
+matmul_asm_baseline,GLC=0 SLC=0,60,675.504270
+matmul_asm_baseline,GLC=0 SLC=0,61,675.565391
+matmul_asm_baseline,GLC=0 SLC=0,62,675.570030
+matmul_asm_baseline,GLC=0 SLC=0,63,676.115803
+matmul_asm_baseline,GLC=0 SLC=0,64,675.562188
+matmul_asm_baseline,GLC=0 SLC=0,65,675.569389
+matmul_asm_baseline,GLC=0 SLC=0,66,675.639949
+matmul_asm_baseline,GLC=0 SLC=0,67,675.457386
+matmul_asm_baseline,GLC=0 SLC=0,68,675.466504
+matmul_asm_baseline,GLC=0 SLC=0,69,675.571466
+matmul_asm_baseline,GLC=0 SLC=0,70,675.629707
+matmul_asm_baseline,GLC=0 SLC=0,71,675.599627
+matmul_asm_baseline,GLC=0 SLC=0,72,675.617386
+matmul_asm_baseline,GLC=0 SLC=0,73,675.501063
+matmul_asm_baseline,GLC=0 SLC=0,74,675.451940
+matmul_asm_baseline,GLC=0 SLC=0,75,675.603784
+matmul_asm_baseline,GLC=0 SLC=0,76,675.407619
+matmul_asm_baseline,GLC=0 SLC=0,77,675.362339
+matmul_asm_baseline,GLC=0 SLC=0,78,675.380096
+matmul_asm_baseline,GLC=0 SLC=0,79,675.936109
+matmul_asm_baseline,GLC=0 SLC=0,80,675.573541
+matmul_asm_baseline,GLC=0 SLC=0,81,675.490497
+matmul_asm_baseline,GLC=0 SLC=0,82,675.402336
+matmul_asm_baseline,GLC=0 SLC=0,83,675.371934
+matmul_asm_baseline,GLC=0 SLC=0,84,675.669061
+matmul_asm_baseline,GLC=0 SLC=0,85,675.351452
+matmul_asm_baseline,GLC=0 SLC=0,86,675.461694
+matmul_asm_baseline,GLC=0 SLC=0,87,675.504574
+matmul_asm_baseline,GLC=0 SLC=0,88,675.529054
+matmul_asm_baseline,GLC=0 SLC=0,89,675.530174
+matmul_asm_baseline,GLC=0 SLC=0,90,675.558013
+matmul_asm_baseline,GLC=0 SLC=0,91,675.444250
+matmul_asm_baseline,GLC=0 SLC=0,92,675.637857
+matmul_asm_baseline,GLC=0 SLC=0,93,675.463452
+matmul_asm_baseline,GLC=0 SLC=0,94,675.524731
+matmul_asm_baseline,GLC=0 SLC=0,95,675.411449
+matmul_asm_baseline,GLC=0 SLC=0,96,675.638012
+matmul_asm_baseline,GLC=0 SLC=0,97,675.506651
+matmul_asm_baseline,GLC=0 SLC=0,98,675.475768
+matmul_asm_baseline,GLC=0 SLC=0,99,675.623132
+matmul_asm_baseline,GLC=0 SLC=0,100,675.372565
+matmul_bypass_L1,GLC=1 SLC=0,1,718.893289
+matmul_bypass_L1,GLC=1 SLC=0,2,718.772325
+matmul_bypass_L1,GLC=1 SLC=0,3,720.100516
+matmul_bypass_L1,GLC=1 SLC=0,4,719.503701
+matmul_bypass_L1,GLC=1 SLC=0,5,718.256631
+matmul_bypass_L1,GLC=1 SLC=0,6,718.509436
+matmul_bypass_L1,GLC=1 SLC=0,7,720.064193
+matmul_bypass_L1,GLC=1 SLC=0,8,718.510555
+matmul_bypass_L1,GLC=1 SLC=0,9,719.143529
+matmul_bypass_L1,GLC=1 SLC=0,10,719.067847
+matmul_bypass_L1,GLC=1 SLC=0,11,719.712020
+matmul_bypass_L1,GLC=1 SLC=0,12,718.478712
+matmul_bypass_L1,GLC=1 SLC=0,13,719.817624
+matmul_bypass_L1,GLC=1 SLC=0,14,719.189926
+matmul_bypass_L1,GLC=1 SLC=0,15,718.391188
+matmul_bypass_L1,GLC=1 SLC=0,16,718.502068
+matmul_bypass_L1,GLC=1 SLC=0,17,719.393130
+matmul_bypass_L1,GLC=1 SLC=0,18,719.034081
+matmul_bypass_L1,GLC=1 SLC=0,19,719.105922
+matmul_bypass_L1,GLC=1 SLC=0,20,718.826395
+matmul_bypass_L1,GLC=1 SLC=0,21,718.662389
+matmul_bypass_L1,GLC=1 SLC=0,22,719.034558
+matmul_bypass_L1,GLC=1 SLC=0,23,719.527050
+matmul_bypass_L1,GLC=1 SLC=0,24,718.352779
+matmul_bypass_L1,GLC=1 SLC=0,25,718.724627
+matmul_bypass_L1,GLC=1 SLC=0,26,719.162237
+matmul_bypass_L1,GLC=1 SLC=0,27,718.601744
+matmul_bypass_L1,GLC=1 SLC=0,28,719.246079
+matmul_bypass_L1,GLC=1 SLC=0,29,719.216636
+matmul_bypass_L1,GLC=1 SLC=0,30,718.519019
+matmul_bypass_L1,GLC=1 SLC=0,31,718.548939
+matmul_bypass_L1,GLC=1 SLC=0,32,718.535658
+matmul_bypass_L1,GLC=1 SLC=0,33,718.937747
+matmul_bypass_L1,GLC=1 SLC=0,34,718.304293
+matmul_bypass_L1,GLC=1 SLC=0,35,717.827001
+matmul_bypass_L1,GLC=1 SLC=0,36,719.278553
+matmul_bypass_L1,GLC=1 SLC=0,37,719.777286
+matmul_bypass_L1,GLC=1 SLC=0,38,718.583337
+matmul_bypass_L1,GLC=1 SLC=0,39,718.466853
+matmul_bypass_L1,GLC=1 SLC=0,40,718.976625
+matmul_bypass_L1,GLC=1 SLC=0,41,718.516612
+matmul_bypass_L1,GLC=1 SLC=0,42,718.207005
+matmul_bypass_L1,GLC=1 SLC=0,43,719.375833
+matmul_bypass_L1,GLC=1 SLC=0,44,719.594716
+matmul_bypass_L1,GLC=1 SLC=0,45,719.310390
+matmul_bypass_L1,GLC=1 SLC=0,46,719.462712
+matmul_bypass_L1,GLC=1 SLC=0,47,718.226041
+matmul_bypass_L1,GLC=1 SLC=0,48,718.501888
+matmul_bypass_L1,GLC=1 SLC=0,49,719.004939
+matmul_bypass_L1,GLC=1 SLC=0,50,718.751013
+matmul_bypass_L1,GLC=1 SLC=0,51,718.141556
+matmul_bypass_L1,GLC=1 SLC=0,52,718.135315
+matmul_bypass_L1,GLC=1 SLC=0,53,718.684768
+matmul_bypass_L1,GLC=1 SLC=0,54,718.638367
+matmul_bypass_L1,GLC=1 SLC=0,55,718.818371
+matmul_bypass_L1,GLC=1 SLC=0,56,718.680286
+matmul_bypass_L1,GLC=1 SLC=0,57,719.065896
+matmul_bypass_L1,GLC=1 SLC=0,58,719.457264
+matmul_bypass_L1,GLC=1 SLC=0,59,717.150198
+matmul_bypass_L1,GLC=1 SLC=0,60,719.278219
+matmul_bypass_L1,GLC=1 SLC=0,61,719.161416
+matmul_bypass_L1,GLC=1 SLC=0,62,718.099949
+matmul_bypass_L1,GLC=1 SLC=0,63,719.134214
+matmul_bypass_L1,GLC=1 SLC=0,64,719.891671
+matmul_bypass_L1,GLC=1 SLC=0,65,719.061891
+matmul_bypass_L1,GLC=1 SLC=0,66,719.847189
+matmul_bypass_L1,GLC=1 SLC=0,67,718.529237
+matmul_bypass_L1,GLC=1 SLC=0,68,718.396592
+matmul_bypass_L1,GLC=1 SLC=0,69,719.443177
+matmul_bypass_L1,GLC=1 SLC=0,70,718.252908
+matmul_bypass_L1,GLC=1 SLC=0,71,719.305412
+matmul_bypass_L1,GLC=1 SLC=0,72,720.164152
+matmul_bypass_L1,GLC=1 SLC=0,73,721.198417
+matmul_bypass_L1,GLC=1 SLC=0,74,719.114365
+matmul_bypass_L1,GLC=1 SLC=0,75,718.656114
+matmul_bypass_L1,GLC=1 SLC=0,76,718.278023
+matmul_bypass_L1,GLC=1 SLC=0,77,719.362690
+matmul_bypass_L1,GLC=1 SLC=0,78,718.633070
+matmul_bypass_L1,GLC=1 SLC=0,79,718.289222
+matmul_bypass_L1,GLC=1 SLC=0,80,718.217220
+matmul_bypass_L1,GLC=1 SLC=0,81,719.253564
+matmul_bypass_L1,GLC=1 SLC=0,82,718.678190
+matmul_bypass_L1,GLC=1 SLC=0,83,718.457224
+matmul_bypass_L1,GLC=1 SLC=0,84,719.976140
+matmul_bypass_L1,GLC=1 SLC=0,85,719.028437
+matmul_bypass_L1,GLC=1 SLC=0,86,718.778668
+matmul_bypass_L1,GLC=1 SLC=0,87,718.990835
+matmul_bypass_L1,GLC=1 SLC=0,88,719.277559
+matmul_bypass_L1,GLC=1 SLC=0,89,719.059633
+matmul_bypass_L1,GLC=1 SLC=0,90,719.371640
+matmul_bypass_L1,GLC=1 SLC=0,91,719.160114
+matmul_bypass_L1,GLC=1 SLC=0,92,719.612285
+matmul_bypass_L1,GLC=1 SLC=0,93,719.102193
+matmul_bypass_L1,GLC=1 SLC=0,94,718.923309
+matmul_bypass_L1,GLC=1 SLC=0,95,719.293076
+matmul_bypass_L1,GLC=1 SLC=0,96,718.958989
+matmul_bypass_L1,GLC=1 SLC=0,97,717.749198
+matmul_bypass_L1,GLC=1 SLC=0,98,718.989866
+matmul_bypass_L1,GLC=1 SLC=0,99,718.266009
+matmul_bypass_L1,GLC=1 SLC=0,100,718.953224
+matmul_bypass_L1_L2,GLC=1 SLC=1,1,737.185658
+matmul_bypass_L1_L2,GLC=1 SLC=1,2,737.461024
+matmul_bypass_L1_L2,GLC=1 SLC=1,3,737.566147
+matmul_bypass_L1_L2,GLC=1 SLC=1,4,737.650628
+matmul_bypass_L1_L2,GLC=1 SLC=1,5,737.011730
+matmul_bypass_L1_L2,GLC=1 SLC=1,6,738.202318
+matmul_bypass_L1_L2,GLC=1 SLC=1,7,737.909512
+matmul_bypass_L1_L2,GLC=1 SLC=1,8,737.020529
+matmul_bypass_L1_L2,GLC=1 SLC=1,9,736.824045
+matmul_bypass_L1_L2,GLC=1 SLC=1,10,737.946630
+matmul_bypass_L1_L2,GLC=1 SLC=1,11,738.127596
+matmul_bypass_L1_L2,GLC=1 SLC=1,12,737.253173
+matmul_bypass_L1_L2,GLC=1 SLC=1,13,736.132344
+matmul_bypass_L1_L2,GLC=1 SLC=1,14,737.538140
+matmul_bypass_L1_L2,GLC=1 SLC=1,15,737.989828
+matmul_bypass_L1_L2,GLC=1 SLC=1,16,738.064870
+matmul_bypass_L1_L2,GLC=1 SLC=1,17,738.442318
+matmul_bypass_L1_L2,GLC=1 SLC=1,18,737.502615
+matmul_bypass_L1_L2,GLC=1 SLC=1,19,752.062802
+matmul_bypass_L1_L2,GLC=1 SLC=1,20,752.583613
+matmul_bypass_L1_L2,GLC=1 SLC=1,21,750.459562
+matmul_bypass_L1_L2,GLC=1 SLC=1,22,749.290254
+matmul_bypass_L1_L2,GLC=1 SLC=1,23,747.312607
+matmul_bypass_L1_L2,GLC=1 SLC=1,24,747.776456
+matmul_bypass_L1_L2,GLC=1 SLC=1,25,746.000733
+matmul_bypass_L1_L2,GLC=1 SLC=1,26,744.761663
+matmul_bypass_L1_L2,GLC=1 SLC=1,27,744.349493
+matmul_bypass_L1_L2,GLC=1 SLC=1,28,742.145441
+matmul_bypass_L1_L2,GLC=1 SLC=1,29,741.127173
+matmul_bypass_L1_L2,GLC=1 SLC=1,30,739.447934
+matmul_bypass_L1_L2,GLC=1 SLC=1,31,739.296890
+matmul_bypass_L1_L2,GLC=1 SLC=1,32,738.535430
+matmul_bypass_L1_L2,GLC=1 SLC=1,33,737.657169
+matmul_bypass_L1_L2,GLC=1 SLC=1,34,736.510901
+matmul_bypass_L1_L2,GLC=1 SLC=1,35,738.500708
+matmul_bypass_L1_L2,GLC=1 SLC=1,36,736.868028
+matmul_bypass_L1_L2,GLC=1 SLC=1,37,736.944510
+matmul_bypass_L1_L2,GLC=1 SLC=1,38,736.095208
+matmul_bypass_L1_L2,GLC=1 SLC=1,39,736.062247
+matmul_bypass_L1_L2,GLC=1 SLC=1,40,737.894769
+matmul_bypass_L1_L2,GLC=1 SLC=1,41,736.882426
+matmul_bypass_L1_L2,GLC=1 SLC=1,42,736.356813
+matmul_bypass_L1_L2,GLC=1 SLC=1,43,735.545112
+matmul_bypass_L1_L2,GLC=1 SLC=1,44,736.909944
+matmul_bypass_L1_L2,GLC=1 SLC=1,45,736.437132
+matmul_bypass_L1_L2,GLC=1 SLC=1,46,735.943360
+matmul_bypass_L1_L2,GLC=1 SLC=1,47,737.628039
+matmul_bypass_L1_L2,GLC=1 SLC=1,48,736.912021
+matmul_bypass_L1_L2,GLC=1 SLC=1,49,736.552493
+matmul_bypass_L1_L2,GLC=1 SLC=1,50,736.927381
+matmul_bypass_L1_L2,GLC=1 SLC=1,51,738.366933
+matmul_bypass_L1_L2,GLC=1 SLC=1,52,737.025303
+matmul_bypass_L1_L2,GLC=1 SLC=1,53,737.176025
+matmul_bypass_L1_L2,GLC=1 SLC=1,54,736.866736
+matmul_bypass_L1_L2,GLC=1 SLC=1,55,737.669634
+matmul_bypass_L1_L2,GLC=1 SLC=1,56,737.144502
+matmul_bypass_L1_L2,GLC=1 SLC=1,57,737.431708
+matmul_bypass_L1_L2,GLC=1 SLC=1,58,737.853157
+matmul_bypass_L1_L2,GLC=1 SLC=1,59,735.750707
+matmul_bypass_L1_L2,GLC=1 SLC=1,60,738.066442
+matmul_bypass_L1_L2,GLC=1 SLC=1,61,737.618271
+matmul_bypass_L1_L2,GLC=1 SLC=1,62,736.699528
+matmul_bypass_L1_L2,GLC=1 SLC=1,63,737.762273
+matmul_bypass_L1_L2,GLC=1 SLC=1,64,738.421168
+matmul_bypass_L1_L2,GLC=1 SLC=1,65,737.565625
+matmul_bypass_L1_L2,GLC=1 SLC=1,66,736.887850
+matmul_bypass_L1_L2,GLC=1 SLC=1,67,738.092357
+matmul_bypass_L1_L2,GLC=1 SLC=1,68,736.127191
+matmul_bypass_L1_L2,GLC=1 SLC=1,69,736.673763
+matmul_bypass_L1_L2,GLC=1 SLC=1,70,736.900488
+matmul_bypass_L1_L2,GLC=1 SLC=1,71,735.997745
+matmul_bypass_L1_L2,GLC=1 SLC=1,72,737.837469
+matmul_bypass_L1_L2,GLC=1 SLC=1,73,736.806244
+matmul_bypass_L1_L2,GLC=1 SLC=1,74,736.895684
+matmul_bypass_L1_L2,GLC=1 SLC=1,75,737.469617
+matmul_bypass_L1_L2,GLC=1 SLC=1,76,736.763201
+matmul_bypass_L1_L2,GLC=1 SLC=1,77,736.530393
+matmul_bypass_L1_L2,GLC=1 SLC=1,78,737.656660
+matmul_bypass_L1_L2,GLC=1 SLC=1,79,736.592795
+matmul_bypass_L1_L2,GLC=1 SLC=1,80,737.641778
+matmul_bypass_L1_L2,GLC=1 SLC=1,81,737.385612
+matmul_bypass_L1_L2,GLC=1 SLC=1,82,736.249105
+matmul_bypass_L1_L2,GLC=1 SLC=1,83,736.497589
+matmul_bypass_L1_L2,GLC=1 SLC=1,84,735.737890
+matmul_bypass_L1_L2,GLC=1 SLC=1,85,737.570254
+matmul_bypass_L1_L2,GLC=1 SLC=1,86,736.696792
+matmul_bypass_L1_L2,GLC=1 SLC=1,87,737.645773
+matmul_bypass_L1_L2,GLC=1 SLC=1,88,736.171498
+matmul_bypass_L1_L2,GLC=1 SLC=1,89,737.262243
+matmul_bypass_L1_L2,GLC=1 SLC=1,90,736.735350
+matmul_bypass_L1_L2,GLC=1 SLC=1,91,736.147496
+matmul_bypass_L1_L2,GLC=1 SLC=1,92,735.738684
+matmul_bypass_L1_L2,GLC=1 SLC=1,93,736.840150
+matmul_bypass_L1_L2,GLC=1 SLC=1,94,737.135197
+matmul_bypass_L1_L2,GLC=1 SLC=1,95,739.571736
+matmul_bypass_L1_L2,GLC=1 SLC=1,96,736.697746
+matmul_bypass_L1_L2,GLC=1 SLC=1,97,736.564941
+matmul_bypass_L1_L2,GLC=1 SLC=1,98,737.188155
+matmul_bypass_L1_L2,GLC=1 SLC=1,99,737.547045
+matmul_bypass_L1_L2,GLC=1 SLC=1,100,737.925612
+matmul_nontemporal,GLC=1 SLC=1,1,666.662308
+matmul_nontemporal,GLC=1 SLC=1,2,665.461158
+matmul_nontemporal,GLC=1 SLC=1,3,667.892417
+matmul_nontemporal,GLC=1 SLC=1,4,667.147918
+matmul_nontemporal,GLC=1 SLC=1,5,668.233863
+matmul_nontemporal,GLC=1 SLC=1,6,668.401867
+matmul_nontemporal,GLC=1 SLC=1,7,666.963271
+matmul_nontemporal,GLC=1 SLC=1,8,668.162819
+matmul_nontemporal,GLC=1 SLC=1,9,667.592886
+matmul_nontemporal,GLC=1 SLC=1,10,667.690968
+matmul_nontemporal,GLC=1 SLC=1,11,668.233220
+matmul_nontemporal,GLC=1 SLC=1,12,666.878468
+matmul_nontemporal,GLC=1 SLC=1,13,666.407415
+matmul_nontemporal,GLC=1 SLC=1,14,667.887930
+matmul_nontemporal,GLC=1 SLC=1,15,666.456216
+matmul_nontemporal,GLC=1 SLC=1,16,666.760222
+matmul_nontemporal,GLC=1 SLC=1,17,669.164279
+matmul_nontemporal,GLC=1 SLC=1,18,667.510638
+matmul_nontemporal,GLC=1 SLC=1,19,667.144550
+matmul_nontemporal,GLC=1 SLC=1,20,667.860246
+matmul_nontemporal,GLC=1 SLC=1,21,665.763236
+matmul_nontemporal,GLC=1 SLC=1,22,665.362426
+matmul_nontemporal,GLC=1 SLC=1,23,666.140043
+matmul_nontemporal,GLC=1 SLC=1,24,665.942279
+matmul_nontemporal,GLC=1 SLC=1,25,666.601494
+matmul_nontemporal,GLC=1 SLC=1,26,665.308661
+matmul_nontemporal,GLC=1 SLC=1,27,665.803234
+matmul_nontemporal,GLC=1 SLC=1,28,668.213850
+matmul_nontemporal,GLC=1 SLC=1,29,666.919578
+matmul_nontemporal,GLC=1 SLC=1,30,666.955899
+matmul_nontemporal,GLC=1 SLC=1,31,667.181504
+matmul_nontemporal,GLC=1 SLC=1,32,666.630130
+matmul_nontemporal,GLC=1 SLC=1,33,667.837199
+matmul_nontemporal,GLC=1 SLC=1,34,667.459589
+matmul_nontemporal,GLC=1 SLC=1,35,664.324953
+matmul_nontemporal,GLC=1 SLC=1,36,668.833540
+matmul_nontemporal,GLC=1 SLC=1,37,666.632847
+matmul_nontemporal,GLC=1 SLC=1,38,666.636527
+matmul_nontemporal,GLC=1 SLC=1,39,666.494124
+matmul_nontemporal,GLC=1 SLC=1,40,667.359104
+matmul_nontemporal,GLC=1 SLC=1,41,666.530603
+matmul_nontemporal,GLC=1 SLC=1,42,666.749327
+matmul_nontemporal,GLC=1 SLC=1,43,667.080696
+matmul_nontemporal,GLC=1 SLC=1,44,667.335581
+matmul_nontemporal,GLC=1 SLC=1,45,664.801760
+matmul_nontemporal,GLC=1 SLC=1,46,667.619587
+matmul_nontemporal,GLC=1 SLC=1,47,666.262754
+matmul_nontemporal,GLC=1 SLC=1,48,666.637642
+matmul_nontemporal,GLC=1 SLC=1,49,667.986955
+matmul_nontemporal,GLC=1 SLC=1,50,667.113971
+matmul_nontemporal,GLC=1 SLC=1,51,667.628544
+matmul_nontemporal,GLC=1 SLC=1,52,666.519717
+matmul_nontemporal,GLC=1 SLC=1,53,666.016825
+matmul_nontemporal,GLC=1 SLC=1,54,665.086243
+matmul_nontemporal,GLC=1 SLC=1,55,666.788202
+matmul_nontemporal,GLC=1 SLC=1,56,666.509155
+matmul_nontemporal,GLC=1 SLC=1,57,667.624861
+matmul_nontemporal,GLC=1 SLC=1,58,667.036846
+matmul_nontemporal,GLC=1 SLC=1,59,666.140025
+matmul_nontemporal,GLC=1 SLC=1,60,666.615396
+matmul_nontemporal,GLC=1 SLC=1,61,668.604083
+matmul_nontemporal,GLC=1 SLC=1,62,666.533312
+matmul_nontemporal,GLC=1 SLC=1,63,666.645315
+matmul_nontemporal,GLC=1 SLC=1,64,666.146584
+matmul_nontemporal,GLC=1 SLC=1,65,667.756381
+matmul_nontemporal,GLC=1 SLC=1,66,665.899376
+matmul_nontemporal,GLC=1 SLC=1,67,667.804541
+matmul_nontemporal,GLC=1 SLC=1,68,667.634615
+matmul_nontemporal,GLC=1 SLC=1,69,667.339888
+matmul_nontemporal,GLC=1 SLC=1,70,666.531070
+matmul_nontemporal,GLC=1 SLC=1,71,665.347840
+matmul_nontemporal,GLC=1 SLC=1,72,664.837267
+matmul_nontemporal,GLC=1 SLC=1,73,666.506747
+matmul_nontemporal,GLC=1 SLC=1,74,667.581012
+matmul_nontemporal,GLC=1 SLC=1,75,666.650429
+matmul_nontemporal,GLC=1 SLC=1,76,666.500986
+matmul_nontemporal,GLC=1 SLC=1,77,666.438744
+matmul_nontemporal,GLC=1 SLC=1,78,666.800831
+matmul_nontemporal,GLC=1 SLC=1,79,665.956651
+matmul_nontemporal,GLC=1 SLC=1,80,667.994618
+matmul_nontemporal,GLC=1 SLC=1,81,666.786590
+matmul_nontemporal,GLC=1 SLC=1,82,666.309138
+matmul_nontemporal,GLC=1 SLC=1,83,667.670129
+matmul_nontemporal,GLC=1 SLC=1,84,665.968009
+matmul_nontemporal,GLC=1 SLC=1,85,667.126436
+matmul_nontemporal,GLC=1 SLC=1,86,668.477987
+matmul_nontemporal,GLC=1 SLC=1,87,667.183396
+matmul_nontemporal,GLC=1 SLC=1,88,668.703272
+matmul_nontemporal,GLC=1 SLC=1,89,667.800530
+matmul_nontemporal,GLC=1 SLC=1,90,666.076648
+matmul_nontemporal,GLC=1 SLC=1,91,666.036167
+matmul_nontemporal,GLC=1 SLC=1,92,666.811065
+matmul_nontemporal,GLC=1 SLC=1,93,667.667246
+matmul_nontemporal,GLC=1 SLC=1,94,665.510554
+matmul_nontemporal,GLC=1 SLC=1,95,665.271187
+matmul_nontemporal,GLC=1 SLC=1,96,666.616660
+matmul_nontemporal,GLC=1 SLC=1,97,665.386069
+matmul_nontemporal,GLC=1 SLC=1,98,666.542256
+matmul_nontemporal,GLC=1 SLC=1,99,667.632362
+matmul_nontemporal,GLC=1 SLC=1,100,665.019659
+matmul_tiled,GLC=0 SLC=0,1,129.865969
+matmul_tiled,GLC=0 SLC=0,2,130.549506
+matmul_tiled,GLC=0 SLC=0,3,129.446438
+matmul_tiled,GLC=0 SLC=0,4,130.654628
+matmul_tiled,GLC=0 SLC=0,5,130.486463
+matmul_tiled,GLC=0 SLC=0,6,130.822792
+matmul_tiled,GLC=0 SLC=0,7,130.548865
+matmul_tiled,GLC=0 SLC=0,8,130.803591
+matmul_tiled,GLC=0 SLC=0,9,130.220058
+matmul_tiled,GLC=0 SLC=0,10,130.577826
+matmul_tiled,GLC=0 SLC=0,11,129.425318
+matmul_tiled,GLC=0 SLC=0,12,129.402758
+matmul_tiled,GLC=0 SLC=0,13,129.513161
+matmul_tiled,GLC=0 SLC=0,14,129.483720
+matmul_tiled,GLC=0 SLC=0,15,131.781694
+matmul_tiled,GLC=0 SLC=0,16,130.309179
+matmul_tiled,GLC=0 SLC=0,17,129.373637
+matmul_tiled,GLC=0 SLC=0,18,129.469319
+matmul_tiled,GLC=0 SLC=0,19,129.441799
+matmul_tiled,GLC=0 SLC=0,20,129.476040
+matmul_tiled,GLC=0 SLC=0,21,129.340196
+matmul_tiled,GLC=0 SLC=0,22,129.487400
+matmul_tiled,GLC=0 SLC=0,23,130.393501
+matmul_tiled,GLC=0 SLC=0,24,132.700436
+matmul_tiled,GLC=0 SLC=0,25,131.485847
+matmul_tiled,GLC=0 SLC=0,26,131.419926
+matmul_tiled,GLC=0 SLC=0,27,130.495423
+matmul_tiled,GLC=0 SLC=0,28,130.426622
+matmul_tiled,GLC=0 SLC=0,29,134.087349
+matmul_tiled,GLC=0 SLC=0,30,130.281498
+matmul_tiled,GLC=0 SLC=0,31,130.367901
+matmul_tiled,GLC=0 SLC=0,32,129.504360
+matmul_tiled,GLC=0 SLC=0,33,129.492999
+matmul_tiled,GLC=0 SLC=0,34,130.477823
+matmul_tiled,GLC=0 SLC=0,35,129.400678
+matmul_tiled,GLC=0 SLC=0,36,130.421342
+matmul_tiled,GLC=0 SLC=0,37,129.446598
+matmul_tiled,GLC=0 SLC=0,38,131.712572
+matmul_tiled,GLC=0 SLC=0,39,130.606306
+matmul_tiled,GLC=0 SLC=0,40,129.425798
+matmul_tiled,GLC=0 SLC=0,41,129.414918
+matmul_tiled,GLC=0 SLC=0,42,130.681507
+matmul_tiled,GLC=0 SLC=0,43,130.330459
+matmul_tiled,GLC=0 SLC=0,44,129.417798
+matmul_tiled,GLC=0 SLC=0,45,129.479719
+matmul_tiled,GLC=0 SLC=0,46,129.382757
+matmul_tiled,GLC=0 SLC=0,47,129.476679
+matmul_tiled,GLC=0 SLC=0,48,129.389637
+matmul_tiled,GLC=0 SLC=0,49,129.388197
+matmul_tiled,GLC=0 SLC=0,50,129.469959
+matmul_tiled,GLC=0 SLC=0,51,129.470919
+matmul_tiled,GLC=0 SLC=0,52,129.479559
+matmul_tiled,GLC=0 SLC=0,53,129.461479
+matmul_tiled,GLC=0 SLC=0,54,130.459423
+matmul_tiled,GLC=0 SLC=0,55,129.366756
+matmul_tiled,GLC=0 SLC=0,56,132.841079
+matmul_tiled,GLC=0 SLC=0,57,131.650011
+matmul_tiled,GLC=0 SLC=0,58,130.604706
+matmul_tiled,GLC=0 SLC=0,59,129.401957
+matmul_tiled,GLC=0 SLC=0,60,129.558280
+matmul_tiled,GLC=0 SLC=0,61,129.382276
+matmul_tiled,GLC=0 SLC=0,62,129.487079
+matmul_tiled,GLC=0 SLC=0,63,129.396997
+matmul_tiled,GLC=0 SLC=0,64,129.440998
+matmul_tiled,GLC=0 SLC=0,65,130.677667
+matmul_tiled,GLC=0 SLC=0,66,130.410301
+matmul_tiled,GLC=0 SLC=0,67,130.773990
+matmul_tiled,GLC=0 SLC=0,68,132.765396
+matmul_tiled,GLC=0 SLC=0,69,130.337499
+matmul_tiled,GLC=0 SLC=0,70,130.543264
+matmul_tiled,GLC=0 SLC=0,71,131.705211
+matmul_tiled,GLC=0 SLC=0,72,130.261177
+matmul_tiled,GLC=0 SLC=0,73,129.465638
+matmul_tiled,GLC=0 SLC=0,74,130.692547
+matmul_tiled,GLC=0 SLC=0,75,130.512543
+matmul_tiled,GLC=0 SLC=0,76,130.658627
+matmul_tiled,GLC=0 SLC=0,77,130.718468
+matmul_tiled,GLC=0 SLC=0,78,130.507103
+matmul_tiled,GLC=0 SLC=0,79,129.409157
+matmul_tiled,GLC=0 SLC=0,80,129.473158
+matmul_tiled,GLC=0 SLC=0,81,129.428518
+matmul_tiled,GLC=0 SLC=0,82,129.414277
+matmul_tiled,GLC=0 SLC=0,83,130.703107
+matmul_tiled,GLC=0 SLC=0,84,130.269977
+matmul_tiled,GLC=0 SLC=0,85,129.387076
+matmul_tiled,GLC=0 SLC=0,86,129.475079
+matmul_tiled,GLC=0 SLC=0,87,129.440997
+matmul_tiled,GLC=0 SLC=0,88,129.478918
+matmul_tiled,GLC=0 SLC=0,89,129.446598
+matmul_tiled,GLC=0 SLC=0,90,129.447558
+matmul_tiled,GLC=0 SLC=0,91,129.421317
+matmul_tiled,GLC=0 SLC=0,92,130.656867
+matmul_tiled,GLC=0 SLC=0,93,130.139574
+matmul_tiled,GLC=0 SLC=0,94,129.434917
+matmul_tiled,GLC=0 SLC=0,95,129.480838
+matmul_tiled,GLC=0 SLC=0,96,129.429797
+matmul_tiled,GLC=0 SLC=0,97,129.946609
+matmul_tiled,GLC=0 SLC=0,98,129.500038
+matmul_tiled,GLC=0 SLC=0,99,129.432196
+matmul_tiled,GLC=0 SLC=0,100,129.886928
+matmul_intrin_baseline,GLC=0 SLC=0,1,351.042585
+matmul_intrin_baseline,GLC=0 SLC=0,2,349.062857
+matmul_intrin_baseline,GLC=0 SLC=0,3,349.320464
+matmul_intrin_baseline,GLC=0 SLC=0,4,349.277422
+matmul_intrin_baseline,GLC=0 SLC=0,5,349.651671
+matmul_intrin_baseline,GLC=0 SLC=0,6,349.536947
+matmul_intrin_baseline,GLC=0 SLC=0,7,350.459050
+matmul_intrin_baseline,GLC=0 SLC=0,8,349.997438
+matmul_intrin_baseline,GLC=0 SLC=0,9,349.557748
+matmul_intrin_baseline,GLC=0 SLC=0,10,348.967174
+matmul_intrin_baseline,GLC=0 SLC=0,11,349.983357
+matmul_intrin_baseline,GLC=0 SLC=0,12,350.319045
+matmul_intrin_baseline,GLC=0 SLC=0,13,349.475985
+matmul_intrin_baseline,GLC=0 SLC=0,14,349.824634
+matmul_intrin_baseline,GLC=0 SLC=0,15,349.535507
+matmul_intrin_baseline,GLC=0 SLC=0,16,349.074055
+matmul_intrin_baseline,GLC=0 SLC=0,17,349.378862
+matmul_intrin_baseline,GLC=0 SLC=0,18,349.889595
+matmul_intrin_baseline,GLC=0 SLC=0,19,350.301764
+matmul_intrin_baseline,GLC=0 SLC=0,20,350.528009
+matmul_intrin_baseline,GLC=0 SLC=0,21,350.598891
+matmul_intrin_baseline,GLC=0 SLC=0,22,349.615828
+matmul_intrin_baseline,GLC=0 SLC=0,23,349.730230
+matmul_intrin_baseline,GLC=0 SLC=0,24,349.517904
+matmul_intrin_baseline,GLC=0 SLC=0,25,349.423823
+matmul_intrin_baseline,GLC=0 SLC=0,26,350.141439
+matmul_intrin_baseline,GLC=0 SLC=0,27,350.848016
+matmul_intrin_baseline,GLC=0 SLC=0,28,349.836632
+matmul_intrin_baseline,GLC=0 SLC=0,29,350.355844
+matmul_intrin_baseline,GLC=0 SLC=0,30,349.649107
+matmul_intrin_baseline,GLC=0 SLC=0,31,350.495527
+matmul_intrin_baseline,GLC=0 SLC=0,32,349.807031
+matmul_intrin_baseline,GLC=0 SLC=0,33,350.564809
+matmul_intrin_baseline,GLC=0 SLC=0,34,349.824791
+matmul_intrin_baseline,GLC=0 SLC=0,35,350.106237
+matmul_intrin_baseline,GLC=0 SLC=0,36,349.240297
+matmul_intrin_baseline,GLC=0 SLC=0,37,349.739348
+matmul_intrin_baseline,GLC=0 SLC=0,38,349.298538
+matmul_intrin_baseline,GLC=0 SLC=0,39,350.359044
+matmul_intrin_baseline,GLC=0 SLC=0,40,350.006714
+matmul_intrin_baseline,GLC=0 SLC=0,41,350.709292
+matmul_intrin_baseline,GLC=0 SLC=0,42,350.153438
+matmul_intrin_baseline,GLC=0 SLC=0,43,350.131518
+matmul_intrin_baseline,GLC=0 SLC=0,44,349.965754
+matmul_intrin_baseline,GLC=0 SLC=0,45,349.767508
+matmul_intrin_baseline,GLC=0 SLC=0,46,348.708123
+matmul_intrin_baseline,GLC=0 SLC=0,47,350.158717
+matmul_intrin_baseline,GLC=0 SLC=0,48,349.657265
+matmul_intrin_baseline,GLC=0 SLC=0,49,350.245439
+matmul_intrin_baseline,GLC=0 SLC=0,50,349.979833
+matmul_intrin_baseline,GLC=0 SLC=0,51,349.754708
+matmul_intrin_baseline,GLC=0 SLC=0,52,349.653105
+matmul_intrin_baseline,GLC=0 SLC=0,53,350.059674
+matmul_intrin_baseline,GLC=0 SLC=0,54,350.432803
+matmul_intrin_baseline,GLC=0 SLC=0,55,349.550382
+matmul_intrin_baseline,GLC=0 SLC=0,56,349.763987
+matmul_intrin_baseline,GLC=0 SLC=0,57,349.135813
+matmul_intrin_baseline,GLC=0 SLC=0,58,349.585743
+matmul_intrin_baseline,GLC=0 SLC=0,59,350.632807
+matmul_intrin_baseline,GLC=0 SLC=0,60,349.969431
+matmul_intrin_baseline,GLC=0 SLC=0,61,349.766386
+matmul_intrin_baseline,GLC=0 SLC=0,62,349.106050
+matmul_intrin_baseline,GLC=0 SLC=0,63,348.733401
+matmul_intrin_baseline,GLC=0 SLC=0,64,349.468779
+matmul_intrin_baseline,GLC=0 SLC=0,65,350.166875
+matmul_intrin_baseline,GLC=0 SLC=0,66,349.663823
+matmul_intrin_baseline,GLC=0 SLC=0,67,349.929110
+matmul_intrin_baseline,GLC=0 SLC=0,68,350.399521
+matmul_intrin_baseline,GLC=0 SLC=0,69,350.680647
+matmul_intrin_baseline,GLC=0 SLC=0,70,350.138074
+matmul_intrin_baseline,GLC=0 SLC=0,71,350.716968
+matmul_intrin_baseline,GLC=0 SLC=0,72,349.157570
+matmul_intrin_baseline,GLC=0 SLC=0,73,349.689583
+matmul_intrin_baseline,GLC=0 SLC=0,74,349.826066
+matmul_intrin_baseline,GLC=0 SLC=0,75,349.985910
+matmul_intrin_baseline,GLC=0 SLC=0,76,350.884171
+matmul_intrin_baseline,GLC=0 SLC=0,77,350.321918
+matmul_intrin_baseline,GLC=0 SLC=0,78,350.094392
+matmul_intrin_baseline,GLC=0 SLC=0,79,349.065887
+matmul_intrin_baseline,GLC=0 SLC=0,80,350.141113
+matmul_intrin_baseline,GLC=0 SLC=0,81,349.335334
+matmul_intrin_baseline,GLC=0 SLC=0,82,349.591979
+matmul_intrin_baseline,GLC=0 SLC=0,83,349.325413
+matmul_intrin_baseline,GLC=0 SLC=0,84,349.351494
+matmul_intrin_baseline,GLC=0 SLC=0,85,349.616781
+matmul_intrin_baseline,GLC=0 SLC=0,86,349.365895
+matmul_intrin_baseline,GLC=0 SLC=0,87,350.259195
+matmul_intrin_baseline,GLC=0 SLC=0,88,350.192474
+matmul_intrin_baseline,GLC=0 SLC=0,89,350.387199
+matmul_intrin_baseline,GLC=0 SLC=0,90,349.278692
+matmul_intrin_baseline,GLC=0 SLC=0,91,350.504161
+matmul_intrin_baseline,GLC=0 SLC=0,92,350.082870
+matmul_intrin_baseline,GLC=0 SLC=0,93,349.848625
+matmul_intrin_baseline,GLC=0 SLC=0,94,349.664780
+matmul_intrin_baseline,GLC=0 SLC=0,95,350.377757
+matmul_intrin_baseline,GLC=0 SLC=0,96,350.445279
+matmul_intrin_baseline,GLC=0 SLC=0,97,349.673260
+matmul_intrin_baseline,GLC=0 SLC=0,98,349.988468
+matmul_intrin_baseline,GLC=0 SLC=0,99,350.186231
+matmul_intrin_baseline,GLC=0 SLC=0,100,349.874225
+matmul_intrin_glc,GLC=1 SLC=0,1,622.660378
+matmul_intrin_glc,GLC=1 SLC=0,2,623.162949
+matmul_intrin_glc,GLC=1 SLC=0,3,620.011673
+matmul_intrin_glc,GLC=1 SLC=0,4,623.946328
+matmul_intrin_glc,GLC=1 SLC=0,5,623.871444
+matmul_intrin_glc,GLC=1 SLC=0,6,622.522292
+matmul_intrin_glc,GLC=1 SLC=0,7,623.895925
+matmul_intrin_glc,GLC=1 SLC=0,8,623.518156
+matmul_intrin_glc,GLC=1 SLC=0,9,619.300296
+matmul_intrin_glc,GLC=1 SLC=0,10,623.162947
+matmul_intrin_glc,GLC=1 SLC=0,11,617.375609
+matmul_intrin_glc,GLC=1 SLC=0,12,621.357944
+matmul_intrin_glc,GLC=1 SLC=0,13,625.131953
+matmul_intrin_glc,GLC=1 SLC=0,14,625.190193
+matmul_intrin_glc,GLC=1 SLC=0,15,628.407870
+matmul_intrin_glc,GLC=1 SLC=0,16,625.774367
+matmul_intrin_glc,GLC=1 SLC=0,17,623.514793
+matmul_intrin_glc,GLC=1 SLC=0,18,625.267474
+matmul_intrin_glc,GLC=1 SLC=0,19,624.722661
+matmul_intrin_glc,GLC=1 SLC=0,20,621.056815
+matmul_intrin_glc,GLC=1 SLC=0,21,624.956266
+matmul_intrin_glc,GLC=1 SLC=0,22,622.806936
+matmul_intrin_glc,GLC=1 SLC=0,23,624.068405
+matmul_intrin_glc,GLC=1 SLC=0,24,623.677995
+matmul_intrin_glc,GLC=1 SLC=0,25,625.105389
+matmul_intrin_glc,GLC=1 SLC=0,26,624.400571
+matmul_intrin_glc,GLC=1 SLC=0,27,619.411173
+matmul_intrin_glc,GLC=1 SLC=0,28,620.013587
+matmul_intrin_glc,GLC=1 SLC=0,29,624.266648
+matmul_intrin_glc,GLC=1 SLC=0,30,622.771732
+matmul_intrin_glc,GLC=1 SLC=0,31,618.859160
+matmul_intrin_glc,GLC=1 SLC=0,32,623.317825
+matmul_intrin_glc,GLC=1 SLC=0,33,627.039833
+matmul_intrin_glc,GLC=1 SLC=0,34,626.288615
+matmul_intrin_glc,GLC=1 SLC=0,35,627.675848
+matmul_intrin_glc,GLC=1 SLC=0,36,624.816899
+matmul_intrin_glc,GLC=1 SLC=0,37,625.716601
+matmul_intrin_glc,GLC=1 SLC=0,38,619.129724
+matmul_intrin_glc,GLC=1 SLC=0,39,624.784577
+matmul_intrin_glc,GLC=1 SLC=0,40,622.972055
+matmul_intrin_glc,GLC=1 SLC=0,41,622.553485
+matmul_intrin_glc,GLC=1 SLC=0,42,621.113449
+matmul_intrin_glc,GLC=1 SLC=0,43,622.922932
+matmul_intrin_glc,GLC=1 SLC=0,44,621.868827
+matmul_intrin_glc,GLC=1 SLC=0,45,625.906683
+matmul_intrin_glc,GLC=1 SLC=0,46,622.656526
+matmul_intrin_glc,GLC=1 SLC=0,47,621.445136
+matmul_intrin_glc,GLC=1 SLC=0,48,621.540338
+matmul_intrin_glc,GLC=1 SLC=0,49,624.565689
+matmul_intrin_glc,GLC=1 SLC=0,50,628.810910
+matmul_intrin_glc,GLC=1 SLC=0,51,622.601483
+matmul_intrin_glc,GLC=1 SLC=0,52,621.906586
+matmul_intrin_glc,GLC=1 SLC=0,53,621.501296
+matmul_intrin_glc,GLC=1 SLC=0,54,625.444110
+matmul_intrin_glc,GLC=1 SLC=0,55,622.088670
+matmul_intrin_glc,GLC=1 SLC=0,56,624.773373
+matmul_intrin_glc,GLC=1 SLC=0,57,621.081285
+matmul_intrin_glc,GLC=1 SLC=0,58,624.893856
+matmul_intrin_glc,GLC=1 SLC=0,59,619.186520
+matmul_intrin_glc,GLC=1 SLC=0,60,619.991339
+matmul_intrin_glc,GLC=1 SLC=0,61,620.993763
+matmul_intrin_glc,GLC=1 SLC=0,62,623.649025
+matmul_intrin_glc,GLC=1 SLC=0,63,623.337018
+matmul_intrin_glc,GLC=1 SLC=0,64,618.977714
+matmul_intrin_glc,GLC=1 SLC=0,65,622.557319
+matmul_intrin_glc,GLC=1 SLC=0,66,621.504334
+matmul_intrin_glc,GLC=1 SLC=0,67,623.970632
+matmul_intrin_glc,GLC=1 SLC=0,68,625.898998
+matmul_intrin_glc,GLC=1 SLC=0,69,626.253886
+matmul_intrin_glc,GLC=1 SLC=0,70,623.538621
+matmul_intrin_glc,GLC=1 SLC=0,71,625.681071
+matmul_intrin_glc,GLC=1 SLC=0,72,621.166885
+matmul_intrin_glc,GLC=1 SLC=0,73,623.126131
+matmul_intrin_glc,GLC=1 SLC=0,74,622.340032
+matmul_intrin_glc,GLC=1 SLC=0,75,621.891861
+matmul_intrin_glc,GLC=1 SLC=0,76,621.018080
+matmul_intrin_glc,GLC=1 SLC=0,77,623.560220
+matmul_intrin_glc,GLC=1 SLC=0,78,624.011111
+matmul_intrin_glc,GLC=1 SLC=0,79,622.611718
+matmul_intrin_glc,GLC=1 SLC=0,80,621.687055
+matmul_intrin_glc,GLC=1 SLC=0,81,625.273220
+matmul_intrin_glc,GLC=1 SLC=0,82,624.489361
+matmul_intrin_glc,GLC=1 SLC=0,83,622.721799
+matmul_intrin_glc,GLC=1 SLC=0,84,626.452128
+matmul_intrin_glc,GLC=1 SLC=0,85,624.750007
+matmul_intrin_glc,GLC=1 SLC=0,86,619.155314
+matmul_intrin_glc,GLC=1 SLC=0,87,621.813937
+matmul_intrin_glc,GLC=1 SLC=0,88,625.322980
+matmul_intrin_glc,GLC=1 SLC=0,89,620.617268
+matmul_intrin_glc,GLC=1 SLC=0,90,626.537728
+matmul_intrin_glc,GLC=1 SLC=0,91,626.052597
+matmul_intrin_glc,GLC=1 SLC=0,92,620.471185
+matmul_intrin_glc,GLC=1 SLC=0,93,623.757502
+matmul_intrin_glc,GLC=1 SLC=0,94,620.019013
+matmul_intrin_glc,GLC=1 SLC=0,95,625.813550
+matmul_intrin_glc,GLC=1 SLC=0,96,623.632538
+matmul_intrin_glc,GLC=1 SLC=0,97,619.742846
+matmul_intrin_glc,GLC=1 SLC=0,98,621.732973
+matmul_intrin_glc,GLC=1 SLC=0,99,622.719877
+matmul_intrin_glc,GLC=1 SLC=0,100,622.061940

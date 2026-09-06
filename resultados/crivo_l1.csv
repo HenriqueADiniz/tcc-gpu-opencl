@@ -1,0 +1,10 @@
+kernel,perfil,nivel,media_ms,dp_ms,mediana_ms,razao_mediana_sobre_L1,loads_globais,verificado
+tdiv_unif,"tabela 2,4 KB, acesso uniforme","L1 (normal)",1.505476,0.043193,1.481360,1.000000,637534208,1
+tdiv_unif,"tabela 2,4 KB, acesso uniforme","L2 (glc)",3.392543,0.286642,3.395705,2.292289,637534208,1
+tdiv_unif,"tabela 2,4 KB, acesso uniforme","VRAM (glc slc)",3.360122,0.329823,3.268178,2.206201,637534208,1
+tdiv_rot,"tabela 2,4 KB, acesso disperso","L1 (normal)",4.295099,0.421392,4.186628,1.000000,637534208,1
+tdiv_rot,"tabela 2,4 KB, acesso disperso","L2 (glc)",29.829316,0.037145,29.838580,7.127115,637534208,1
+tdiv_rot,"tabela 2,4 KB, acesso disperso","VRAM (glc slc)",29.837622,0.037625,29.846103,7.128912,637534208,1
+crivo,"tabela 2,2 KB, uniforme, dominado por escrita","L1 (normal)",10.243597,0.197058,10.258478,1.000000,9240576,1
+crivo,"tabela 2,2 KB, uniforme, dominado por escrita","L2 (glc)",10.016339,0.249190,10.056067,0.980269,9240576,1
+crivo,"tabela 2,2 KB, uniforme, dominado por escrita","VRAM (glc slc)",10.119727,0.175868,10.145831,0.989019,9240576,1

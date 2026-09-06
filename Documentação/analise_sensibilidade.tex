@@ -1,0 +1,357 @@
+\documentclass[12pt]{article}
+
+\usepackage{sbc-template}
+\usepackage{graphicx,url}
+\usepackage[utf8]{inputenc}
+\usepackage[brazil]{babel}
+\usepackage{amssymb}
+\usepackage{booktabs}
+\usepackage{multirow}
+
+\sloppy
+
+\title{Análise de Sensibilidade ao Tamanho do Problema no Isolamento
+do Efeito do \textit{Cache} L1 em GPU AMD Polaris}
+
+\author{Henrique de Almeida Diniz\inst{1}, Pedro Henrique Ramos Costa\inst{1}}
+
+\address{Instituto de Ciências Exatas e de Informática\\
+  Pontifícia Universidade Católica de Minas Gerais (PUC Minas) -- Belo Horizonte, MG -- Brasil
+  \email{henriquealdiniz@gmail.com, phramoscosta@gmail.com}
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This report documents a problem-size sensitivity analysis of the cache-flag experiment on an
+AMD Ellesmere GPU (Polaris/GCN, gfx803). Ten kernel variants, differing only in
+the memory path taken by their loads, were measured at five matrix sizes from
+$N=1024$ to $N=16384$, with 100 measured executions each, totalling 50 measured
+points and about 12.6 hours of GPU time. All 50 points were numerically
+validated. Three results stand out. The cost of the assembly construction is
+nearly invariant with size (1.52$\times$ to 1.46$\times$), whereas the cost
+attributed to the \texttt{glc} flag falls markedly with it (2.47$\times$ to
+1.65$\times$), which shows that a single-size measurement does not characterise
+the effect. The \texttt{slc} flag, negligible at small sizes (1.9\%), reaches
+11.8\% at $N=16384$ --- behaviour consistent with an eviction policy rather than
+a bypass, and detectable only once the working set greatly exceeds the L2. And
+the dispersion between executions collapses from 4.0\% to 0.02\%, so the
+bench's resolution improves by two orders of magnitude across the analysis.
+\end{abstract}
+
+\begin{resumo}
+Este relatório documenta uma análise de sensibilidade ao tamanho do problema no experimento de
+\textit{flags} de \textit{cache} em GPU AMD Ellesmere (Polaris/GCN, gfx803). Dez
+variantes de \textit{kernel}, que diferem apenas no caminho de memória de seus
+\textit{loads}, foram medidas em cinco tamanhos de matriz, de $N=1024$ a
+$N=16384$, com 100 execuções medidas cada, totalizando 50 pontos e cerca de 12,6
+horas de GPU. Os 50 pontos foram validados numericamente. Três resultados se
+destacam. O custo da construção em \textit{assembly} é quase invariante com o
+tamanho (1,52$\times$ a 1,46$\times$), ao passo que o custo atribuído à
+\textit{flag} \texttt{glc} cai acentuadamente com ele (2,47$\times$ a
+1,65$\times$), o que mostra que uma medida de tamanho único não caracteriza o
+efeito. A \textit{flag} \texttt{slc}, desprezível em tamanhos pequenos (1,9\%),
+alcança 11,8\% em $N=16384$ --- comportamento coerente com política de
+\textit{eviction}, e não com \textit{bypass}, e detectável apenas quando o
+conjunto de trabalho excede largamente o L2. E a dispersão entre execuções
+colapsa de 4,0\% para 0,02\%, de modo que a resolução da bancada melhora duas
+ordens de grandeza ao longo da análise.
+\end{resumo}
+
+
+\section{Objetivo}
+
+Medições anteriores do custo de contornar o \textit{cache} L1 foram conduzidas
+em um único tamanho de problema, $N=1024$. Duas razões tornam essa prática
+insuficiente. A primeira é que $N=1024$ é múltiplo de 256 e, com armazenamento
+\textit{row-major} de elementos de 4~bytes, produz \textit{stride} entre linhas
+múltiplo de 1~KB, condição associada a \textit{conflict misses} no L1. A
+segunda, e mais geral, é que nada garante que o custo de uma \textit{flag} de
+\textit{cache} seja constante em relação ao tamanho do problema: à medida que o
+conjunto de trabalho cresce, a fração dos acessos que o \textit{cache} conseguia
+atender muda, e com ela o valor de contorná-lo.
+
+Este relatório documenta a análise conduzida para responder a essa questão:
+como cada fator isolado no desenho experimental varia quando o tamanho do
+problema cresce por um fator de 4.096 em volume de dados.
+
+\section{Desenho experimental}
+
+Dez variantes do mesmo algoritmo --- multiplicação de matrizes \textit{naive},
+um \textit{work-item} por elemento de saída --- foram medidas. Elas executam o
+mesmo trabalho aritmético e diferem exclusivamente no caminho de memória de seus
+\textit{loads} e na forma como esse caminho é solicitado ao compilador. Três
+delas são \textbf{controles}, e existem para que os fatores confundidos possam
+ser descontados:
+
+\begin{itemize}
+\item \textbf{Controle negativo} (variantes 2 e 3): dois \textit{kernels} de
+fonte idêntico, que geram ISA idêntica instrução a instrução. A diferença
+medida entre eles é integralmente artefato da bancada e fornece o \textbf{piso
+de ruído} abaixo do qual nenhum efeito é afirmado.
+
+\item \textbf{Controle da construção em \textit{assembly}} (variante 4): usa
+\textit{inline assembly} sem \textit{flag} alguma. O bloco \texttt{\_\_asm\_\_}
+é opaco ao otimizador, impede a redução de força no cálculo de endereço e
+acrescenta trabalho de ALU por iteração. Comparar a variante 1 com a 4 mede esse
+custo; comparar a 4 com a 5 mede o efeito da \textit{flag} já descontado dele.
+
+\item \textbf{Controle da construção por intrinsic} (variante 9): usa
+\texttt{llvm.amdgcn.raw.buffer.load.f32} com política de \textit{cache} nula.
+Diferentemente do bloco de \textit{assembly}, o intrinsic tem semântica
+conhecida pelo compilador, que pode escalonar em volta dele. Comparar a variante
+9 com a 10 isola a \textit{flag} \texttt{glc} sozinha sobre código otimizado ---
+combinação inalcançável pelas demais vias, já que \texttt{\_\_builtin\_nontemporal\_load}
+emite \texttt{glc} e \texttt{slc} em conjunto, e o \textit{assembly} cobra a
+barreira de otimização.
+\end{itemize}
+
+\subsection{Instrumentação}
+
+Cada ponto consiste em 100 execuções medidas, precedidas de execuções de
+aquecimento descartadas. A temporização usa \texttt{clGetEventProfilingInfo}
+entre \texttt{COMMAND\_START} e \texttt{COMMAND\_END}, ou seja, mede
+\textbf{apenas a execução do \textit{kernel}}: as transferências entre
+\textit{host} e dispositivo ficam fora da janela cronometrada, por serem
+idênticas entre as dez variantes e por estarem amortizadas em 100 execuções
+sobre os mesmos \textit{buffers}. Os valores de GFLOPS deste relatório são,
+portanto, de \textit{kernel}, e não fim a fim.
+
+Registram-se média, mediana, desvio padrão, coeficiente de variação, percentil
+95 e a deriva entre o primeiro e o último décimo das execuções, esta última para
+detectar variação de \textit{clock} sob carga sustentada. As razões entre
+cenários são calculadas sobre medianas, menos sensíveis a valores extremos.
+
+\subsection{Validação}
+
+Os 50 pontos foram verificados numericamente, em duas camadas. Cada variante é
+comparada elemento a elemento com a saída da variante 1, em $O(N^2)$; e a
+variante 1 é conferida contra uma referência calculada na CPU sobre uma amostra
+aleatória de 4.096 posições, com semente fixa. A amostragem é necessária porque
+a referência completa é $O(N^3)$ e, em $N=16384$, custaria cerca de três horas
+de CPU --- mais do que a própria medição. Ela é suficiente porque as falhas em
+questão não são pontuais: um descritor de recurso mal formado devolve zero em
+todas as posições, e uma \textit{flag} mal emitida altera o caminho de memória
+de todos os acessos.
+
+A tolerância é proporcional a $N$, já que a soma acumula erro de ponto flutuante
+ao longo de $N$ termos e um limite fixo produziria falso negativo em matrizes
+grandes.
+
+\subsection{Restrição de \textit{hardware}: o \textit{watchdog} de 60~s}
+
+O \textit{driver} \texttt{amdgpu} declara travamento e reinicia a GPU quando um
+trabalho de \textit{compute} ultrapassa 60~s. Em $N=16384$, um lançamento único
+do \textit{kernel} mais lento foi estimado em cerca de 58~s, dentro da margem de
+erro desse limite. Como a GPU utilizada é também a única saída de vídeo da
+máquina, um reinício encerraria a sessão gráfica e a medição em curso.
+
+A solução adotada foi fatiar a \textit{NDRange} em faixas de linhas por meio do
+\texttt{global\_work\_offset}, com 2.048 linhas por lançamento em $N=16384$, o
+que resulta em oito lançamentos de cerca de 7~s por execução. O trabalho total
+permanece idêntico e os \textit{kernels} não requerem alteração, pois
+\texttt{get\_global\_id(1)} já devolve o índice global com o deslocamento
+incorporado. O custo acrescido é o de lançamento, medido em 0,02~ms por lote,
+desprezível diante de segundos de execução. Antes de aplicar o modo em lotes ao
+tamanho maior, verificou-se em $N=2048$ que ele produz resultado idêntico ao
+lançamento único.
+
+\subsection{Limite superior da análise}
+
+O maior tamanho medido é $N=16384$. Tamanhos maiores não são alcançáveis nesta
+máquina: em $N=32768$, as três matrizes exigiriam 12~GB de memória de vídeo,
+contra os 8~GB disponíveis, e 16~GB de memória de sistema, contra 15~GB
+instalados. Em $N=16384$ o experimento ocupa 3~GB de VRAM e 4~GB de RAM.
+
+\section{Resultados}
+
+A análise completa consumiu cerca de 12,6~horas de execução contínua, das
+quais 11~horas no ponto $N=16384$. Os 50 pontos foram validados sem divergência.
+
+\begin{table}[ht]
+\centering
+\caption{Mediana do tempo de execução, em milissegundos, por tamanho e cenário.
+Cada valor resume 100 execuções medidas.}
+\label{tab:medianas}
+\small
+\begin{tabular}{@{}llrrrrr@{}}
+\toprule
+\textbf{Cenário} & \textbf{\textit{Flags}} & \textbf{1024} & \textbf{2048} &
+\textbf{4096} & \textbf{8192} & \textbf{16384} \\
+\midrule
+\input{tab_medianas}
+\bottomrule
+\end{tabular}
+
+\vspace{2pt}
+{\footnotesize $^\ast$ depende do compilador: \texttt{glc} sob o Clang/LLVM do
+ROCm, nenhuma \textit{flag} sob o AMDOCL do Windows.}
+\end{table}
+
+\subsection{A dispersão colapsa com o tamanho}
+
+A Tabela~\ref{tab:cv} mostra o coeficiente de variação entre as 100 execuções de
+cada ponto. Ele cai de cerca de 4\% em $N=1024$ para 0,02\% em $N=16384$: com
+\textit{kernels} de dezenas de segundos, o ruído de lançamento e de escalonamento
+torna-se irrelevante diante da duração medida.
+
+\begin{table}[ht]
+\centering
+\caption{Coeficiente de variação entre as 100 execuções, em porcentagem.}
+\label{tab:cv}
+\small
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+\textbf{Cenário} & \textbf{1024} & \textbf{2048} & \textbf{4096} &
+\textbf{8192} & \textbf{16384} \\
+\midrule
+\input{tab_cv}
+\bottomrule
+\end{tabular}
+\end{table}
+
+A consequência é metodológica: a resolução da bancada melhora duas ordens de
+grandeza ao longo da análise. Efeitos de poucos por cento, que em $N=1024$ se
+confundem com o ruído, tornam-se inequívocos em $N=16384$. O piso de ruído
+medido pelo par de \textit{kernels} idênticos acompanha esse comportamento,
+mantendo-se em torno de 0,1\% a partir de $N=2048$ (Tabela~\ref{tab:razoes}).
+
+\subsection{Decomposição dos fatores}
+
+\begin{table}[ht]
+\centering
+\caption{Razões entre cenários, calculadas sobre as medianas. Valores acima de
+1 indicam que o cenário do numerador é mais lento.}
+\label{tab:razoes}
+\small
+\begin{tabular}{@{}lrrrrr@{}}
+\toprule
+\textbf{Fator isolado} & \textbf{1024} & \textbf{2048} & \textbf{4096} &
+\textbf{8192} & \textbf{16384} \\
+\midrule
+\input{tab_razoes}
+\bottomrule
+\end{tabular}
+\end{table}
+
+A Tabela~\ref{tab:razoes} separa fatores que se comportam de maneiras
+qualitativamente distintas.
+
+\textbf{O custo da construção é estável.} A barreira de otimização imposta pelo
+bloco de \textit{assembly} custa entre 1,52$\times$ e 1,46$\times$ em toda a
+faixa, com tendência suave de queda. O intrinsic, por sua vez, é
+\textbf{mais rápido} que o código em C puro por um fator praticamente constante
+de 0,78$\times$ --- resultado atribuível ao formato MUBUF, que mantém o
+descritor em registradores escalares e usa deslocamento de 32~bits por
+\textit{lane}, reduzindo a alocação de 11 para 7 registradores vetoriais e
+elevando a ocupância. Que ambos os fatores sejam quase invariantes é o que
+permite descontá-los com segurança.
+
+\textbf{O custo da \textit{flag} \texttt{glc} não é estável.} Medido sobre a
+base em intrinsic, cai de 2,47$\times$ em $N=1024$ para 1,65$\times$ em
+$N=16384$; sobre a base em \textit{assembly}, de 1,20$\times$ para 1,06$\times$.
+A interpretação é direta: à medida que o conjunto de trabalho cresce, a fração
+dos acessos que o L1 conseguia atender diminui, e portanto diminui também o que
+se perde ao contorná-lo. \textbf{Uma medida em um único tamanho não caracteriza
+o efeito do \textit{cache}} --- e, tomada isoladamente, o superestima em relação
+ao regime assintótico.
+
+\textbf{As duas bases discordam por construção.} O mesmo bit medido contra bases
+diferentes produz 1,65$\times$ e 1,06$\times$ em $N=16384$. Não há contradição:
+a base em \textit{assembly} já está cerca de 1,46$\times$ mais lenta, e uma base
+mais lenta dilui a penalidade relativa do \textit{cache}. As duas razões
+respondem a perguntas distintas --- quanto custa perder o L1 em código que se
+pretende efetivamente usar, e qual o efeito do bit isolado de todo o resto.
+Relatar uma delas sem declarar a base torna o número ininterpretável.
+
+\subsection{O efeito de \texttt{slc} aparece apenas em conjuntos grandes}
+
+O resultado mais informativo da análise está na linha do \texttt{slc} isolado.
+A \textit{flag} custa 1,9\% em $N=1024$, valor próximo ao piso de ruído e que em
+medições anteriores oscilou de veredito entre execuções independentes. Com o
+crescimento do problema, o efeito cresce de forma monotônica e alcança
+\textbf{11,8\% em $N=16384$}, duas ordens de grandeza acima do piso de ruído
+daquele ponto.
+
+Esse comportamento é exatamente o previsto para uma \textbf{política de
+substituição}, e não para um \textit{bypass}. Marcar uma linha como candidata
+preferencial a \textit{eviction} não produz efeito algum quando o conjunto de
+trabalho cabe no \textit{cache}, pois não há disputa por espaço; o efeito só se
+manifesta quando há mais dados concorrendo do que capacidade disponível. Em
+$N=16384$, as três matrizes somam 3~GB disputando 2~MB de L2.
+
+O achado corrobora, por via independente e sob carga real, a conclusão obtida em
+experimento dedicado de vazão: \texttt{SLC=1} não realiza \textit{bypass} do L2.
+Um \textit{bypass} produziria penalidade grande e aproximadamente constante,
+presente já nos tamanhos pequenos; o que se observa é o oposto --- efeito nulo
+enquanto há folga no \textit{cache} e crescente conforme a folga desaparece.
+
+\subsection{Demais observações}
+
+O ganho da variante com memória local (LDS) sobre o acesso à memória global
+mantém-se entre 3,2$\times$ e 3,5$\times$ em toda a faixa, com leve queda no
+ponto extremo. O desempenho absoluto do \textit{kernel} de referência decai
+suavemente com o tamanho, de 307 para 294 GFLOPS, ao passo que o da variante com
+intrinsic e \texttt{glc} \textbf{sobe} de 161 para 226 GFLOPS: as duas curvas
+convergem, o que é a mesma tendência de queda do custo da \textit{flag} vista de
+outro ângulo.
+
+O \texttt{volatile} sob o ROCm, que emite \texttt{glc} e adicionalmente
+serializa os \textit{loads}, acompanha a queda geral, de 1,92$\times$ para
+1,59$\times$.
+
+\section{Limitações}
+
+\textbf{Todos os tamanhos medidos são múltiplos de 256.} A série dobra $N$ a
+cada ponto a partir de 1024, de modo que a condição associada a \textit{conflict
+misses} no L1 --- \textit{stride} entre linhas múltiplo de 1~KB --- vale em todos
+os cinco pontos. As tendências relatadas são, portanto, tendências \emph{dentro}
+desse regime. Medições em tamanhos fora da grade de 256 apresentaram efeito de
+\texttt{glc} sensivelmente menor, o que indica que a comparação entre regimes
+exige série própria, com passo fino e tamanhos não alinhados.
+
+\textbf{Cem execuções por ponto.} O número foi escolhido para tornar a análise
+viável: mil execuções, usadas em medições de tamanho único, custariam mais de
+cinco dias apenas em $N=16384$. Em tamanhos pequenos isso amplia o intervalo de
+confiança em relação às medições anteriores; em tamanhos grandes é irrelevante,
+dada a dispersão de 0,02\%.
+
+\textbf{Uma única carga e uma única geração de \textit{hardware}.} Todos os
+pontos vêm da multiplicação de matrizes \textit{naive} em uma GPU gfx803. A
+generalização das tendências para outros padrões de acesso e outras arquiteturas
+não está estabelecida por estes dados.
+
+\textbf{Apenas leituras.} O comportamento das \textit{flags} em instruções de
+escrita permanece em aberto, questão relevante por o L1 do GFX8 ser
+\textit{write-through}.
+
+\section{Reprodução}
+
+O programa aceita o número de execuções, o tamanho da matriz, o número de
+execuções de aquecimento e o número de linhas por lote:
+
+\begin{verbatim}
+source setup/env_rocm.sh
+g++ -Wall -Wextra -O2 experimentos/matmul.cpp -o output/matmul -lOpenCL
+
+./output/matmul 100  1024 5         # lancamento unico
+./output/matmul 100 16384 3 2048    # lotes de 2048 linhas
+\end{verbatim}
+
+O quarto argumento é obrigatório a partir de $N=16384$, pelas razões expostas na
+Seção~2.4. Passar zero, ou omiti-lo, faz o programa usar um lançamento único.
+Passar zero como primeiro argumento ativa o modo adaptativo, no qual o número de
+execuções é derivado de um orçamento de tempo por cenário.
+
+A análise completa é reproduzida por \texttt{tools/cadeia\_sweep.sh}, que
+encadeia os tamanhos, verifica a integridade do que já foi gravado e valida o
+modo em lotes antes de prosseguir para o tamanho maior. Os resultados são
+acumulados em \texttt{resultados/matmul\_sweep.csv}, com uma linha por par
+(tamanho, cenário) e gravação imediata, de modo que uma interrupção não perde o
+que já foi medido. As amostras individuais de cada tamanho ficam em
+\texttt{resultados/matmul\_amostras\_N$\langle$N$\rangle$.csv}, para análise de
+distribuição.
+
+\end{document}

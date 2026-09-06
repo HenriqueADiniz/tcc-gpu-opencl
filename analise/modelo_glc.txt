@@ -2,35 +2,35 @@ Ajuste  T(N) = a*N^3 + b*N^2  por minimos quadrados
 ========================================================================
 celula                         a (ns/N^3)     b (us/N^2)      R^2
 ------------------------------------------------------------------------
-GLC=0, sobreposto                0.010180        -0.0001  0.99999
-GLC=0, serializado               0.011173        -0.0001  0.99999
-GLC=1, sobreposto                0.011620        -0.0003  0.99988
-GLC=1, serializado               0.011984         0.0012  0.99991
-C puro (sem asm)                 0.006625         0.0002  0.99998
-volatile                         0.010769         0.0012  0.99986
+GLC=0, sobreposto                0.009948         0.0000  1.00000
+GLC=0, serializado               0.010934        -0.0001  0.99999
+GLC=1, sobreposto                0.011079         0.0002  0.99993
+GLC=1, serializado               0.011476         0.0014  0.99992
+C puro (sem asm)                 0.006534         0.0002  0.99997
+volatile                         0.010406         0.0012  0.99989
 
 Custo assintotico (razao dos coeficientes a)
 ========================================================================
-  bypass do L1     (3)/(1)     = 1.141x
-  serializacao     (2)/(1)     = 1.098x
-  ambos            (4)/(1)     = 1.177x
-  custo do asm     (1)/(0)     = 1.537x
+  bypass do L1     (3)/(1)     = 1.114x
+  serializacao     (2)/(1)     = 1.099x
+  ambos            (4)/(1)     = 1.154x
+  custo do asm     (1)/(0)     = 1.522x
 
 Razao medida por tamanho — bypass do L1 (3)/(1)
 ========================================================================
-  N =   256   1.346x  <- N multiplo de 256
-  N =   320   1.003x
-  N =   384   1.134x
-  N =   448   1.031x
-  N =   512   1.780x  <- N multiplo de 256
-  N =   576   1.032x
-  N =   640   1.068x
-  N =   704   1.038x
-  N =   768   1.301x  <- N multiplo de 256
-  N =   896   1.092x
-  N =  1024   1.264x  <- N multiplo de 256
-  N =  1280   1.089x  <- N multiplo de 256
-  N =  1536   1.177x  <- N multiplo de 256
-  N =  2048   1.114x  <- N multiplo de 256
-  N =  2560   1.130x  <- N multiplo de 256
-  N =  3072   1.137x  <- N multiplo de 256
+  N =   256   1.332x  <- N multiplo de 256
+  N =   320   1.011x
+  N =   384   1.093x
+  N =   448   0.993x
+  N =   512   1.757x  <- N multiplo de 256
+  N =   576   1.020x
+  N =   640   1.079x
+  N =   704   1.054x
+  N =   768   1.263x  <- N multiplo de 256
+  N =   896   1.085x
+  N =  1024   1.251x  <- N multiplo de 256
+  N =  1280   1.078x  <- N multiplo de 256
+  N =  1536   1.158x  <- N multiplo de 256
+  N =  2048   1.113x  <- N multiplo de 256
+  N =  2560   1.114x  <- N multiplo de 256
+  N =  3072   1.119x  <- N multiplo de 256

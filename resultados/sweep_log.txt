@@ -1,0 +1,328 @@
+===================== N=1024  23:48:37 =====================
+=== AMD GPU Cache Bypass — Multiplicacao de Matrizes ===
+Matriz: 1024 x 1024 (4.0 MB por matriz, 12.0 MB total)
+FLOPs por execucao: 2.15 GFLOP
+
+GPU: gfx803
+Vendor: Advanced Micro Devices, Inc.
+
+[INFO] Binario ISA salvo em 'isa/matmul_gfx803.bin' (26704 bytes)
+       Dispositivo: gfx803
+       Analise: llvm-objdump -d --triple=amdgcn-amd-amdhsa \
+                  --mcpu=gfx803 isa/matmul_gfx803.bin   (Linux/ROCm)
+                clrxdisasm isa/matmul_gfx803.bin                       (binario do driver Windows)
+
+Referencia da CPU sobre 4096 posicoes amostradas...
+Referencia pronta.
+
+Matriz: 1024x1024 | Workgroup: 16x16 (256 threads)
+Warmup: 5 | Runs: 100 por cenario (1000 execucoes no total)
+================================================================
+
+--- Kernel 1  normal (C puro) [GLC=0 SLC=0] ---
+   10% (10/100)   20% (20/100)   30% (30/100)   40% (40/100)   50% (50/100)   60% (60/100)   70% (70/100)   80% (80/100)   90% (90/100)  100% (100/100)              Media: 6.992 ms | Mediana: 6.991 ms | Min: 6.443 | Max: 8.205
+  Performance: 307.20 GFLOPS (pela mediana)
+  Validacao: OK (amostra da CPU, max diferenca 0.00000000)
+
+--- Kernel 2  volatile (hipotese original) [GLC=1 SLC=0 *] ---
+   10% (10/100)   20% (20/100)   30% (30/100)   40% (40/100)   50% (50/100)   60% (60/100)   70% (70/100)   80% (80/100)   90% (90/100)  100% (100/100)              Media: 13.449 ms | Mediana: 13.398 ms | Min: 12.328 | Max: 14.411
+  Performance: 160.29 GFLOPS (pela mediana)
+  Validacao: OK (contra kernel 1, max diferenca 0.00000000)
+
+--- Kernel 3  volatile agressivo (idem k2) [GLC=1 SLC=0 *] ---
+   10% (10/100)   20% (20/100)   30% (30/100)   40% (40/100)   50% (50/100)   60% (60/100)   70% (70/100)   80% (80/100)   90% (90/100)  100% (100/100)              Media: 13.289 ms | Mediana: 13.278 ms | Min: 12.453 | Max: 14.247
+  Performance: 161.74 GFLOPS (pela mediana)
+  Validacao: OK (contra kernel 1, max diferenca 0.00000000)
+
+--- Kernel 4  controle asm (sem flags) [GLC=0 SLC=0] ---
+   10% (10/100)   20% (20/100)   30% (30/100)   40% (40/100)   50% (50/100)   60% (60/100)   70% (70/100)   80% (80/100)   90% (90/100)  100% (100/100)              Media: 10.656 ms | Mediana: 10.625 ms | Min: 10.248 | Max: 11.049
+  Performance: 202.12 GFLOPS (pela mediana)
+  Validacao: OK (contra kernel 1, max diferenca 0.00000000)
+
+--- Kernel 5  bypass de L1 [GLC=1 SLC=0] ---
+   10% (10/100)   20% (20/100)   30% (30/100)   40% (40/100)   50% (50/100)   60% (60/100)   70% (70/100)   80% (80/100)   90% (90/100)  100% (100/100)              Media: 12.777 ms | Mediana: 12.734 ms | Min: 11.960 | Max: 13.798
+  Performance: 168.64 GFLOPS (pela mediana)
+  Validacao: OK (contra kernel 1, max diferenca 0.00000000)
+
+--- Kernel 6  bypass de L1 + streaming L2 [GLC=1 SLC=1] ---
+   10% (10/100)   20% (20/100)   30% (30/100)   40% (40/100)   50% (50/100)   60% (60/100)   70% (70/100)   80% (80/100)   90% (90/100)  100% (100/100)              Media: 13.003 ms | Mediana: 12.979 ms | Min: 12.288 | Max: 13.788
+  Performance: 165.46 GFLOPS (pela mediana)
+  Validacao: OK (contra kernel 1, max diferenca 0.00000000)
+
+--- Kernel 7  nontemporal (sem asm) [GLC=1 SLC=1] ---
+   10% (10/100)   20% (20/100)   30% (30/100)   40% (40/100)   50% (50/100)   60% (60/100)   70% (70/100)   80% (80/100)   90% (90/100)  100% (100/100)              Media: 12.435 ms | Mediana: 12.415 ms | Min: 11.738 | Max: 13.423
+  Performance: 172.97 GFLOPS (pela mediana)
+  Validacao: OK (contra kernel 1, max diferenca 0.00000000)
+
+--- Kernel 8  tiled com LDS (referencia) [GLC=0 SLC=0] ---
+   10% (10/100)   20% (20/100)   30% (30/100)   40% (40/100)   50% (50/100)   60% (60/100)   70% (70/100)   80% (80/100)   90% (90/100)  100% (100/100)              Media: 2.093 ms | Mediana: 2.115 ms | Min: 1.986 | Max: 2.253
+  Performance: 1015.39 GFLOPS (pela mediana)
+  Validacao: OK (contra kernel 1, max diferenca 0.00000000)
+
+--- Kernel 9  controle intrinsic (sem flag) [GLC=0 SLC=0] ---
+   10% (10/100)   20% (20/100)   30% (30/100)   40% (40/100)   50% (50/100)   60% (60/100)   70% (70/100)   80% (80/100)   90% (90/100)  100% (100/100)              Media: 5.431 ms | Mediana: 5.421 ms | Min: 5.001 | Max: 5.811
+  Performance: 396.11 GFLOPS (pela mediana)
+  Validacao: OK (contra kernel 1, max diferenca 0.00000000)
+
+--- Kernel 10 intrinsic com glc isolado [GLC=1 SLC=0] ---
+   10% (10/100)   20% (20/100)   30% (30/100)   40% (40/100)   50% (50/100)   60% (60/100)   70% (70/100)   80% (80/100)   90% (90/100)  100% (100/100)              Media: 13.377 ms | Mediana: 13.369 ms | Min: 11.465 | Max: 14.786
+  Performance: 160.63 GFLOPS (pela mediana)
+  Validacao: OK (contra kernel 1, max diferenca 0.00000000)
+
+================================================================
+cenario                                  flags ISA          media   mediana   dp(ms)    cv%  deriva%    GFLOPS val
+---------------------------------------------------------------------------------------------------------
+Kernel 1  normal (C puro)                GLC=0 SLC=0        6.992     6.991   0.2789   3.99    +9.17    307.20 OK
+Kernel 2  volatile (hipotese original)   GLC=1 SLC=0 *     13.449    13.398   0.4063   3.02    -2.89    160.29 OK
+Kernel 3  volatile agressivo (idem k2)   GLC=1 SLC=0 *     13.289    13.278   0.3533   2.66    +0.20    161.74 OK
+Kernel 4  controle asm (sem flags)       GLC=0 SLC=0       10.656    10.625   0.1812   1.70    -0.42    202.12 OK
+Kernel 5  bypass de L1                   GLC=1 SLC=0       12.777    12.734   0.3948   3.09    +3.51    168.64 OK
+Kernel 6  bypass de L1 + streaming L2    GLC=1 SLC=1       13.003    12.979   0.3454   2.66    -2.98    165.46 OK
+Kernel 7  nontemporal (sem asm)          GLC=1 SLC=1       12.435    12.415   0.4033   3.24    +0.16    172.97 OK
+Kernel 8  tiled com LDS (referencia)     GLC=0 SLC=0        2.093     2.115   0.0554   2.65    +3.57   1015.39 OK
+Kernel 9  controle intrinsic (sem flag)  GLC=0 SLC=0        5.431     5.421   0.1427   2.63    -1.52    396.11 OK
+Kernel 10 intrinsic com glc isolado      GLC=1 SLC=0       13.377    13.369   0.7101   5.31    +1.29    160.63 OK
+---------------------------------------------------------------------------------------------------------
+dp = desvio padrao amostral | cv = dp/media | deriva = ultimo decimo das execucoes contra o primeiro
+GFLOPS calculado pela mediana, menos sensivel a outliers. As razoes abaixo usam a media, porque
+o intervalo de confianca do metodo delta se apoia no erro padrao da media (dp/raiz(n)).
+----------------------------------------------------------------
+(*) k2 e k3 dependem do compilador: o mesmo fonte gera GLC=1 no
+    Clang/LLVM do ROCm e GLC=0 no AMDOCL do Windows. Confira sempre
+    a ISA realmente gerada antes de citar a flag.
+
+Comparacoes validas:
+  k1 vs k7 : MEDIDA PRINCIPAL — ISA identica instrucao a instrucao,
+             diferindo so pelos bits 'glc slc' em dois flat_load_dword
+  k1 -> k2 : efeito do volatile NESTE compilador (nao portavel).
+             CUIDADO: sob o ROCm o volatile emite glc E serializa os
+             loads (s_waitcnt apos cada um). O controle dele e o k4,
+             nao o k1 — senao bypass e serializacao ficam confundidos
+  k2 vs k3 : repetibilidade — fontes identicos, tempos devem coincidir
+  k1 -> k4 : custo do inline asm (barreira de otimizacao), sem bypass
+  k4 -> k5 : efeito do bypass de L1  (bit GLC), ja descontado o asm
+  k5 -> k6 : efeito do streaming em L2 (bit SLC)
+  k6 vs k7 : mesmas flags por caminhos diferentes (asm x builtin)
+
+Razoes (media, IC95 pelo metodo delta, t de Welch):
+  k3/k2 controle negativo          0.9881x  IC95 [0.9803, 0.9959]  t=   -2.97  significativo
+  k7/k1 GLC+SLC, sem asm           1.7785x  IC95 [1.7606, 1.7964]  t=  111.01  significativo
+  k2/k1 volatile no ROCm           1.9234x  IC95 [1.9046, 1.9423]  t=  131.02  significativo
+  k4/k1 so o custo do asm          1.5240x  IC95 [1.5111, 1.5370]  t=  110.18  significativo
+  k5/k4 efeito do GLC              1.1991x  IC95 [1.1908, 1.2073]  t=   48.83  significativo
+  k6/k5 efeito do SLC              1.0177x  IC95 [1.0095, 1.0258]  t=    4.30  significativo
+  k2/k5 volatile x asm glc         1.0526x  IC95 [1.0436, 1.0615]  t=   11.85  significativo
+  k1/k8 LDS vs global              3.3414x  IC95 [3.3101, 3.3728]  t=  172.33  significativo
+  k9/k1  custo do intrinsic        0.7767x  IC95 [0.7695, 0.7840]  t=  -49.83  significativo
+  k10/k9 GLC isolado (intrin)      2.4631x  IC95 [2.4345, 2.4917]  t=  109.71  significativo
+
+  Piso de ruido da bancada (k2 vs k3, kernels identicos): 1.19%
+  Efeitos menores que isso nao devem ser afirmados, ainda que o
+  teste os aponte como significativos — com n=100 o t detecta ate a
+  diferenca entre dois kernels de ISA identica.
+
+Amostras individuais gravadas em 'resultados/matmul_cache_flags.csv'
+(10 cenarios; n por cenario na coluna 'runs' de matmul_sweep.csv)
+
+
+=== Fim ===
+
+===================== N=2048  23:48:49 =====================
+=== AMD GPU Cache Bypass — Multiplicacao de Matrizes ===
+Matriz: 2048 x 2048 (16.0 MB por matriz, 48.0 MB total)
+FLOPs por execucao: 17.18 GFLOP
+
+GPU: gfx803
+Vendor: Advanced Micro Devices, Inc.
+
+[INFO] Binario ISA salvo em 'isa/matmul_gfx803.bin' (26704 bytes)
+       Dispositivo: gfx803
+       Analise: llvm-objdump -d --triple=amdgcn-amd-amdhsa \
+                  --mcpu=gfx803 isa/matmul_gfx803.bin   (Linux/ROCm)
+                clrxdisasm isa/matmul_gfx803.bin                       (binario do driver Windows)
+
+Referencia da CPU sobre 4096 posicoes amostradas...
+Referencia pronta.
+
+Matriz: 2048x2048 | Workgroup: 16x16 (256 threads)
+Warmup: 5 | Runs: 100 por cenario (1000 execucoes no total)
+================================================================
+
+--- Kernel 1  normal (C puro) [GLC=0 SLC=0] ---
+   10% (10/100)   20% (20/100)   30% (30/100)   40% (40/100)   50% (50/100)   60% (60/100)   70% (70/100)   80% (80/100)   90% (90/100)  100% (100/100)              Media: 55.904 ms | Mediana: 55.845 ms | Min: 55.187 | Max: 56.746
+  Performance: 307.64 GFLOPS (pela mediana)
+  Validacao: OK (amostra da CPU, max diferenca 0.00000000)
+
+--- Kernel 2  volatile (hipotese original) [GLC=1 SLC=0 *] ---
+   10% (10/100)   20% (20/100)   30% (30/100)   40% (40/100)   50% (50/100)   60% (60/100)   70% (70/100)   80% (80/100)   90% (90/100)  100% (100/100)              Media: 92.189 ms | Mediana: 92.117 ms | Min: 90.614 | Max: 94.414
+  Performance: 186.50 GFLOPS (pela mediana)
+  Validacao: OK (contra kernel 1, max diferenca 0.00000000)
+
+--- Kernel 3  volatile agressivo (idem k2) [GLC=1 SLC=0 *] ---
+   10% (10/100)   20% (20/100)   30% (30/100)   40% (40/100)   50% (50/100)   60% (60/100)   70% (70/100)   80% (80/100)   90% (90/100)  100% (100/100)              Media: 92.631 ms | Mediana: 92.395 ms | Min: 90.681 | Max: 95.188
+  Performance: 185.94 GFLOPS (pela mediana)
+  Validacao: OK (contra kernel 1, max diferenca 0.00000000)
+
+--- Kernel 4  controle asm (sem flags) [GLC=0 SLC=0] ---
+   10% (10/100)   20% (20/100)   30% (30/100)   40% (40/100)   50% (50/100)   60% (60/100)   70% (70/100)   80% (80/100)   90% (90/100)  100% (100/100)              Media: 84.409 ms | Mediana: 84.373 ms | Min: 84.167 | Max: 84.980
+  Performance: 203.62 GFLOPS (pela mediana)
+  Validacao: OK (contra kernel 1, max diferenca 0.00000000)
+
+--- Kernel 5  bypass de L1 [GLC=1 SLC=0] ---
+   10% (10/100)   20% (20/100)   30% (30/100)   40% (40/100)   50% (50/100)   60% (60/100)   70% (70/100)   80% (80/100)   90% (90/100)  100% (100/100)              Media: 92.664 ms | Mediana: 92.308 ms | Min: 90.548 | Max: 95.933
+  Performance: 186.11 GFLOPS (pela mediana)
+  Validacao: OK (contra kernel 1, max diferenca 0.00000000)
+
+--- Kernel 6  bypass de L1 + streaming L2 [GLC=1 SLC=1] ---
+   10% (10/100)   20% (20/100)   30% (30/100)   40% (40/100)   50% (50/100)   60% (60/100)   70% (70/100)   80% (80/100)   90% (90/100)  100% (100/100)              Media: 93.913 ms | Mediana: 93.460 ms | Min: 91.629 | Max: 97.152
+  Performance: 183.82 GFLOPS (pela mediana)
+  Validacao: OK (contra kernel 1, max diferenca 0.00000000)
+
+--- Kernel 7  nontemporal (sem asm) [GLC=1 SLC=1] ---
+   10% (10/100)   20% (20/100)   30% (30/100)   40% (40/100)   50% (50/100)   60% (60/100)   70% (70/100)   80% (80/100)   90% (90/100)  100% (100/100)              Media: 86.639 ms | Mediana: 86.617 ms | Min: 84.999 | Max: 87.932
+  Performance: 198.34 GFLOPS (pela mediana)
+  Validacao: OK (contra kernel 1, max diferenca 0.00000000)
+
+--- Kernel 8  tiled com LDS (referencia) [GLC=0 SLC=0] ---
+   10% (10/100)   20% (20/100)   30% (30/100)   40% (40/100)   50% (50/100)   60% (60/100)   70% (70/100)   80% (80/100)   90% (90/100)  100% (100/100)              Media: 16.325 ms | Mediana: 16.243 ms | Min: 15.427 | Max: 19.427
+  Performance: 1057.70 GFLOPS (pela mediana)
+  Validacao: OK (contra kernel 1, max diferenca 0.00000000)
+
+--- Kernel 9  controle intrinsic (sem flag) [GLC=0 SLC=0] ---
+   10% (10/100)   20% (20/100)   30% (30/100)   40% (40/100)   50% (50/100)   60% (60/100)   70% (70/100)   80% (80/100)   90% (90/100)  100% (100/100)              Media: 41.329 ms | Mediana: 41.193 ms | Min: 40.420 | Max: 42.739
+  Performance: 417.05 GFLOPS (pela mediana)
+  Validacao: OK (contra kernel 1, max diferenca 0.00000000)
+
+--- Kernel 10 intrinsic com glc isolado [GLC=1 SLC=0] ---
+   10% (10/100)   20% (20/100)   30% (30/100)   40% (40/100)   50% (50/100)   60% (60/100)   70% (70/100)   80% (80/100)   90% (90/100)  100% (100/100)              Media: 85.494 ms | Mediana: 85.707 ms | Min: 80.875 | Max: 88.835
+  Performance: 200.45 GFLOPS (pela mediana)
+  Validacao: OK (contra kernel 1, max diferenca 0.00000000)
+
+================================================================
+cenario                                  flags ISA          media   mediana   dp(ms)    cv%  deriva%    GFLOPS val
+---------------------------------------------------------------------------------------------------------
+Kernel 1  normal (C puro)                GLC=0 SLC=0       55.904    55.845   0.3441   0.62    +0.52    307.64 OK
+Kernel 2  volatile (hipotese original)   GLC=1 SLC=0 *     92.189    92.117   0.7718   0.84    -0.05    186.50 OK
+Kernel 3  volatile agressivo (idem k2)   GLC=1 SLC=0 *     92.631    92.395   1.1789   1.27    +1.74    185.94 OK
+Kernel 4  controle asm (sem flags)       GLC=0 SLC=0       84.409    84.373   0.1786   0.21    -0.03    203.62 OK
+Kernel 5  bypass de L1                   GLC=1 SLC=0       92.664    92.308   1.3006   1.40    -2.78    186.11 OK
+Kernel 6  bypass de L1 + streaming L2    GLC=1 SLC=1       93.913    93.460   1.5478   1.65    -0.72    183.82 OK
+Kernel 7  nontemporal (sem asm)          GLC=1 SLC=1       86.639    86.617   0.6681   0.77    +0.81    198.34 OK
+Kernel 8  tiled com LDS (referencia)     GLC=0 SLC=0       16.325    16.243   0.5378   3.29    -2.04   1057.70 OK
+Kernel 9  controle intrinsic (sem flag)  GLC=0 SLC=0       41.329    41.193   0.5372   1.30    +1.24    417.05 OK
+Kernel 10 intrinsic com glc isolado      GLC=1 SLC=0       85.494    85.707   1.9901   2.33    -0.18    200.45 OK
+---------------------------------------------------------------------------------------------------------
+dp = desvio padrao amostral | cv = dp/media | deriva = ultimo decimo das execucoes contra o primeiro
+GFLOPS calculado pela mediana, menos sensivel a outliers. As razoes abaixo usam a media, porque
+o intervalo de confianca do metodo delta se apoia no erro padrao da media (dp/raiz(n)).
+----------------------------------------------------------------
+(*) k2 e k3 dependem do compilador: o mesmo fonte gera GLC=1 no
+    Clang/LLVM do ROCm e GLC=0 no AMDOCL do Windows. Confira sempre
+    a ISA realmente gerada antes de citar a flag.
+
+Comparacoes validas:
+  k1 vs k7 : MEDIDA PRINCIPAL — ISA identica instrucao a instrucao,
+             diferindo so pelos bits 'glc slc' em dois flat_load_dword
+  k1 -> k2 : efeito do volatile NESTE compilador (nao portavel).
+             CUIDADO: sob o ROCm o volatile emite glc E serializa os
+             loads (s_waitcnt apos cada um). O controle dele e o k4,
+             nao o k1 — senao bypass e serializacao ficam confundidos
+  k2 vs k3 : repetibilidade — fontes identicos, tempos devem coincidir
+  k1 -> k4 : custo do inline asm (barreira de otimizacao), sem bypass
+  k4 -> k5 : efeito do bypass de L1  (bit GLC), ja descontado o asm
+  k5 -> k6 : efeito do streaming em L2 (bit SLC)
+  k6 vs k7 : mesmas flags por caminhos diferentes (asm x builtin)
+
+Razoes (media, IC95 pelo metodo delta, t de Welch):
+  k3/k2 controle negativo          1.0048x  IC95 [1.0018, 1.0078]  t=    3.14  significativo
+  k7/k1 GLC+SLC, sem asm           1.5498x  IC95 [1.5468, 1.5528]  t=  408.99  significativo
+  k2/k1 volatile no ROCm           1.6490x  IC95 [1.6457, 1.6524]  t=  429.38  significativo
+  k4/k1 so o custo do asm          1.5099x  IC95 [1.5079, 1.5118]  t=  735.16  significativo
+  k5/k4 efeito do GLC              1.0978x  IC95 [1.0947, 1.1009]  t=   62.88  significativo
+  k6/k5 efeito do SLC              1.0135x  IC95 [1.0092, 1.0178]  t=    6.18  significativo
+  k2/k5 volatile x asm glc         0.9949x  IC95 [0.9917, 0.9981]  t=   -3.14  significativo
+  k1/k8 LDS vs global              3.4245x  IC95 [3.4020, 3.4470]  t=  619.90  significativo
+  k9/k1  custo do intrinsic        0.7393x  IC95 [0.7372, 0.7414]  t= -228.47  significativo
+  k10/k9 GLC isolado (intrin)      2.0686x  IC95 [2.0578, 2.0794]  t=  214.25  significativo
+
+  Piso de ruido da bancada (k2 vs k3, kernels identicos): 0.48%
+  Efeitos menores que isso nao devem ser afirmados, ainda que o
+  teste os aponte como significativos — com n=100 o t detecta ate a
+  diferenca entre dois kernels de ISA identica.
+
+Amostras individuais gravadas em 'resultados/matmul_cache_flags.csv'
+(10 cenarios; n por cenario na coluna 'runs' de matmul_sweep.csv)
+
+
+=== Fim ===
+
+===================== N=4096  23:50:08 =====================
+=== AMD GPU Cache Bypass — Multiplicacao de Matrizes ===
+Matriz: 4096 x 4096 (64.0 MB por matriz, 192.0 MB total)
+FLOPs por execucao: 137.44 GFLOP
+
+GPU: gfx803
+Vendor: Advanced Micro Devices, Inc.
+
+[INFO] Binario ISA salvo em 'isa/matmul_gfx803.bin' (26704 bytes)
+       Dispositivo: gfx803
+       Analise: llvm-objdump -d --triple=amdgcn-amd-amdhsa \
+                  --mcpu=gfx803 isa/matmul_gfx803.bin   (Linux/ROCm)
+                clrxdisasm isa/matmul_gfx803.bin                       (binario do driver Windows)
+
+Referencia da CPU sobre 4096 posicoes amostradas...
+Referencia pronta.
+
+Matriz: 4096x4096 | Workgroup: 16x16 (256 threads)
+Warmup: 5 | Runs: 100 por cenario (1000 execucoes no total)
+================================================================
+
+--- Kernel 1  normal (C puro) [GLC=0 SLC=0] ---
+   10% (10/100)   20% (20/100)   30% (30/100)   40% (40/100)   50% (50/100)   60% (60/100)   70% (70/100)   80% (80/100)   90% (90/100)  100% (100/100)              Media: 447.509 ms | Mediana: 447.186 ms | Min: 446.424 | Max: 451.108
+  Performance: 307.34 GFLOPS (pela mediana)
+  Validacao: OK (amostra da CPU, max diferenca 0.00000000)
+
+--- Kernel 2  volatile (hipotese original) [GLC=1 SLC=0 *] ---
+   10% (10/100)   20% (20/100)   30% (30/100)   40% (40/100)   50% (50/100)   60% (60/100)   70% (70/100)   80% (80/100)   90% (90/100)  100% (100/100)              Media: 742.665 ms | Mediana: 742.618 ms | Min: 739.635 | Max: 745.339
+  Performance: 185.07 GFLOPS (pela mediana)
+  Validacao: OK (contra kernel 1, max diferenca 0.00000000)
+
+--- Kernel 3  volatile agressivo (idem k2) [GLC=1 SLC=0 *] ---
+   10% (10/100)   20% (20/100)   30% (30/100)   40% (40/100)   50% (50/100)   60% (60/100)   70% (70/100)   80% (80/100)   90% (90/100)  100% (100/100)              Media: 742.959 ms | Mediana: 742.982 ms | Min: 739.202 | Max: 746.468
+  Performance: 184.98 GFLOPS (pela mediana)
+  Validacao: OK (contra kernel 1, max diferenca 0.00000000)
+
+--- Kernel 4  controle asm (sem flags) [GLC=0 SLC=0] ---
+   10% (10/100)   20% (20/100)   30% (30/100)   40% (40/100)   50% (50/100)   60% (60/100)   70% (70/100)   80% (80/100)   90% (90/100)  100% (100/100)              Media: 678.245 ms | Mediana: 677.952 ms | Min: 676.095 | Max: 683.448
+  Performance: 202.73 GFLOPS (pela mediana)
+  Validacao: OK (contra kernel 1, max diferenca 0.00000000)
+
+--- Kernel 5  bypass de L1 [GLC=1 SLC=0] ---
+   10% (10/100)   20% (20/100)   30% (30/100)   40% (40/100)   50% (50/100)   60% (60/100)   70% (70/100)   80% (80/100)   90% (90/100)  100% (100/100)              Media: 728.235 ms | Mediana: 726.322 ms | Min: 718.106 | Max: 755.432
+  Performance: 189.23 GFLOPS (pela mediana)
+  Validacao: OK (contra kernel 1, max diferenca 0.00000000)
+
+--- Kernel 6  bypass de L1 + streaming L2 [GLC=1 SLC=1] ---
+
+===================== N=8192  23:56:06 =====================
+=== AMD GPU Cache Bypass — Multiplicacao de Matrizes ===
+Matriz: 8192 x 8192 (256.0 MB por matriz, 768.0 MB total)
+FLOPs por execucao: 1099.51 GFLOP
+
+GPU: gfx803
+Vendor: Advanced Micro Devices, Inc.
+
+[INFO] Binario ISA salvo em 'isa/matmul_gfx803.bin' (26704 bytes)
+       Dispositivo: gfx803
+       Analise: llvm-objdump -d --triple=amdgcn-amd-amdhsa \
+                  --mcpu=gfx803 isa/matmul_gfx803.bin   (Linux/ROCm)
+                clrxdisasm isa/matmul_gfx803.bin                       (binario do driver Windows)
+
+Referencia da CPU sobre 4096 posicoes amostradas...
+Referencia pronta.
+
+Matriz: 8192x8192 | Workgroup: 16x16 (256 threads)
+Warmup: 5 | Runs: 100 por cenario (1000 execucoes no total)
+================================================================
+
+--- Kernel 1  normal (C puro) [GLC=0 SLC=0] ---

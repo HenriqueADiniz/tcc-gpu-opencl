@@ -1,0 +1,10 @@
+1. normal (C puro) & GLC=0 SLC=0 & 6.99 & 55.84 & 449.0 & 3693 & 29934 \\
+2. \texttt{volatile} & GLC=1$^\ast$ & 13.40 & 92.12 & 744.5 & 5940 & 47671 \\
+3. \texttt{volatile} (idem 2) & GLC=1$^\ast$ & 13.28 & 92.39 & 745.3 & 5952 & 47714 \\
+4. controle \textit{asm} & GLC=0 SLC=0 & 10.62 & 84.37 & 675.5 & 5429 & 43642 \\
+5. \textit{asm} \texttt{glc} & GLC=1 & 12.73 & 92.31 & 719.0 & 5747 & 46343 \\
+6. \textit{asm} \texttt{glc slc} & GLC=1 SLC=1 & 12.98 & 93.46 & 737.3 & 6048 & 51816 \\
+7. \texttt{nontemporal} & GLC=1 SLC=1 & 12.42 & 86.62 & 666.8 & 5397 & 47536 \\
+8. \textit{tiled} (LDS) & GLC=0 SLC=0 & 2.11 & 16.24 & 129.5 & 1078 & 9369 \\
+9. controle intrinsic & GLC=0 SLC=0 & 5.42 & 41.19 & 349.8 & 2896 & 23630 \\
+10. intrinsic \texttt{glc} & GLC=1 & 13.37 & 85.71 & 623.2 & 4895 & 39014 \\

@@ -123,6 +123,15 @@ L1 por perfil de acesso:
 | Matmul *naive* | $N$, disperso em 8 MB | não | 1,27× |
 | *Stencil* 2D 3×3 | 9, janela de 3 linhas | **sim** | **1,80×** |
 
+> **⚠ CORRIGIDO PELA BATERIA DE REPRODUÇÃO** (`bateria_reproducao.md`): o valor
+> **0,95×** do *streaming* **não é reprodutível**. Sete execuções independentes deram
+> razões L2/L1 entre 0,93× e 1,19×, sem sinal consistente. A cada execução uma das três
+> variantes apresenta dp < 0,5% e as demais 8–32%, e qual delas fica "limpa" muda entre
+> execuções — o mesmo artefato de *outliers* tratado com mediana no Exp. 8. A leitura
+> correta é **efeito não mensurável**. As demais cargas (stencil 1,70–1,82×; matmul
+> 1,25–1,31×) reproduzem-se de forma estreita e permanecem válidas.
+
+
 O padrão é consistente: o L1 só cobra quando existe **reúso de leitura,
 volumoso, sobre um conjunto de trabalho que cabe em 16 KB por CU**. Reúso alto
 mas uniforme (crivo) não conta, porque o coalescedor já o resolve; reúso alto

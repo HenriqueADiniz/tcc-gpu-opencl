@@ -1,0 +1,16 @@
+L2 informada pelo driver: 16 KB
+
+=== A) 1 MB   — CABE na L2 (2 MB)  (buffer 1 MB) ===
+kernel         flags        mediana(ms)         GB/s   vs GLC=1
+sweep_noflag   GLC=0 SLC=0      0.2283        587.8          -
+sweep_glc      GLC=1 SLC=0      0.2378        564.5          -
+sweep_glc_slc  GLC=1 SLC=1      0.2415        555.9           
+                                                        1.015x
+
+=== B) 64 MB  — NAO cabe na L2  (buffer 64 MB) ===
+kernel         flags        mediana(ms)         GB/s   vs GLC=1
+sweep_noflag   GLC=0 SLC=0      0.6039        222.3          -
+sweep_glc      GLC=1 SLC=0      0.6042        222.1          -
+sweep_glc_slc  GLC=1 SLC=1      0.5930        226.3           
+                                                        0.981x
+
