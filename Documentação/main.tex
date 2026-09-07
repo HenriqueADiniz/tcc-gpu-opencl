@@ -24,48 +24,39 @@
 \maketitle
 
 \begin{abstract}
-This work experimentally analyses the impact of the memory hierarchy on the
-performance of parallel algorithms on an AMD Ellesmere GPU (Polaris/GCN, GFX8)
-under OpenCL, on Windows and Linux. The methodology comprises five experiments,
-progressing from the failure of the \texttt{volatile} qualifier as a cache
-control mechanism to explicit selection of the cache level, its isolation
-through a controlled design, and a sweep of problem sizes. A central finding is
-that mapping \texttt{volatile} onto coherence flags is a compiler code
-generation decision, not an architectural property: on the same device and
-target, the Windows driver compiler emits GLC=0 while the ROCm Clang/LLVM
-compiler emits GLC=1. With explicit control available, the cost of bypassing the
-L1 is separated from two factors the naive comparison mixes with it. The size
-sweep --- five sizes from $N=1024$ to $N=16384$, 100 executions each --- shows
-that the construction costs are nearly invariant with size while the cost of the
-\texttt{glc} flag falls from 2.47$\times$ to 1.65$\times$, so a single-size
-measurement does not characterise the cache effect. The hypothesis that SLC=1
-bypasses the L2 is refuted twice over: by throughput, where a working set that
-fits in the L2 still sustains 556~GB/s against a 222~GB/s VRAM ceiling; and by
-the sweep, where the flag's cost grows from 1.9\% to 11.8\% with size, the
-signature of an eviction policy rather than a bypass.
+This work experimentally analyses the control of the memory hierarchy on an AMD
+Ellesmere GPU (Polaris/GCN, GFX8) under OpenCL, on Windows and Linux. Five
+experiments progress from the failure of the \texttt{volatile} qualifier as a
+cache control mechanism to explicit selection of the cache level and its
+isolation through a controlled design. A central finding is that mapping
+\texttt{volatile} onto coherence flags is a compiler code generation decision,
+not an architectural property: on the same device and target, the Windows driver
+compiler emits GLC=0 while the ROCm Clang/LLVM compiler emits GLC=1. With
+explicit control available, the cost of bypassing the L1 is separated from the
+code generation costs a naive comparison mixes with it, and shown to vary with
+problem size, falling from 2.47$\times$ to 1.65$\times$ over a 4,096-fold range
+in data volume. The hypothesis that SLC=1 bypasses the L2 is refuted twice over:
+a working set that fits in the L2 still sustains 556~GB/s against a 222~GB/s VRAM
+ceiling, and the flag's cost grows with size --- the signature of an eviction
+policy rather than a bypass.
 \end{abstract}
 
 \begin{resumo}
-Este trabalho analisa experimentalmente o impacto da hierarquia de memória no
-desempenho de algoritmos paralelos em GPU AMD Ellesmere (Polaris/GCN, GFX8) sob
-OpenCL, em Windows e Linux. A metodologia compreende cinco experimentos, que vão
-do fracasso do qualificador \texttt{volatile} como mecanismo de controle de
-\textit{cache} até a seleção explícita do nível, seu isolamento por desenho
-controlado e uma análise de sensibilidade ao tamanho do problema. Um achado central é que o
-mapeamento de \texttt{volatile} para \textit{flags} de coerência é decisão de
-geração de código do compilador, e não propriedade da arquitetura: no mesmo
-dispositivo e \textit{target}, o compilador do \textit{driver} Windows emite
-GLC=0 e o Clang/LLVM do ROCm emite GLC=1. Obtido o controle explícito, o custo
-de contornar o L1 é separado de dois fatores que a comparação ingênua mistura
-com ele. A análise de sensibilidade --- cinco tamanhos de $N=1024$ a $N=16384$, com 100
-execuções cada --- mostra que os custos de construção são quase invariantes com
-o tamanho, ao passo que o custo da \textit{flag} \texttt{glc} cai de
-2,47$\times$ para 1,65$\times$, de modo que uma medida de tamanho único não
-caracteriza o efeito do \textit{cache}. A hipótese de que SLC=1 contorna o L2 é
-refutada por duas vias: por vazão, em que um conjunto que cabe no L2 ainda
-sustenta 556~GB/s contra um teto de 222~GB/s da VRAM; e pela análise de sensibilidade, em que
-o custo da \textit{flag} cresce de 1,9\% para 11,8\% com o tamanho --- assinatura
-de política de \textit{eviction}, e não de \textit{bypass}.
+Este trabalho analisa experimentalmente o controle da hierarquia de memória em
+GPU AMD Ellesmere (Polaris/GCN, GFX8) sob OpenCL, em Windows e Linux. Cinco
+experimentos vão do fracasso do qualificador \texttt{volatile} como mecanismo de
+controle de \textit{cache} até a seleção explícita do nível e seu isolamento por
+desenho controlado. Um achado central é que o mapeamento de \texttt{volatile}
+para \textit{flags} de coerência é decisão de geração de código do compilador, e
+não propriedade da arquitetura: no mesmo dispositivo e \textit{target}, o
+compilador do \textit{driver} Windows emite GLC=0 e o Clang/LLVM do ROCm emite
+GLC=1. Obtido o controle explícito, o custo de contornar o L1 é separado dos
+custos de construção que a comparação ingênua mistura com ele, e mostra-se
+dependente do tamanho do problema, caindo de 2,47$\times$ para 1,65$\times$ ao
+longo de um fator de 4.096 em volume de dados. A hipótese de que SLC=1 contorna o
+L2 é refutada por duas vias: um conjunto que cabe no L2 ainda sustenta 556~GB/s
+contra um teto de 222~GB/s da VRAM, e o custo da \textit{flag} cresce com o
+tamanho --- assinatura de política de \textit{eviction}, e não de \textit{bypass}.
 \end{resumo}
 
 
@@ -77,43 +68,34 @@ Embora o paralelismo massivo oferecido pelas GPUs seja fundamental para o desemp
 
 Diante desse cenário, a pergunta que orienta este trabalho é: qual é o impacto quantitativo da hierarquia de memória no desempenho de algoritmos paralelos executados em GPU AMD utilizando OpenCL? A literatura existente concentra-se predominantemente em GPUs NVIDIA \cite{ariel2012, fang2011, wong2010, mei2017, jia2018}, havendo escassez de estudos que investiguem o comportamento de \textit{cache} e memória em GPUs AMD da arquitetura GCN sob OpenCL. Além disso, a interação entre o compilador OpenCL, o sistema operacional e a arquitetura da GPU no que diz respeito ao controle de \textit{cache} permanece pouco explorada.
 
-A relevância do estudo é teórica e prática. No plano teórico, estudos clássicos demonstram que a estrutura do sistema operacional exerce influência mensurável sobre o desempenho do sistema de memória \cite{chen1993} e que as políticas de escalonamento afetam significativamente aplicações paralelas \cite{gupta1991}, o que reforça a necessidade de investigações que considerem a plataforma de execução. No plano prático, compreender como o compilador OpenCL da AMD traduz --- ou deixa de traduzir --- qualificadores de memória em instruções com \textit{flags} de controle de \textit{cache} permite decisões mais fundamentadas na otimização de algoritmos para esse \textit{hardware}; e a análise em Windows e Linux permite avaliar se o compilador do \textit{driver} ou o ambiente de execução influenciam essa tradução.
+A relevância é teórica e prática. Estudos clássicos mostram que a estrutura do sistema operacional influencia de forma mensurável o desempenho do sistema de memória~\cite{chen1993} e que as políticas de escalonamento afetam aplicações paralelas~\cite{gupta1991}, o que justifica investigações que considerem a plataforma de execução. No plano prático, saber como o compilador OpenCL da AMD traduz --- ou deixa de traduzir --- qualificadores de memória em \textit{flags} de \textit{cache} fundamenta decisões de otimização para esse \textit{hardware}.
 
 O objetivo geral deste trabalho é analisar experimentalmente o impacto da hierarquia de memória no desempenho de algoritmos paralelos executados em GPU AMD (arquitetura Polaris/GCN) utilizando OpenCL. Para isso, são definidos os seguintes objetivos específicos:
 
 \begin{enumerate}
-\item Implementar \textit{benchmarks} em OpenCL que exercitem seletivamente os níveis da hierarquia de memória da GPU --- \textit{cache} L1, \textit{cache} L2, LDS e memória global --- por meio do controle explícito do caminho de memória de cada acesso.
-\item Analisar o binário ISA gerado pelo compilador OpenCL da AMD para verificar como qualificadores de memória (como \texttt{volatile}) são traduzidos em instruções de máquina na arquitetura GFX8.
-\item Isolar, por desenho experimental controlado, o custo de contornar o \textit{cache} L1, separando-o dos fatores que a comparação ingênua confunde com ele.
-\item Investigar mecanismos de controle direto de \textit{cache} (\textit{inline assembly} GCN, \textit{binary patching}, HIP SDK) e avaliar sua viabilidade em diferentes plataformas.
-\item Comparar o comportamento do compilador OpenCL em ambiente Windows (\textit{driver} proprietário AMDOCL) e Linux (ROCm/Clang-LLVM), verificando se o suporte a \textit{inline assembly} e a geração de \textit{flags} de \textit{cache} diferem entre plataformas.
-\item Verificar como esse custo varia com o tamanho do problema, por meio de análise de sensibilidade que cubra várias ordens de grandeza em volume de dados.
+\item Determinar quais limites da hierarquia são efetivamente selecionáveis a partir de código OpenCL no GCN, e implementar \textit{benchmarks} que exercitem cada caminho assim obtido.
+\item Analisar o binário ISA gerado pelo compilador OpenCL da AMD, verificando como qualificadores de memória são traduzidos em instruções no GFX8.
+\item Investigar mecanismos de controle direto (\textit{inline assembly} GCN, \textit{binary patching}, HIP SDK) e comparar o compilador do \textit{driver} Windows com o Clang/LLVM do ROCm.
+\item Isolar, por desenho controlado, o custo de contornar o L1, separando-o dos fatores que a comparação ingênua confunde com ele.
+\item Verificar como esse custo varia com o tamanho do problema, ao longo de várias ordens de grandeza em volume de dados.
 \end{enumerate}
 
-Este texto está estruturado da seguinte forma. A Seção 2 apresenta o referencial teórico, abordando computação paralela em GPU, o \textit{framework} OpenCL e a hierarquia de memória em GPUs AMD. A Seção 3 descreve os trabalhos relacionados e posiciona a contribuição deste estudo. A Seção 4 descreve a metodologia experimental. A Seção 5 apresenta os resultados obtidos. A Seção 6 apresenta o cronograma do TCC~II. Por fim, a Seção 7 traz as considerações finais.
+Este texto está estruturado da seguinte forma: a Seção~2 apresenta o referencial teórico; a Seção~3 discute os trabalhos relacionados e posiciona a contribuição; a Seção~4 descreve a metodologia; a Seção~5 apresenta os resultados; a Seção~6 traz o cronograma do TCC~II; e a Seção~7, as considerações finais.
 
 
 \section{Referencial Teórico}
 
 Nesta seção são descritos os principais conceitos relacionados à computação paralela em GPU, ao \textit{framework} OpenCL e à hierarquia de memória em GPUs AMD.
 
-\subsection{Computação Paralela em GPU (GPGPU)}
+\subsection{GPGPU e o Modelo de Memória do OpenCL}
 
-A utilização de GPUs para computação de propósito geral (GPGPU) tem se consolidado como uma das principais estratégias para a aceleração de aplicações que demandam alto paralelismo de dados. Diferentemente das CPUs, projetadas para minimizar a latência de tarefas individuais, as GPUs são arquitetadas para maximizar o \textit{throughput} de operações simultâneas, dispondo de centenas a milhares de núcleos de processamento \cite{fang2011}. Essa característica as torna particularmente adequadas para algoritmos que operam sobre grandes conjuntos de dados de forma uniforme, como multiplicação de matrizes, processamento de imagens e simulações numéricas.
+Diferentemente das CPUs, projetadas para minimizar a latência de tarefas individuais, as GPUs maximizam o \textit{throughput} de operações simultâneas sobre centenas a milhares de núcleos~\cite{fang2011}, o que as torna adequadas a algoritmos de paralelismo de dados uniforme, como a multiplicação de matrizes. Entre os \textit{frameworks} de programação, o CUDA é proprietário da NVIDIA e o OpenCL é um padrão aberto e portável entre fabricantes~\cite{memeti2017}, embora o desempenho ótimo costume exigir otimizações específicas de plataforma~\cite{seo2011, vidye2023}.
 
-Os principais \textit{frameworks} para programação GPGPU incluem o CUDA, proprietário da NVIDIA, e o OpenCL, um padrão aberto mantido pelo Khronos Group. Enquanto o CUDA oferece otimizações específicas para \textit{hardware} NVIDIA, o OpenCL proporciona portabilidade entre dispositivos de diferentes fabricantes \cite{memeti2017}, embora a obtenção de desempenho ótimo frequentemente requeira otimizações específicas para cada plataforma \cite{seo2011, vidye2023}.
-
-\subsection{OpenCL: Modelo de Plataforma e Execução}
-
-O OpenCL (\textit{Open Computing Language}) define um modelo de plataforma composto por um \textit{host} (tipicamente a CPU) conectado a um ou mais \textit{compute devices} (como GPUs). Cada \textit{compute device} é dividido em \textit{compute units} (CUs), que por sua vez contêm \textit{processing elements} (PEs) \cite{seo2011}. O modelo de execução baseia-se em \textit{kernels} --- funções executadas paralelamente por múltiplas instâncias denominadas \textit{work-items}, organizados em \textit{work-groups} que executam em uma mesma CU.
-
-O modelo de memória do OpenCL define quatro regiões distintas: memória \textit{global} (acessível por todos os \textit{work-items}), memória \textit{constant} (somente leitura), memória \textit{local} (compartilhada dentro de um \textit{work-group}) e memória \textit{private} (privada a cada \textit{work-item}). A correta utilização dessas regiões é fundamental para o desempenho, visto que a latência e a largura de banda variam significativamente entre elas \cite{fraire2013}.
+O OpenCL organiza a execução em \textit{kernels}, instanciados como \textit{work-items} agrupados em \textit{work-groups} que executam numa mesma \textit{compute unit} (CU). Seu modelo de memória distingue quatro regiões --- \textit{global}, \textit{constant}, \textit{local} e \textit{private} ---, cuja latência e largura de banda diferem em ordens de grandeza~\cite{fraire2013}. É a região \textit{global}, atendida pela VRAM através dos \textit{caches}, que este trabalho investiga: o modelo do OpenCL nomeia as regiões, mas não expõe qual nível de \textit{cache} atende cada acesso, e é precisamente esse controle que se busca aqui.
 
 \subsection{Hierarquia de Memória em GPUs AMD (GCN/Polaris)}
 
-As GPUs AMD baseadas na arquitetura GCN (\textit{Graphics Core Next}), como a família Polaris (RX 470/480/570/580, codinome Ellesmere), possuem uma hierarquia de memória composta por múltiplos níveis. Os registradores constituem a memória privada de cada \textit{work-item}, com latência mínima. O LDS (\textit{Local Data Share}) oferece 64~KB de memória compartilhada por CU, correspondendo à memória \texttt{\_\_local} do OpenCL. O \textit{cache} L1 (vL1), com 16~KB por CU e política \textit{write-through}, é utilizado para leituras de memória global. O \textit{cache} L2, compartilhado entre todas as CUs, possui capacidade de até 2~MB na Polaris e reside no mesmo \textit{die} da GPU, particionado entre os controladores de memória. Por fim, a VRAM (memória global GDDR5) oferece alta largura de banda teórica (até 256~GB/s), porém com latência elevada em comparação aos \textit{caches} \cite{ariel2012}.
-
-Cabe registrar que a consulta \texttt{CL\_DEVICE\_GLOBAL\_MEM\_CACHE\_SIZE} do OpenCL retorna 16~KB no dispositivo utilizado, ou seja, a capacidade do L1 por CU, e não a do L2. A API não expõe a capacidade do L2, de modo que esse valor não deve ser tomado como tal.
+As GPUs AMD baseadas na arquitetura GCN (\textit{Graphics Core Next}), como a família Polaris (RX 470/480/570/580, codinome Ellesmere), possuem uma hierarquia de memória composta por múltiplos níveis. Os registradores constituem a memória privada de cada \textit{work-item}, com latência mínima. O LDS (\textit{Local Data Share}) oferece 64~KB de memória compartilhada por CU, correspondendo à memória \texttt{\_\_local} do OpenCL. O \textit{cache} L1 (vL1), com 16~KB por CU e política \textit{write-through}, é utilizado para leituras de memória global. O \textit{cache} L2, compartilhado entre todas as CUs, possui capacidade de até 2~MB na Polaris e reside no mesmo \textit{die} da GPU, particionado entre os controladores de memória.\footnote{A consulta \texttt{CL\_DEVICE\_GLOBAL\_MEM\_CACHE\_SIZE} retorna 16~KB neste dispositivo --- a capacidade do L1 por CU, não a do L2, que a API não expõe.} Por fim, a VRAM (memória global GDDR5) oferece alta largura de banda teórica (até 256~GB/s), porém com latência elevada em comparação aos \textit{caches} \cite{ariel2012}.
 
 Na ISA GCN, as instruções de acesso à memória global (\texttt{buffer\_load\_dword} no formato MUBUF, \texttt{flat\_load\_dword} no formato FLAT) possuem campos de bits associados ao comportamento de \textit{cache}: GLC (\textit{Globally Coherent}) e SLC (\textit{System Level Coherent}). No formato FLAT do GFX8, o bit~16 corresponde a GLC e o bit~17 a SLC; no formato MUBUF, GLC ocupa o bit~14 e SLC o bit~17~\cite{amdgcn3}. Em gerações posteriores (GFX9+) as \textit{flags} foram renomeadas para \texttt{sc0}/\texttt{sc1}. A nomenclatura sugere que GLC controlaria a coerência no L1 e SLC no nível de sistema --- e é comum encontrar a leitura de que SLC=1 realizaria o \textit{bypass} do L2. O efeito microarquitetural efetivo de cada bit no GFX8 é objeto de investigação neste trabalho, e a Seção~\ref{sec:slc} mostra que essa leitura não se sustenta para o SLC.
 
@@ -126,13 +108,7 @@ Diversos estudos investigaram o desempenho de \textit{frameworks} de programaç�
 
 \subsection{Comparação de \textit{Frameworks} para GPGPU}
 
-Fang et al.~\cite{fang2011} compararam CUDA e OpenCL em 16 \textit{kernels} sobre GPUs NVIDIA Tesla, demonstrando que o desempenho do OpenCL pode ficar significativamente aquém do CUDA na mesma GPU quando otimizações específicas não são aplicadas. Os autores atribuem parte da diferença a padrões de acesso à memória menos eficientes gerados pelo compilador OpenCL.
-
-Seo et al.~\cite{seo2011} portaram os \textit{NAS Parallel Benchmarks} para OpenCL e evidenciaram que a eficiência do acesso à memória é frequentemente determinante para o desempenho, superando o impacto do paralelismo computacional, e que \textit{kernels} com alta reutilização se beneficiam do uso explícito de memória local.
-
-Memeti et al.~\cite{memeti2017} compararam OpenCL, OpenACC, OpenMP e CUDA em produtividade e desempenho, concluindo que a escolha do \textit{framework} e das otimizações de memória produz variações de até uma ordem de grandeza entre implementações otimizadas e não otimizadas.
-
-Fraire et al.~\cite{fraire2013} compararam o desempenho de CPU e GPU em multiplicação de matrizes e operações vetoriais sob OpenCL, ressaltando a importância do modelo de memória e da organização dos \textit{work-items}.
+Um primeiro eixo da literatura compara \textit{frameworks} de programação paralela. Fang et al.~\cite{fang2011} avaliaram CUDA e OpenCL em 16 \textit{kernels} sobre GPUs NVIDIA e atribuíram parte da desvantagem do OpenCL a padrões de acesso à memória menos eficientes gerados pelo seu compilador; Memeti et al.~\cite{memeti2017} mediram variações de até uma ordem de grandeza entre implementações otimizadas e não otimizadas, conforme o \textit{framework} e as otimizações de memória; e Fraire et al.~\cite{fraire2013} ressaltaram o peso do modelo de memória e da organização dos \textit{work-items}. Seo et al.~\cite{seo2011}, ao portarem os \textit{NAS Parallel Benchmarks} para OpenCL, mostraram que a eficiência do acesso à memória frequentemente supera o paralelismo computacional como determinante do desempenho. O conjunto estabelece a premissa deste trabalho --- o acesso à memória domina --- e localiza no \textbf{compilador} uma fonte de variação que a Seção~\ref{sec:multi} retoma de forma direta.
 
 \subsection{Hierarquia de Memória em GPUs}
 
@@ -152,7 +128,7 @@ Vidye et al.~\cite{vidye2023} avaliaram o OpenCL em Windows, Linux e macOS, iden
 
 Balen et al.~\cite{balen2022} avaliaram o desempenho de diferentes distribuições Linux em tarefas computacionais, demonstrando que a configuração do sistema operacional afeta significativamente o desempenho de aplicações. Embora não aborde GPUs diretamente, o estudo reforça a importância de considerar o ambiente de execução completo.
 
-Ambos os trabalhos atribuem ao sistema operacional as diferenças observadas entre plataformas. Cabe registrar desde já que o resultado deste estudo qualifica essa atribuição: a diferença aqui medida entre Windows e Linux, no mesmo dispositivo, não decorre do sistema operacional, mas do \textit{front-end} do compilador de \textit{kernels} que cada ambiente utiliza (Seção~\ref{sec:multi}). Comparações entre plataformas que não isolem o compilador correm o risco de imputar ao ambiente um efeito de geração de código.
+Ambos atribuem ao sistema operacional as diferenças entre plataformas, e o resultado deste estudo qualifica essa atribuição: a diferença aqui medida entre Windows e Linux, no mesmo dispositivo, não decorre do SO, mas do \textit{front-end} do compilador de \textit{kernels} de cada ambiente (Seção~\ref{sec:multi}). Comparações que não isolem o compilador arriscam imputar ao ambiente um efeito de geração de código.
 
 \subsection{Síntese e Posicionamento}
 
@@ -197,6 +173,14 @@ entre eles. A Tabela~\ref{tab:ambiente} descreve os dois ambientes; a metodologi
 compreende cinco experimentos, distribuídos entre eles conforme a última linha
 da tabela.
 
+O desenho parte de três caminhos candidatos para uma mesma leitura --- atendida
+pelo L1; pelo L2, com desvio do L1; e pela memória global, com desvio de ambos ---,
+que é o que a nomenclatura das \textit{flags} GLC e SLC sugere. Quais deles são de
+fato obteníveis no GFX8 não é premissa, mas objeto de verificação: o
+Experimento~4 submete o terceiro a teste (Seção~\ref{sec:slc}). Adiante-se que
+apenas os dois primeiros existem, de modo que os experimentos comparam
+\textbf{dois caminhos de memória}, e não três.
+
 \begin{table}[ht]
 \centering
 \caption{Ambientes de execução. O dispositivo é o mesmo nos dois; varia apenas a
@@ -231,24 +215,11 @@ com \texttt{volatile} em graus distintos e uma \textit{tiled} com memória local
 
 Para verificar se o qualificador de fato altera as instruções emitidas, o binário
 compilado pelo \textit{driver} é extraído via
-\texttt{clGetProgramInfo(CL\_PROGRAM\_BINARIES)} e analisado por três ferramentas
-complementares: um decodificador próprio, em C++, que percorre a estrutura ELF
-aninhada do binário (ELF externo de 32~bits $\to$ ELF interno de 64~bits, HSA
-\textit{Code Object} $\to$ seção \texttt{.hsatext}) e extrai os campos GLC e SLC;
-o \textbf{CLRadeonExtender} (\texttt{clrxdisasm}), como verificação independente; e
-o \textbf{Radeon GPU Analyzer} (RGA), compilador \textit{offline} que permite
-compilar os mesmos \textit{kernels} para múltiplos \textit{targets} (gfx803,
-gfx900, gfx950) e comparar o comportamento do compilador entre gerações.
-
-O uso do RGA para o \textit{target} gfx803 isola a variável ``ambiente de
-execução'': o \textit{driver} e o sistema operacional não respondem pela ausência
-de \textit{flags}, já que o compilador \textit{offline} também não as gera para
-esse alvo. Resta, porém, uma limitação: o mapeamento de \texttt{volatile} para
-instruções é decisão do \textit{backend} LLVM, e as versões do RGA usadas para
-gfx803 e para os demais \textit{targets} diferem, o que impede atribuir as
-diferenças exclusivamente à arquitetura. O Experimento~2 foi desenhado para
-resolver isso.
-
+\texttt{clGetProgramInfo(CL\_PROGRAM\_BINARIES)} e desmontado por duas ferramentas
+independentes: um decodificador próprio, em C++, que percorre a estrutura ELF
+aninhada do binário e extrai os campos GLC e SLC, e o CLRadeonExtender
+(\texttt{clrxdisasm}). O Radeon GPU Analyzer (RGA) compila os mesmos
+\textit{kernels} \textit{offline}, o que isola a variável ``ambiente de execução''.
 Investigam-se ainda mecanismos alternativos de controle direto: \textit{inline
 assembly} GCN, edição dos bits GLC/SLC no binário (\textit{binary patching}) e o
 HIP SDK da AMD.
@@ -328,42 +299,24 @@ barreira de otimização, impedindo o reuso de valores em registradores (10 cont
 11 VGPRs) e a reordenação de \textit{loads}; sob esse compilador, porém, a barreira
 não se traduz em \textit{flags} de \textit{cache}.
 
-\begin{table}[ht]
-\centering
-\caption{Efeito do \texttt{volatile} na ISA por \textit{target} (compilação
-\textit{offline} via RGA).}
-\label{tab:isa}
-\small
-\begin{tabular}{@{}llll@{}}
-\toprule
-\textbf{Target} & \textbf{Sem \texttt{volatile}} & \textbf{Com \texttt{volatile}} & \textbf{Efeito na ISA} \\
-\midrule
-gfx803 (Polaris/GFX8) & sem \textit{flags} & sem \textit{flags} & Nenhuma \textit{flag} de coerência \\
-gfx900 (Vega/GFX9) & sem \textit{flags} & \texttt{glc} & \textit{Flag} de coerência emitida \\
-gfx950 (CDNA3) & sem \textit{flags} & \texttt{sc0 sc1} & \textit{Flags} de coerência emitidas \\
-\bottomrule
-\end{tabular}
-\end{table}
+A compilação \textit{offline} para o mesmo \textit{target} reproduz o resultado, o
+que afasta o \textit{driver} e o sistema operacional como responsáveis pela ausência
+de \textit{flags}. Para \textit{targets} posteriores (gfx900, gfx950) o mesmo fonte
+passa a gerar \texttt{glc} e \texttt{sc0 sc1}, o que sugere decisão de
+\textit{codegen}; como as versões do RGA diferem entre alvos, porém, essa comparação
+isolada não separa arquitetura de evolução do \textit{backend} --- questão que o
+Experimento~2 resolve de forma direta.
 
-A Tabela~\ref{tab:isa} mostra que o mapeamento varia conforme o \textit{target},
-sugerindo decisão de \textit{codegen}. Como foram usadas versões distintas do RGA,
-esta comparação isoladamente não separa arquitetura de evolução do \textit{backend}
---- limitação que o Experimento~2 resolve.
-
-Nenhum dos mecanismos alternativos se mostrou viável neste ambiente: o
-\textit{inline assembly} produz GLC=1 (\texttt{DC510000}) na compilação
-\textit{offline}, confirmando que a instrução existe na ISA do GFX8, mas o AMDOCL
-não reconhece a sintaxe \texttt{\_\_asm\_\_}; o \textit{binary patching} é carregado
-pelo \textit{driver} e falha na execução, por inconsistência dos metadados HSA; e o
-HIP SDK para Windows exige no mínimo RDNA2. Conclui-se que, em
-GFX8/OpenCL/Windows, \textbf{não existe mecanismo suportado para controle de
-\textit{cache} em tempo de execução}.
-
-Registra-se ainda que o \textit{kernel} nomeado \texttt{matmul\_direto\_VRAM}
-\textbf{não realiza acesso direto à VRAM}: gera código byte a byte idêntico ao
-\texttt{matmul\_via\_L2}, e o Experimento~4 mostra que nenhuma \textit{flag} do
-GFX8 produz esse comportamento. A nomenclatura reflete a expectativa corrente
-sobre o efeito das \textit{flags}, e não o que a ISA oferece.
+Nenhum mecanismo alternativo se mostrou viável neste ambiente: o \textit{inline
+assembly} produz GLC=1 (\texttt{DC510000}) na compilação \textit{offline},
+confirmando que a instrução existe na ISA do GFX8, mas o AMDOCL não reconhece a
+sintaxe \texttt{\_\_asm\_\_}; o \textit{binary patching} é carregado pelo
+\textit{driver} e falha na execução, por inconsistência dos metadados HSA; e o HIP
+SDK para Windows exige no mínimo RDNA2. Em GFX8/OpenCL/Windows, portanto,
+\textbf{não existe mecanismo suportado para controle de \textit{cache} em tempo de
+execução} --- e o \textit{kernel} nomeado \texttt{matmul\_direto\_VRAM} não realiza
+acesso direto à VRAM: gera código idêntico ao \texttt{matmul\_via\_L2}, refletindo a
+expectativa corrente sobre as \textit{flags} e não o que a ISA oferece.
 
 \subsection{Experimento 2: Verificação Multiplataforma e Mecanismos de Controle}
 \label{sec:multi}
@@ -397,11 +350,9 @@ Padrão (\texttt{\_\_global const float*}) & Sem \textit{flags} & \texttt{DC5000
 \end{tabular}
 \end{table}
 
-Três observações decorrem da tabela. A primeira é que o atributo \texttt{address\_space(1)}, por vezes apontado como forma de forçar o \textit{bypass} do L1, \textbf{não cumpre essa função}: no mapeamento do AMDGPU o espaço de endereçamento 1 \textbf{é} o espaço global, o mesmo que \texttt{\_\_global}. Em modo OpenCL o Clang trata os dois como espaços distintos e rejeita a conversão (\texttt{changes address space of pointer}); declarado no parâmetro do \textit{kernel}, compila mas gera ISA sem \textit{flag} alguma. A segunda é que as quatro combinações de \textit{flags} são geradas corretamente, com os bits nas posições esperadas do formato FLAT. A terceira é que \texttt{\_\_builtin\_nontemporal\_load} alcança \texttt{glc slc} sem \textit{assembly}, preservando as otimizações --- propriedade explorada no Experimento~3.
+Três observações decorrem da tabela. A primeira é que o atributo \texttt{address\_space(1)}, por vezes apontado como forma de forçar o \textit{bypass} do L1, \textbf{não cumpre essa função}: no mapeamento do AMDGPU o espaço de endereçamento~1 \textbf{é} o espaço global, o mesmo que \texttt{\_\_global}; em modo OpenCL o Clang rejeita a conversão e, declarado no parâmetro do \textit{kernel}, gera ISA sem \textit{flag} alguma. A segunda é que as quatro combinações de \textit{flags} são geradas corretamente, com os bits nas posições esperadas do formato FLAT. A terceira é que \texttt{\_\_builtin\_nontemporal\_load} alcança \texttt{glc slc} sem \textit{assembly}, preservando as otimizações --- propriedade explorada no Experimento~3.
 
-O formato MUBUF também foi verificado: \texttt{buffer\_load\_dword} com modificador \texttt{slc} é aceita e executa corretamente, ao custo de construir manualmente o descritor de recurso de 128 bits. O caminho é viável, porém frágil --- um descritor mal formado não produz erro, apenas leituras silenciosamente nulas ---, e como \texttt{flat\_load\_dword} aceita as mesmas \textit{flags} recebendo o ponteiro em VGPRs, adotou-se o formato FLAT.
-
-Registra-se por fim que \textbf{nenhuma instrução de escrita} recebeu a \textit{flag} \texttt{glc}: nas 50 formas distintas de \textit{store} presentes nos binários analisados o campo está sempre em zero. As escritas alcançam o L2 por o vL1 do GCN ser \textit{write-through} por construção, e não pelo bit GLC.
+O formato MUBUF também foi verificado e é viável, porém frágil: exige construir manualmente o descritor de recurso de 128 bits, e um descritor mal formado não produz erro, apenas leituras silenciosamente nulas. Como \texttt{flat\_load\_dword} aceita as mesmas \textit{flags} recebendo o ponteiro em VGPRs, adotou-se o formato FLAT. Registra-se por fim que \textbf{nenhuma instrução de escrita} recebeu a \textit{flag} \texttt{glc}: nas 50 formas distintas de \textit{store} presentes nos binários o campo está sempre em zero --- as escritas alcançam o L2 por o vL1 do GCN ser \textit{write-through} por construção, e não pelo bit GLC.
 
 \subsection{Experimento 3: Isolamento do Efeito do L1}
 \label{sec:fatorial}
@@ -453,13 +404,13 @@ A Tabela~\ref{tab:razoes} decompõe os fatores. A comparação mais limpa é a d
 \end{tabular}
 \end{table}
 
-Três leituras decorrem da tabela. A primeira é que \textbf{a construção em \textit{assembly} responde sozinha por 1,509$\times$}, sem alterar o caminho de memória: comparar o \textit{kernel} normal diretamente com uma variante em \textit{assembly} atribuiria ao \textit{cache} um custo majoritariamente da barreira de otimização, e é esse o papel do cenário de controle.
+Três leituras decorrem da tabela. A primeira é que \textbf{a construção em \textit{assembly} responde sozinha por 1,509$\times$}, sem alterar o caminho de memória: sem o cenário de controle, esse custo seria atribuído ao \textit{cache}.
 
 A segunda é que \textbf{o valor medido para a mesma \textit{flag} depende da qualidade da linha de base}. Sobre código otimizado as \textit{flags} custam 1,842$\times$; com a construção em \textit{assembly} constante nos dois lados, \texttt{glc} custa 1,264$\times$. Não há contradição: a linha de base em \textit{assembly} já está 1,509$\times$ mais lenta, e uma base mais lenta dilui a penalidade relativa. As duas razões respondem a perguntas distintas --- quanto custa perder o L1 em código que se pretende usar, e qual o efeito do bit isolado de todo o resto.
 
-A terceira é a convergência entre mecanismos independentes: o \texttt{volatile} do ROCm e o \textit{inline assembly} com \texttt{glc} produzem tempos a 2,6\% um do outro, coerente com emitirem ambos \texttt{glc} e serializar os \textit{loads}. Já o efeito do \texttt{slc}, de 1,015$\times$, situa-se logo acima do piso de ruído de 0,54\% e oscilou de veredito entre execuções independentes; não é efeito que este experimento sustente, e o Experimento~4 esclarece a razão.
+A terceira é a convergência entre mecanismos independentes: o \texttt{volatile} do ROCm e o \textit{inline assembly} com \texttt{glc} produzem tempos a 2,6\% um do outro. Já o efeito do \texttt{slc}, de 1,015$\times$, mal supera o piso de ruído de 0,54\% e oscilou de veredito entre execuções; não é efeito que este experimento sustente, e o Experimento~4 esclarece por quê.
 
-A repetição em $N=1008$, que não é múltiplo de 256, mostra que os fatores não são igualmente estáveis: o custo da construção em \textit{assembly} praticamente não varia (1,528$\times$ contra 1,509$\times$), enquanto a razão 1~$\to$~7 cai de 1,815$\times$ para 1,536$\times$ e a razão 4~$\to$~5, de 1,233$\times$ para 1,162$\times$. Uma medida de ponto único não caracteriza, portanto, o custo de contornar o L1: ele depende do tamanho do problema, e $N=1024$, múltiplo de 256 e por isso sujeito a \textit{conflict misses} sobre a matriz $B$ --- cujo \textit{stride} entre linhas é múltiplo de 1~KB ---, não é representativo. A extensão desta análise a tamanhos não alinhados à grade de 256 é o passo seguinte da investigação.
+A repetição em $N=1008$ mostra que os fatores não são igualmente estáveis: o custo da construção em \textit{assembly} praticamente não varia (1,528$\times$ contra 1,509$\times$), enquanto a razão 1~$\to$~7 cai de 1,815$\times$ para 1,536$\times$. A diferença é de alinhamento: o \textit{stride} entre linhas de $B$ vale $4N$ bytes, e o número de fatores 2 desse valor determina quantos acessos colidem no mesmo conjunto do \textit{cache} --- 12 em $N=1024$, contra 6 em $N=1008$. Uma medida de ponto único não caracteriza, portanto, o custo de contornar o L1.
 
 \subsection{Experimento 4: Semântica do Bit SLC}
 \label{sec:slc}
@@ -488,9 +439,7 @@ A Tabela~\ref{tab:slc} apresenta a leitura repetida sobre \textit{buffers} de 1~
 
 O regime de 64~MB calibra a bancada: com o conjunto de trabalho muito além da capacidade do L2, as três variantes convergem para $\sim$222~GB/s, valor que corresponde a cerca de 87\% do pico teórico da GDDR5 desta placa e estabelece o custo de um acesso efetivamente atendido pela memória global.
 
-O regime de 1~MB é o teste. Com \texttt{glc slc} ativos, a leitura sustenta \textbf{555,9~GB/s}, 2,5$\times$ acima do teto da VRAM; se \texttt{SLC=1} realizasse o \textit{bypass} do L2, a vazão teria caído ao patamar de 222~GB/s. \textbf{A hipótese é refutada}: o L2 continua atendendo os acessos, e \texttt{SLC=1} atua como política de substituição --- marcando a linha como candidata preferencial a \textit{eviction} --- e não como desvio do nível. Isso explica o 1,015$\times$ medido no Experimento~3: no regime em que o conjunto ativo cabe, não há o que substituir, e a política não tem sobre o que agir.
-
-Segue daí que \textbf{no GFX8 apenas um limite da hierarquia é controlável pelas \textit{flags} de instrução de \textit{load}}; o caminho ``direto à VRAM'' que a leitura corrente das \textit{flags} sugere não existe pelo lado do \textit{shader}. A diferença entre os dois regimes confirma ainda, por vazão, que o L2 reside no \textit{die} da GPU: memória alojada nos chips de GDDR5 não poderia entregar 2,5$\times$ a banda da GDDR5.
+O regime de 1~MB é o teste. Com \texttt{glc slc} ativos, a leitura sustenta \textbf{555,9~GB/s}, 2,5$\times$ acima do teto da VRAM; se \texttt{SLC=1} realizasse o \textit{bypass} do L2, a vazão teria caído ao patamar de 222~GB/s. \textbf{A hipótese é refutada}: o L2 continua atendendo os acessos, e \texttt{SLC=1} atua como política de substituição --- marcando a linha como candidata preferencial a \textit{eviction} --- e não como desvio do nível. Isso explica o 1,015$\times$ do Experimento~3: no regime em que o conjunto ativo cabe, não há o que substituir. Segue daí que \textbf{no GFX8 apenas um limite da hierarquia é controlável pelas \textit{flags} de instrução de \textit{load}}: o caminho ``direto à VRAM'' que a leitura corrente sugere não existe pelo lado do \textit{shader}. A diferença entre os regimes confirma ainda, por vazão, que o L2 reside no \textit{die}: memória alojada nos chips de GDDR5 não poderia entregar 2,5$\times$ a banda da GDDR5.
 
 
 \subsection{Experimento 5: Análise de Sensibilidade ao Tamanho do Problema}
@@ -501,8 +450,8 @@ Os 50 pontos da análise --- cinco tamanhos por dez cenários, cerca de
 
 \begin{table}[ht]
 \centering
-\caption{Mediana do tempo de execução, em milissegundos, por tamanho e cenário.
-Cada valor resume 100 execuções medidas.}
+\caption{Mediana do tempo de execução (ms) por tamanho e cenário; cada valor
+resume 100 execuções.}
 \label{tab:sens}
 \small
 \begin{tabular}{@{}llrrrrr@{}}
@@ -518,35 +467,27 @@ Cada valor resume 100 execuções medidas.}
 {\footnotesize $^\ast$ depende do compilador, conforme a Seção~\ref{sec:multi}.}
 \end{table}
 
-O primeiro efeito do crescimento do problema é sobre a própria bancada. O
-coeficiente de variação entre as 100 execuções de cada ponto cai de cerca de
-4\% em $N=1024$ para 0,02\% em $N=16384$: com \textit{kernels} de dezenas de
-segundos, o ruído de lançamento e de escalonamento torna-se irrelevante diante
-da duração medida. A resolução melhora, assim, duas ordens de grandeza ao longo
-da análise, e efeitos de poucos por cento que no tamanho menor se confundiam
-com o ruído tornam-se inequívocos no maior.
+O primeiro efeito do crescimento do problema é sobre a própria bancada: o
+coeficiente de variação entre as 100 execuções de cada ponto cai de cerca de 4\%
+em $N=1024$ para 0,02\% em $N=16384$, de modo que efeitos de poucos por cento
+que no tamanho menor se confundiam com o ruído tornam-se inequívocos no maior.
 
-Cabe uma ressalva sobre o alcance desse piso. Comparadas as duas campanhas de
-medição em $N=1024$, o cenário~1 apresenta mediana de 7,191~ms na
-Tabela~\ref{tab:cenarios} e 6,99~ms na Tabela~\ref{tab:sens}, uma diferença de
-2,8\% para o mesmo \textit{kernel} e o mesmo tamanho. O piso de ruído de 0,54\%
-estabelecido na Seção~\ref{sec:fatorial} mede a dispersão \emph{dentro} de uma
-campanha e, portanto, \textbf{subestima a variação entre campanhas} --- que
-incorpora estado térmico, política de \textit{clock} e ocupação do dispositivo
-no momento da coleta. Segue daí que só são comparáveis entre si as razões
-calculadas dentro de uma mesma campanha, como são todas as aqui reportadas, e
-que tempos absolutos de campanhas distintas não devem ser confrontados
-diretamente.
+Esse piso tem alcance limitado, porém. Em $N=1024$ o cenário~1 apresenta mediana
+de 7,191~ms na Tabela~\ref{tab:cenarios} e 6,99~ms na Tabela~\ref{tab:sens} ---
+2,8\% para o mesmo \textit{kernel} e o mesmo tamanho, em campanhas distintas. O
+piso de 0,54\% mede a dispersão \emph{dentro} de uma campanha e \textbf{subestima
+a variação entre campanhas}, que incorpora estado térmico e política de
+\textit{clock}. Só são comparáveis, portanto, razões calculadas dentro de uma
+mesma campanha --- como são todas as aqui reportadas.
 
 \begin{figure}[ht]
 \centering
 \includegraphics[width=\textwidth]{fig_sensibilidade}
-\caption{Razões entre cenários ao longo dos cinco tamanhos, calculadas sobre as
-medianas da Tabela~\ref{tab:sens}, de onde as demais razões são recuperáveis.
-Valores acima de~1 indicam que o cenário do numerador é mais lento; a linha
-tracejada marca a razão unitária. Cada painel tem escala vertical própria: o que
-a figura separa é a \emph{forma} de cada fator --- plana em~(a), decrescente
-em~(b), crescente em~(c) ---, e não a magnitude entre painéis.}
+\caption{Razões entre cenários, calculadas sobre as medianas da
+Tabela~\ref{tab:sens}, de onde as demais são recuperáveis. Valores acima de~1
+indicam cenário do numerador mais lento. Cada painel tem escala própria: a figura
+separa a \emph{forma} de cada fator --- plana em~(a), decrescente em~(b),
+crescente em~(c) ---, não a magnitude entre painéis.}
 \label{fig:sens}
 \end{figure}
 
@@ -563,10 +504,15 @@ O \textbf{custo da \textit{flag} \texttt{glc}, ao contrário, não é estável}
 (painel~b): medido sobre a base em intrinsic, cai de 2,47$\times$ em $N=1024$
 para 1,65$\times$ em $N=16384$; sobre a base em \textit{assembly}, de
 1,20$\times$ para 1,06$\times$. O contraste entre os dois painéis é, em si,
-evidência de que a \textit{flag} atua sobre o \textit{cache}: um custo de codegen
-não teria motivo para variar com o tamanho do problema, e não varia; um custo de
-\textit{cache} diminui à medida que o conjunto de trabalho cresce e o L1 passa a
-atender uma fração menor dos acessos, que é precisamente o observado. Segue daí
+evidência de que a \textit{flag} atua sobre o \textit{cache}: um custo de geração
+de código não teria motivo para variar com o tamanho do problema, e de fato não
+varia; o custo da \textit{flag} varia. O argumento é de contraste e não depende de
+saber \emph{por que} varia. Cabe a ressalva de que este experimento estabelece a
+dependência, mas não o mecanismo que a produz: com todos os tamanhos medidos
+potências de dois, o crescimento do conjunto de trabalho e o agravamento das
+condições de \textit{conflict miss} avançam juntos, e separá-los exige uma
+varredura cruzando magnitude e alinhamento, apontada na Seção~\ref{sec:conclusao}
+como o passo seguinte. Segue daí
 que \textbf{uma medida em um único tamanho não caracteriza o efeito do
 \textit{cache}}, e que reportá-la sem declarar o tamanho e a linha de base a
 torna ininterpretável: as duas curvas do painel~b discordam por construção,
@@ -624,24 +570,24 @@ Defesa do TCC & & & & & $\bullet$ \\
 \end{table}
 
 \section{Conclusão}
+\label{sec:conclusao}
 
-Este trabalho investigou experimentalmente o impacto do \textit{cache} L1 sobre o
-desempenho de algoritmos paralelos em uma GPU AMD Polaris (gfx803) sob OpenCL,
-em duas plataformas. Os cinco experimentos permitem cinco conclusões.
+Este trabalho investigou experimentalmente o controle do \textit{cache} L1 e seu
+impacto no desempenho de algoritmos paralelos em uma GPU AMD Polaris (gfx803) sob
+OpenCL, em duas plataformas. Os cinco experimentos permitem cinco conclusões.
 
 A primeira é que \textbf{o mapeamento de \texttt{volatile} para \textit{flags} de
 coerência é decisão de geração de código do compilador, e não propriedade da
-arquitetura}. Para o mesmo \textit{target} gfx803 e o mesmo dispositivo físico, o
+arquitetura}: para o mesmo \textit{target} gfx803 e o mesmo dispositivo físico, o
 compilador do \textit{driver} Windows emite \texttt{DC500000} (GLC=0) e o
-Clang/LLVM do ROCm emite \texttt{DC510000} (GLC=1). Obtido com a arquitetura
-mantida constante, o resultado elimina a variável confundida que limitava a
-comparação entre \textit{targets} em compilação \textit{offline} e mostra que
-\texttt{volatile} não é mecanismo confiável de controle de \textit{cache}.
+Clang/LLVM do ROCm emite \texttt{DC510000} (GLC=1). Mantida a arquitetura
+constante, segue que \texttt{volatile} não é mecanismo confiável de controle de
+\textit{cache}.
 
 A segunda é que \textbf{a disponibilidade de controle explícito acompanha o
 \textit{front-end} do compilador, e não o sistema operacional}: o \textit{inline
-assembly} GCN é rejeitado pelo AMDOCL mas compila sob o ROCm e o Mesa Clover, ambos
-baseados em Clang. Apenas o \textit{inline assembly},
+assembly} GCN é rejeitado pelo AMDOCL, mas compila sob o ROCm e o Mesa Clover,
+ambos baseados em Clang. Apenas o \textit{inline assembly},
 \texttt{\_\_builtin\_nontemporal\_load} e o intrinsic
 \texttt{llvm.amdgcn.raw.buffer.load.f32} produzem as \textit{flags} de forma
 previsível; o atributo \texttt{address\_space(1)}, citado com essa finalidade, não
@@ -649,50 +595,51 @@ a cumpre, por designar o mesmo espaço global que \texttt{\_\_global}.
 
 A terceira é que \textbf{apenas um limite da hierarquia é controlável por
 \textit{flags} de instrução de \textit{load}}. A \textit{flag} \texttt{glc}
-contorna o L1 de forma verificável na ISA e mensurável em desempenho. Já
-\texttt{slc} não produz \textit{bypass} do L2, e a refutação vem por duas vias
-independentes: por vazão, um conjunto de trabalho que cabe no L2 sustenta
-555,9~GB/s com a \textit{flag} ativa, contra o teto de 222,3~GB/s medido para a
-VRAM; e pela análise de sensibilidade, o custo da \textit{flag} cresce de 1,9\% para 11,8\%
-conforme o conjunto de trabalho aumenta, assinatura de política de
-\textit{eviction}, e não de desvio de nível. Não há, portanto, caminho para
-acesso direto à VRAM por controle de \textit{flags} nesta arquitetura ---
-resultado que contraria tanto a leitura difundida sobre o bit SLC quanto a
-expectativa que orientou a formulação inicial deste trabalho.
+contorna o L1 de forma verificável na ISA e mensurável em desempenho; \texttt{slc}
+não produz \textit{bypass} do L2, e a refutação vem por duas vias: um conjunto que
+cabe no L2 sustenta 555,9~GB/s com a \textit{flag} ativa, contra o teto de
+222,3~GB/s medido para a VRAM; e o custo da \textit{flag} cresce de 1,9\% para
+11,8\% com o conjunto de trabalho, assinatura de política de \textit{eviction}.
+Não há, nesta arquitetura, caminho para acesso direto à VRAM por controle de
+\textit{flags} --- contra a leitura difundida sobre o bit SLC.
 
 A quarta é que \textbf{o custo de contornar o L1 não é uma constante da
-arquitetura}. Ao longo de um fator de 4.096 em volume de dados, ele cai de
+arquitetura}: ao longo de um fator de 4.096 em volume de dados ele cai de
 2,47$\times$ para 1,65$\times$, enquanto os custos de construção do experimento
---- a barreira do \textit{inline assembly} e a vantagem do intrinsic ---
-permanecem praticamente invariantes --- contraste que a Seção~\ref{sec:sens}
-argumenta ser, em si, evidência de que a \textit{flag} atua sobre o
-\textit{cache}. Segue daí que uma medida em um único tamanho
-não caracteriza o efeito, e que reportá-la sem declarar o tamanho e a linha de
-base a torna ininterpretável.
+permanecem invariantes --- contraste que a Seção~\ref{sec:sens} argumenta ser
+evidência de que a \textit{flag} atua sobre o \textit{cache}. Uma medida em um
+único tamanho não caracteriza o efeito.
 
 A quinta é metodológica. \textbf{A comparação ingênua entre um \textit{kernel}
 normal e uma variante com \textit{bypass} superestima o efeito do \textit{cache}},
-porque dois fatores variam junto com a \textit{flag}: o \textit{codegen} do
-\texttt{volatile} também serializa os \textit{loads}, e o bloco de \textit{inline
-assembly} custa por si só cerca de 1,5$\times$. Isolá-los exigiu cenários de
-controle sem \textit{flag} alguma, construídos com as mesmas ferramentas, e um par
-de \textit{kernels} de fonte idêntico para fixar o piso de ruído da bancada ---
-critério necessário porque, com centenas de execuções por ponto, o teste de
-significância acusa como real até a diferença entre dois \textit{kernels} de ISA
-idêntica.
+porque o \textit{codegen} do \texttt{volatile} serializa os \textit{loads} e o
+bloco de \textit{inline assembly} custa por si só cerca de 1,5$\times$. Isolá-los
+exigiu cenários de controle sem \textit{flag} alguma e um par de \textit{kernels}
+de fonte idêntico para fixar o piso de ruído --- necessário porque, com centenas
+de execuções por ponto, o teste de significância acusa como real até a diferença
+entre \textit{kernels} de ISA idêntica.
 
 Como limitações, os resultados provêm de uma única geração de \textit{hardware} e
-de uma única carga; apenas leituras foram investigadas, permanecendo em aberto o
-comportamento das \textit{flags} em escrita, relevante por o L1 do GFX8 ser
-\textit{write-through}; e todos os tamanhos medidos são múltiplos de 256, de
-modo que a condição associada a \textit{conflict misses} vale em todos os pontos
-e as tendências relatadas são tendências \emph{dentro} desse regime. Como
-trabalhos futuros, propõem-se análise com passo fino em tamanhos não alinhados
-à grade de 256, capaz de separar o efeito do tamanho do efeito do conflito; a
-extensão do desenho controlado a padrões de acesso com fatores de reúso
-distintos; e a caracterização por latência, com \textit{pointer chasing} sob
-controle de \textit{flags}, que forneceria a verificação direta do desvio do L1
-hoje sustentada por assinatura de desempenho.
+de uma única carga; apenas leituras foram investigadas, ficando em aberto o
+comportamento das \textit{flags} em escrita; e todos os tamanhos medidos são
+potências de dois, de modo que o crescimento do conjunto de trabalho e o
+agravamento das condições de \textit{conflict miss} avançam juntos. Como trabalhos
+futuros, propõe-se um desenho fatorial cruzando magnitude e alinhamento ---
+tamanhos de mesma ordem com números distintos de fatores 2 ---, capaz de separar
+os dois efeitos e de estabelecer o mecanismo que este trabalho apenas constata; a
+extensão a padrões de acesso com reúso distinto; e a caracterização por latência,
+com \textit{pointer chasing} sob controle de \textit{flags}.
+
+\section*{Declaração de uso de ferramentas de Inteligência Artificial}
+
+Nos termos dos Artigos~6\textordmasculine{} a 8\textordmasculine{} do Regulamento
+Geral de TCC, declara-se o uso da ferramenta Claude (Anthropic), modelo Opus, para
+auxílio na implementação e depuração do código dos experimentos em OpenCL e C++
+--- \textit{kernels} em \textit{inline assembly} e \textit{scripts} de análise ---
+e para revisão gramatical e de redação do texto, em todas as seções. A concepção, o
+desenho experimental, a condução das medições, a interpretação dos resultados e as
+conclusões são de autoria do aluno, integralmente responsável pelo conteúdo nos
+termos do Artigo~9\textordmasculine{}.
 
 \bibliographystyle{sbc}
 \bibliography{sbc-template}
