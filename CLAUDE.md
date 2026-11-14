@@ -169,17 +169,38 @@ g++ -Wall -Wextra -O2 experimentos/<prog>.cpp -o output/<prog> -lOpenCL
   no preâmbulo). `babel` passou de `brazil` (obsoleto) a `brazilian`. PDF local
   idêntico. Ao mudar arquivos aqui, reenviar ao Overleaf (ou refazer o zip).
 
+## Feito em 12 e 13/11/2026
+
+- Revisão rigorosa do artigo (fontes, interpretação, linguagem) e volta às 16
+  páginas. Bibliografia corrigida: duas referências tinham metadados inexistentes
+  (hoje Baghsorkhi et al. 2012 e Boras et al. 2020), além de DOI, autores e
+  gerações de GPU errados em outras. Detalhes, cortes e correções de conteúdo no
+  `Documentação/CORTES.md`.
+- Números derivados acrescentados na revisão recalculados dos CSVs: `slc`
+  isolado do Exp. 4 (`linha_coluna*.csv`) e erros do modelo do Exp. 2
+  (`teto_vram.csv`).
+- Parágrafo de N=1008 retirado: os números não têm CSV. Só volta se for remedido.
+- Decisões do aluno: não remedir a transposição em OpenCL C (o texto declara a
+  construção usada); menção breve à etapa em Windows (versão do driver nas
+  limitações); sem intervalo para o 2,19× (o texto dá n e cv do ponto).
+- Declaração de IA: acrescentado o Claude Fable 5.2, usado nesta revisão (o regulamento
+  pede a versão). Redação de resto intacta.
+- `overleaf.zip` refeito com os 13 arquivos atuais. **Reenviar ao Overleaf.**
+
 ## Pendências
 
 - [ ] Revisão do aluno da nova redação do Exp. 2 (04/11/2026).
-- [ ] Voltar a 16 páginas (Art. 4º): o artigo está com 18; candidatos de corte no `CORTES.md`.
+- [x] Voltar a 16 páginas (Art. 4º): feito em 13/11/2026.
+- [ ] Leitura do orientador sobre a versão revisada (13/11/2026).
+- [ ] Confirmar volume e páginas de Vidye et al. (2023) na página da revista.
+- [ ] Conferir no PDF de Jia, Shaw e Martonosi (2012) as afirmações da §3.2 (tráfego L1–L2; taxonomia).
 - [x] Declaração de IA: versão curta do aluno (04/11/2026), que substitui a
   redação do orientador mantida desde 19/10/2026. Ao mexer, manter ferramenta,
   fornecedor, versão, finalidade e seções (Arts. 7º e 8º).
 - [ ] Revisão do aluno sobre o texto reestruturado antes da entrega de 21/10/2026.
 
-Estado em 04/11/2026: **18 páginas** (acima do limite; enquadramento adiado pelo
-aluno), 0 erros, 0 Overfull, 14 referências; resumo e abstract com 10 linhas cada.
+Estado em 13/11/2026: **16 páginas**, 0 erros, 0 Overfull, 22 referências; resumo e
+abstract com 10 linhas cada.
 
 ## Regras de trabalho
 

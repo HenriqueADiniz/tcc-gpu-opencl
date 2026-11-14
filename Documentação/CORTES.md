@@ -855,3 +855,83 @@ anterior, que não a declarava. Texto final:
 > experimentos, bem como à redação e à revisão de todas as seções do texto.
 
 Estado: 18 páginas, 0 erros, 0 Overfull.
+
+# Revisão de 12 e 13/11/2026 — revisão rigorosa, fontes e volta às 16 páginas
+
+Revisão completa do artigo a pedido do aluno: fontes, interpretação dos
+resultados, linguagem e enquadramento em 16 páginas. Feita numa cópia do
+`overleaf.zip` de 05/11 e trazida de volta para `Documentação/`.
+
+## Bibliografia (conferida na Crossref, no doi.org e nos resumos)
+
+- `ariel2012`: título e autor não existiam. O DOI é de Baghsorkhi, Gelado,
+  Delahaye e Hwu (PPoPP 2012, pp. 23–34) → `baghsorkhi2012`.
+- `balen2022`: DOI não registrado. O artigo é de Boras, Balen e Vdovjak (SST
+  2020) → `boras2020`.
+- `fraire2013`: DOI corrigido (`…6502816`) e coautor "Alejandro Ferreyra".
+- `tee2025`: quatro autores (faltavam Curtis e Wolfe), pp. 1110–1116.
+- `vidye2023`: o DOI era o da revista; retirado. Só foi localizado um depósito
+  no Zenodo; **volume e páginas seguem por confirmar**.
+- `granlund1994` (divisão por constantes) trocado por Cooper, Simpson e Vick
+  (2001), que trata de redução de força.
+- Mei e Chu: "de Fermi a Pascal" → Fermi, Kepler e Maxwell.
+- Fontes novas: Owens et al. (GPGPU), Stone et al. (OpenCL), documentação do
+  ROCm (capacidades do Polaris 10/gfx803), guia do AMDGPU no LLVM, Qureshi et
+  al. (políticas de inserção), Xie et al. e Tian et al. (bypass de cache em
+  GPU), Drepper (transposição em CPU). O `sbc.bst` ignora `url` e `doi`: os
+  links vão no campo `note`. Total: 22 referências.
+- Atribuições reescritas para dizer só o que os resumos sustentam (Fang, Seo,
+  Memeti, Fraire). A Tabela 1 troca a coluna "SO" por "Controle de cache"; "Este
+  trabalho" deixa de dizer "Win/Linux".
+
+## Correções de conteúdo
+
+- Contradição: a Metodologia dizia que, com n=1000, o teste acusa até a
+  diferença entre kernels de ISA idêntica; os Resultados mostram t=0,76. Ficou
+  a justificativa correta (diferenças sem consequência prática).
+- Tabela 6: o texto atribuía ao `slc` a razão `glc slc`/sem flag. Agora isola o
+  bit (`glc slc`/`glc`): dispersa 1,22× → 2,08× → 1,41×; linha 1–2%; coluna
+  4–6% e depois 13% e 22%. Recalculado de `linha_coluna*.csv`.
+- SO × compilador: virou ressalva (o mesmo fonte gera ISA diferente conforme o
+  compilador; SO e compilador variam juntos), sem afirmar que "não decorre do SO".
+- Transposição: declarado que foi medida na construção de controle em assembly
+  (decisão do aluno: não remedir em OpenCL C).
+- Retirados: o "produto reproduz a razão direta" (identidade algébrica), a
+  "convergência entre mecanismos" e o argumento de que "o L2 reside no die".
+- "Não há pressão no L2 em N=1024" (as três matrizes somam 12 MB) trocado pela
+  distância de reúso, marcada como hipótese; estimativa de que um bypass custaria
+  ≥ 24 ms em N=1024 (5N³ bytes a 222,7 GB/s) contra 13 ms medidos.
+- Curva (a): "varia pouco" (queda de 4%), não "não varia".
+- Modelo do Exp. 2: declarados os erros em 2 e 4 MB (+6% e −10%).
+- CPU: explicação por acesso à memória marcada como não medida; o cenário 1 usa
+  menos de 5% do pico aritmético da GPU.
+- N=1008: parágrafo retirado. Nem 1,528× nem 1,162× têm CSV (regra 1).
+- Do manual GCN3 (conferido no PDF): Seção 8.1.9 (GLC=1 falta no L1; linha de
+  64 B; coalescência na instrução) e Seção 13.9 (no FLAT, o SLC "controla a
+  política do cache L2"). Do guia do LLVM: `nontemporal` emite `glc slc`.
+- Dados do repositório incorporados: Ubuntu 20.04, GCC 9.4 (`-O2`; CPU com
+  `-march=native -fopenmp`), Clang 14 do comgr, `llvm-objdump` do LLVM 12; ordem
+  dos blocos (1, 3, réplica, 2, 4, 5); clocks sem fixação; bloco de asm com uma
+  única espera e laço de 20 instruções contra 15; IC por bootstrap do 1,20× e do
+  1,06×; 78 execuções e cv de 12,9% no ponto do 2,19×.
+- Nova reflexão nas Conclusões (aprovada pelo aluno): o controle útil ao
+  programador é a política de retenção, não o desvio de um nível.
+- Nota de rodapé com o repositório público. Limitações ampliadas (sem
+  contadores, um algoritmo, saída de vídeo, blocos sequenciais, clocks, versão
+  do driver do Windows não registrada).
+
+## Cortes para as 16 páginas
+
+- Síntese da Introdução reduzida a uma frase, com a organização do texto (o
+  regulamento exige as duas).
+- Subseção 3.3 fundida na 3.1 ("Frameworks e Plataformas").
+- Saíram: a frase do `address_space(1)`, as horas de campanha (12,6 h e 14,6 h),
+  a linha de CPU da Tabela 2 (o valor segue no texto e na Tabela 5), o parágrafo
+  de N=1008 e a frase final do Exp. 2.
+- Conclusões enxugadas; tabelas em `\footnotesize`; Figura 2 a 80% da largura;
+  nomes de eventos abreviados na bibliografia.
+- Linguagem: "falta" (miss), "expulsão" (eviction), "desmontagem", "código-fonte
+  idêntico", "GCN de 4ª geração", "sem suporte oficial" (era "depreciada").
+
+Estado: **16 páginas**, 0 erros, 0 Overfull, 22 referências; resumo e abstract
+com 10 linhas cada, na página 1.
