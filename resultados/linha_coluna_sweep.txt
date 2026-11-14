@@ -1,0 +1,61 @@
+=== Localidade de acesso x flags de cache — gfx803 ===
+
+--- N = 1024  (matriz de 4.0 MB; linha de 4.0 KB, coluna toca 1024 linhas de cache) ---
+  linha    GLC=0        5.484 ms  cv  3.27%    783.2 GB/s   1.000x  n=200  OK
+  linha    glc         10.106 ms  cv  4.15%    425.0 GB/s   1.843x  n=200  OK
+  linha    glc slc     10.202 ms  cv  3.36%    421.0 GB/s   1.860x  n=200  OK
+  dispersa GLC=0       23.837 ms  cv  3.08%    180.2 GB/s   1.000x  n=160  OK
+  dispersa glc         52.192 ms  cv 12.92%     82.3 GB/s   2.190x  n=78   OK
+  dispersa glc slc     63.670 ms  cv 19.36%     67.5 GB/s   2.671x  n=47   OK
+  coluna   GLC=0        6.184 ms  cv  2.81%    694.6 GB/s   1.000x  n=200  OK
+  coluna   glc          6.270 ms  cv  2.52%    685.1 GB/s   1.014x  n=200  OK
+  coluna   glc slc      6.640 ms  cv  1.49%    646.8 GB/s   1.074x  n=200  OK
+
+--- N = 2048  (matriz de 16.0 MB; linha de 8.0 KB, coluna toca 2048 linhas de cache) ---
+  linha    GLC=0       43.572 ms  cv  1.20%    788.6 GB/s   1.000x  n=99   OK
+  linha    glc         66.666 ms  cv  1.12%    515.4 GB/s   1.530x  n=62   OK
+  linha    glc slc     67.937 ms  cv  0.71%    505.8 GB/s   1.559x  n=59   OK
+  dispersa GLC=0      181.889 ms  cv  1.37%    188.9 GB/s   1.000x  n=21   OK
+  dispersa glc        331.011 ms  cv  5.75%    103.8 GB/s   1.820x  n=12   OK
+  dispersa glc slc    460.567 ms  cv  7.29%     74.6 GB/s   2.532x  n=9    OK
+  coluna   GLC=0       51.808 ms  cv  0.35%    663.2 GB/s   1.000x  n=79   OK
+  coluna   glc         52.141 ms  cv  0.34%    659.0 GB/s   1.006x  n=79   OK
+  coluna   glc slc     54.119 ms  cv  0.25%    634.9 GB/s   1.045x  n=75   OK
+
+--- N = 4096  (matriz de 64.0 MB; linha de 16.0 KB, coluna toca 4096 linhas de cache) ---
+  linha    GLC=0      346.150 ms  cv  0.48%    794.1 GB/s   1.000x  n=11   OK
+  linha    glc        514.710 ms  cv  0.36%    534.0 GB/s   1.487x  n=7    OK
+  linha    glc slc    524.028 ms  cv  0.30%    524.5 GB/s   1.514x  n=7    OK
+  dispersa GLC=0     1461.851 ms  cv  0.38%    188.0 GB/s   1.000x  n=5    OK
+  dispersa glc       2484.397 ms  cv  0.83%    110.6 GB/s   1.699x  n=5    OK
+  dispersa glc slc   4064.596 ms  cv  1.51%     67.6 GB/s   2.780x  n=5    OK
+  coluna   GLC=0      424.355 ms  cv  0.11%    647.8 GB/s   1.000x  n=9    OK
+  coluna   glc        426.986 ms  cv  0.08%    643.8 GB/s   1.006x  n=9    OK
+  coluna   glc slc    446.708 ms  cv  0.05%    615.3 GB/s   1.053x  n=9    OK
+
+--- N = 8192  (matriz de 256.0 MB; linha de 32.0 KB, coluna toca 8192 linhas de cache) ---
+  linha    GLC=0     2755.919 ms  cv  0.09%    797.9 GB/s   1.000x  n=5    OK
+  linha    glc       4045.770 ms  cv  0.08%    543.5 GB/s   1.468x  n=5    OK
+  linha    glc slc   4109.890 ms  cv  0.02%    535.1 GB/s   1.491x  n=5    OK
+  dispersa GLC=0    11875.637 ms  cv  0.11%    185.2 GB/s   1.000x  n=5    OK
+  dispersa glc      19306.368 ms  cv  0.13%    113.9 GB/s   1.626x  n=5    OK
+  dispersa glc slc  40091.095 ms  cv  7.38%     54.9 GB/s   3.376x  n=5    OK
+  coluna   GLC=0     3548.540 ms  cv  0.08%    619.7 GB/s   1.000x  n=5    OK
+  coluna   glc       3576.944 ms  cv  0.06%    614.8 GB/s   1.008x  n=5    OK
+  coluna   glc slc   4046.839 ms  cv  0.16%    543.4 GB/s   1.140x  n=5    OK
+
+Resultados: resultados/linha_coluna.csv
+=== Localidade de acesso x flags de cache — gfx803 ===
+
+--- N = 16384  (matriz de 1024.0 MB; linha de 64.0 KB, coluna toca 16384 linhas de cache) ---
+  linha    GLC=0    22086.561 ms  cv  0.09%    796.5 GB/s   1.000x  n=5    OK
+  linha    glc      32168.960 ms  cv  0.36%    546.9 GB/s   1.456x  n=5    OK
+  linha    glc slc  32643.088 ms  cv  0.18%    538.9 GB/s   1.478x  n=5    OK
+  dispersa GLC=0    103369.910 ms  cv  0.20%    170.2 GB/s   1.000x  n=5    OK
+  dispersa glc      154842.541 ms  cv  0.02%    113.6 GB/s   1.498x  n=5    OK
+  dispersa glc slc  218247.110 ms  cv  0.24%     80.6 GB/s   2.111x  n=5    OK
+  coluna   GLC=0    28980.111 ms  cv  0.34%    607.0 GB/s   1.000x  n=5    OK
+  coluna   glc      29241.219 ms  cv  0.16%    601.6 GB/s   1.009x  n=5    OK
+  coluna   glc slc  35745.665 ms  cv  0.47%    492.1 GB/s   1.233x  n=5    OK
+
+Resultados: resultados/linha_coluna.csv

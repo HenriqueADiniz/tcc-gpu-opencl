@@ -1,0 +1,19 @@
+############ remedição iniciada 14/10 15:43:55 ############
+Campanha original (resultados/linha_coluna.csv), dispersa glc slc / GLC=0:
+  N=8192: 3,376x    N=16384: 2,111x   <- o ponto em questão
+
+=== Localidade de acesso x flags de cache — gfx803 ===
+
+--- N = 8192  (matriz de 256.0 MB; linha de 32.0 KB, coluna toca 8192 linhas de cache) ---
+  dispersa GLC=0    11991.108 ms  cv  0.69%    183.4 GB/s   1.000x  n=5    OK
+  dispersa glc      19409.889 ms  cv  1.13%    113.3 GB/s   1.619x  n=5    OK
+  dispersa glc slc  36160.082 ms  cv  3.71%     60.8 GB/s   3.016x  n=5    OK
+
+--- N = 16384  (matriz de 1024.0 MB; linha de 64.0 KB, coluna toca 16384 linhas de cache) ---
+  dispersa GLC=0    102068.964 ms  cv  0.13%    172.4 GB/s   1.000x  n=5    OK
+  dispersa glc      152888.368 ms  cv  0.05%    115.1 GB/s   1.498x  n=5    OK
+  dispersa glc slc  255150.356 ms  cv  4.25%     68.9 GB/s   2.500x  n=5    OK
+
+Resultados: resultados/linha_coluna_remedicao.csv
+############ concluída 14/10 16:42:16 ############
+Pode fechar esta janela.

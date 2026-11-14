@@ -1,0 +1,11 @@
+=== Localidade de acesso x flags de cache — gfx803 ===
+
+--- N = 16384  (matriz de 1024.0 MB; linha de 64.0 KB, coluna toca 16384 linhas de cache) ---
+  linha  GLC=0     22089.207 ms  cv  0.32%    796.4 GB/s   1.000x  n=5    OK
+  linha  glc       31762.001 ms  cv  0.08%    553.9 GB/s   1.438x  n=5    OK
+  linha  glc slc   32723.166 ms  cv  0.24%    537.6 GB/s   1.481x  n=5    OK
+  coluna GLC=0     28630.247 ms  cv  0.40%    614.5 GB/s   1.000x  n=5    OK
+  coluna glc       28824.409 ms  cv  0.08%    610.3 GB/s   1.007x  n=5    OK
+  coluna glc slc   35472.597 ms  cv  0.09%    495.9 GB/s   1.239x  n=5    OK
+
+Resultados: resultados/linha_coluna.csv

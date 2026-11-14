@@ -1,0 +1,51 @@
+### execucao 1 de 3 do binario original (output/slc_l2, 19/08/2026), 04/11/2026 15:45:08
+L2 informada pelo driver: 16 KB
+
+=== A) 1 MB   — CABE na L2 (2 MB)  (buffer 1 MB) ===
+kernel         flags        mediana(ms)         GB/s   vs GLC=1
+sweep_noflag   GLC=0 SLC=0      0.2323        577.7          -
+sweep_glc      GLC=1 SLC=0      0.2423        554.0          -
+sweep_glc_slc  GLC=1 SLC=1      0.2544        527.6           
+                                                        1.050x
+
+=== B) 64 MB  — NAO cabe na L2  (buffer 64 MB) ===
+kernel         flags        mediana(ms)         GB/s   vs GLC=1
+sweep_noflag   GLC=0 SLC=0      1.1629        115.4          -
+sweep_glc      GLC=1 SLC=0      0.6037        222.3          -
+sweep_glc_slc  GLC=1 SLC=1      0.5915        226.9           
+                                                        0.980x
+
+### execucao 2 de 3 do binario original (output/slc_l2, 19/08/2026), 04/11/2026 15:45:09
+L2 informada pelo driver: 16 KB
+
+=== A) 1 MB   — CABE na L2 (2 MB)  (buffer 1 MB) ===
+kernel         flags        mediana(ms)         GB/s   vs GLC=1
+sweep_noflag   GLC=0 SLC=0      0.2325        577.3          -
+sweep_glc      GLC=1 SLC=0      0.2423        554.0          -
+sweep_glc_slc  GLC=1 SLC=1      0.2551        526.2           
+                                                        1.053x
+
+=== B) 64 MB  — NAO cabe na L2  (buffer 64 MB) ===
+kernel         flags        mediana(ms)         GB/s   vs GLC=1
+sweep_noflag   GLC=0 SLC=0      0.6031        222.6          -
+sweep_glc      GLC=1 SLC=0      0.6026        222.7          -
+sweep_glc_slc  GLC=1 SLC=1      0.5919        226.8           
+                                                        0.982x
+
+### execucao 3 de 3 do binario original (output/slc_l2, 19/08/2026), 04/11/2026 15:45:09
+L2 informada pelo driver: 16 KB
+
+=== A) 1 MB   — CABE na L2 (2 MB)  (buffer 1 MB) ===
+kernel         flags        mediana(ms)         GB/s   vs GLC=1
+sweep_noflag   GLC=0 SLC=0      0.2282        588.2          -
+sweep_glc      GLC=1 SLC=0      0.2381        563.7          -
+sweep_glc_slc  GLC=1 SLC=1      0.2443        549.3           
+                                                        1.026x
+
+=== B) 64 MB  — NAO cabe na L2  (buffer 64 MB) ===
+kernel         flags        mediana(ms)         GB/s   vs GLC=1
+sweep_noflag   GLC=0 SLC=0      0.6029        222.6          -
+sweep_glc      GLC=1 SLC=0      0.6032        222.5          -
+sweep_glc_slc  GLC=1 SLC=1      0.5923        226.6           
+                                                        0.982x
+

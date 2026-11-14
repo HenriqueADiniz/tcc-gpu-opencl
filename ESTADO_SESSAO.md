@@ -1,3 +1,9 @@
+> **DOCUMENTO HISTÓRICO** (marcado em 14/10/2026). Superado pelo `CLAUDE.md`, que é a
+> fonte única de contexto. Mantido só como registro do percurso; não use como
+> referência do estado atual.
+> Atenção: a justificativa dos lotes abaixo (reset da GPU em 60 s) **não se
+> confirmou** — um lançamento de 218 s rodou sem reset em 28/09/2026.
+
 # Estado da sessão — 20/08/2026
 
 Documento de retomada. Registra o que mudou, o que está rodando e o que ficou

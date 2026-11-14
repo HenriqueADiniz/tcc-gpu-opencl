@@ -1,0 +1,10 @@
+=== Referência em CPU — multiplicação de matrizes 1024x1024 ===
+Algoritmo: laço triplo ingênuo, o mesmo dos kernels de GPU
+Threads disponíveis: 14 | Repetições: 15
+
+variante                  media(ms) mediana(ms)    cv(%)    GFLOPS
+---------------------------------------------------------------------
+1 thread                     2149.9     2149.3     0.24      1.00
+todas as threads              270.7      274.2     5.25      7.83
+
+FLOPs por execução: 2.15 GFLOP

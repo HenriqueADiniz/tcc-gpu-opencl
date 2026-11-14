@@ -1,169 +1,194 @@
-# Contexto do Projeto TCC - Análise de Hierarquia de Memória em GPU AMD
+# TCC — Impacto da Hierarquia de Memória em GPU AMD sob OpenCL
 
-## Sobre mim e o trabalho
+Fonte única de contexto do projeto. Atualizado em 20/10/2026.
+`CONTEXTO_LINUX.md` e `ESTADO_SESSAO.md` são históricos; `COMO_RODAR.md` é o
+manual operacional.
 
-Sou estudante de Ciência da Computação na PUC Minas, atualmente cursando TCC I. Meu trabalho de conclusão de curso tem o seguinte tema:
+## O trabalho
 
-**"Análise do impacto da hierarquia de memória no desempenho de algoritmos paralelos executados em GPU AMD utilizando OpenCL em ambiente Windows"**
+- **Aluno:** Henrique de Almeida Diniz — Ciência da Computação, PUC Minas.
+- **Orientador:** Pedro Henrique Ramos Costa.
+- **Estágio:** **TCC II**. Próxima entrega: **intermediária** ao orientador, **21/10/2026**.
+- **Artigo:** `Documentação/main.tex`, formato SBC, **10 a 16 páginas** (Art. 4º).
+- **Título:** "Análise do Impacto da Hierarquia de Memória em GPU AMD Utilizando OpenCL".
 
-Estou no 3º Ponto de Controle do TCC I. O artigo deve seguir o formato SBC (Sociedade Brasileira de Computação), entre 10 e 16 páginas, escrito em LaTeX.
+### Pergunta central (decidida em 14/10/2026)
 
-## Hardware e ambiente
+**Qual o impacto da hierarquia de memória no desempenho de algoritmos paralelos
+em GPU AMD sob OpenCL?** As *flags* de cache (GLC/SLC) são o **instrumento** de
+medição, não o objeto: servem para tirar ou pôr o L1 no caminho e medir quanto
+ele vale. Núcleo do artigo: o que o L1 vale e do que isso depende (tamanho do
+problema, localidade, algoritmo completo). Como as flags foram obtidas é
+apoio metodológico.
 
-- **GPU**: AMD Ellesmere (RX 470/480/570/580) — arquitetura Polaris/GCN 4ª geração (GFX8/gfx803)
-  - Cache L1: 16 KB por CU (vL1, write-through)
-  - Cache L2: 2 MB compartilhado
-  - LDS (Local Data Share): 64 KB por CU
-  - VRAM: GDDR5, bandwidth teórica ~224-256 GB/s
-- **Sistema**: Windows 10/11
-- **Framework**: OpenCL 1.2 (driver AMD Adrenalin)
-- **SDK**: OCL SDK Light em `C:\Program Files (x86)\OCL_SDK_Light`
-- **Compilador host**: MinGW GCC (g++)
-- **IDE**: VS Code
+## Experimentos (numeração do artigo, desde 14/10/2026)
 
-## Comando de compilação que funciona
+O antigo "Experimento 1" (mecanismos) virou a **§4.1 Obtenção e Verificação do
+Instrumento**, sem seção de resultados; os demais foram renumerados (2→1, 3→2,
+4→3, 5→4). Arquivos e CSVs não mudaram de nome.
 
-```
-g++ -Wall -O2 -D__USE_MINGW_ANSI_STDIO=1 "-Wl,--enable-stdcall-fixup" -I "C:\Program Files (x86)\OCL_SDK_Light\include" arquivo.cpp -o output\saida.exe "C:\Windows\System32\OpenCL.dll"
-```
+| # | Pergunta | Programa | Dados |
+|---|---|---|---|
+| §4.1 | Que mecanismo emite as flags? (volatile, asm, builtin, address_space) | `experimentos/matmul.cpp` | ISA em `isa/` |
+| 1 | Quanto custa contornar o L1, isolado do custo de construção? | `matmul.cpp` (N=1024, 1000 exec.) | `resultados/matmul_cache_flags.csv` |
+| 2 | SLC=1 contorna o L2? (não: é política de evicção) | `experimentos/slc_l2.cpp`; extensão `teto_vram.cpp` (04/11) | `resultados/slc_l2.txt` (só texto); `teto_vram.csv` (Tabela 4 desde 04/11) |
+| 3 | Como o custo varia com N (1024–16384)? + referência em CPU | `matmul.cpp`, `matmul_cpu.cpp` | `matmul_sweep.csv`, `matmul_cpu_sweep.csv` |
+| 4 | Quanto o valor do L1 depende da localidade? (linha/dispersa/coluna) + matmul com B transposta | `linha_coluna.cpp`, `matmul_layout.cpp` | `linha_coluna.csv`, `matmul_layout.csv` |
 
-**Pontos críticos da compilação**:
-- Linkar diretamente contra `C:\Windows\System32\OpenCL.dll`, NÃO contra o `.lib` do SDK (formato MSVC incompatível com MinGW)
-- `-D__USE_MINGW_ANSI_STDIO=1` para suportar `%zu` no printf
-- `"-Wl,--enable-stdcall-fixup"` precisa de aspas no PowerShell
-- Definir `#define CL_USE_DEPRECATED_OPENCL_1_2_APIS` antes do include OpenCL para suprimir warnings de `clCreateCommandQueue`
+Arquivados (fora do artigo, reserva para banca): P-chase, padrões de acesso
+(51×), `tdiv_ws` (pico de 9,79× em 16 KB), scan/primos/crivo — texto em
+`Documentação/arquivo_experimentos.tex`. Comparativo Windows × Linux: reservado
+para a apresentação.
 
-## O que já foi feito (percurso científico)
+### Resultados centrais (conferidos contra os CSVs)
 
-### Etapa 1 - Tentativa com volatile
-Hipótese inicial: usar `volatile` nos ponteiros do kernel OpenCL forçaria o compilador a gerar instruções com bypass de cache via flags GLC/SLC.
+- `glc` contorna o L1 (verificado na ISA: `DC510000`); o custo cai de 1,20× (N=1024) a 1,06× (N=16384).
+- Em leituras FLAT sobre a VRAM, `slc` **não** contorna o L2: 555,9 GB/s com conjunto que cabe no L2, acima do pico teórico de 256 GB/s da VRAM (o patamar medido fora do L2 é 222,3–223,9 GB/s, teto prático). De 2 a 64 MB, `glc slc` é até 1,51× **mais rápido** que `glc`. O manual GCN3 descreve o SLC como "forced to miss in level 2" para MUBUF/MTBUF (Tab. 8.2) e como política com GLC e MTYPE para FLAT (Tab. 9.1); MUBUF e outros MTYPE não foram testados.
+- Localidade: contornar o L1 custa até 2,19× em percurso contíguo e 1,01× em percurso por coluna. O que governa é o reúso dentro da linha de 64 B, não o *broadcast*.
+- Transpor B (otimização clássica de CPU) deixa a matmul 2,31–2,46× **mais lenta**; a soma dos padrões isolados prevê a razão (erro < 3% a partir de N=2048).
+- Comparação ingênua superestima o efeito do cache: o bloco de asm custa sozinho ~1,5×; o `volatile` serializa os loads.
 
-Implementei `matmul.cpp` com 4 kernels para multiplicação de matrizes 1024x1024:
-- Kernel naive (via L1)
-- Kernel com volatile (suposto bypass para L2)
-- Kernel com volatile mais agressivo (suposto VRAM)
-- Kernel tiled com __local memory (LDS)
+## Ambiente
 
-**Resultado**: kernels 1, 2 e 3 tiveram tempo idêntico (~6.2ms, ~346 GFLOPS). Apenas o tiled foi 3x mais rápido (2.07ms, 1038 GFLOPS).
+- **GPU:** RX 580 8 GB (Ellesmere, Polaris, GCN 4, **gfx803**), 36 CUs; L1 16 KB/CU (write-through), L2 2 MB, LDS 64 KB/CU. É a **única** saída de vídeo (CPU 245KF sem gráfico integrado).
+- **Sistema:** Ubuntu, kernel 5.15, **ROCm 5.2** (Polaris depreciada: exige `ROC_ENABLE_PRE_VEGA=1`). Compilador de kernel: Clang/LLVM (`comgr`). Host: GCC. ISA: `llvm-objdump`.
+- O percurso em **Windows** (AMDOCL, MinGW) foi a etapa inicial: lá o `volatile` não emite flags e o `__asm__` não compila. Não é mais o ambiente de trabalho.
 
-### Etapa 2 - Análise do binário ISA
-Extraí o binário compilado pelo driver via `clGetProgramInfo(CL_PROGRAM_BINARIES)`, gerando `matmul_kernel_dump.bin`. Fiz parse manual:
-- ELF externo (32-bit) → ELF interno (64-bit, HSA Code Object)
-- Localização da seção `.hsatext`
-- Decodificação bit-a-bit das instruções MUBUF (`buffer_load_dword`)
-- Análise dos campos GLC (bit 13) e SLC (bit 17)
-
-**Resultado**: TODOS os kernels foram gerados com GLC=0 e SLC=0. Os kernels "via L2" e "VRAM" são IDÊNTICOS byte-a-byte ao kernel normal. Prova que o compilador OpenCL da AMD no GFX8/Polaris **ignora** o qualificador `volatile` para geração de flags de cache.
-
-### Etapa 3 - Validação cruzada com RGA
-RGA (Radeon GPU Analyzer) não suporta Polaris (lista começa em GFX900/Vega). Compilei os mesmos kernels para GFX950 (MI300) como referência.
-
-**Resultado**: na arquitetura GFX9+, o `volatile` GERA flags `sc0+sc1` (equivalentes modernas ao GLC+SLC). Confirma que o comportamento é específico da geração da GPU.
-
-### Etapa 4 - Tentativas alternativas (todas falharam)
-
-1. **Inline assembly (`__asm__`)**: não compila no OpenCL do Windows. Erro: `use of undeclared identifier '__asm__'`. Só funciona via HIP/ROCm.
-
-2. **Binary patching**: implementei `patch_cache.cpp` que edita os bits GLC/SLC no binário. O driver carrega mas crasha ao executar (provavelmente por inconsistência de metadados HSA).
-
-3. **HIP SDK Windows**: não suporta Polaris. GPU mínima é RDNA2 (gfx1030).
-
-### Etapa 5 - Nova abordagem (sucesso): mem_hierarchy.cpp
-Em vez de forçar bypass de cache, implementei benchmarks que demonstram o impacto da hierarquia via padrões de acesso. 
-
-**Parte A - Benchmarks de redução** (16 MB, 262.144 threads, 128 iterações):
-- `reduce_sequential` - acesso contíguo → 0.35 ms, 383 GB/s
-- `reduce_local` (LDS) - 0.34 ms, 396 GB/s
-- `reduce_stride` (salto 67) - 17.94 ms, 7.5 GB/s
-- `reduce_random` (xorshift) - 18.03 ms, 7.4 GB/s
-- **Diferença de 51x** entre cache-friendly e cache-hostile
-
-**Parte B - Stencil 2D blur 3x3** (4096x4096):
-- `stencil_global` - 0.71 ms, ~949 GB/s efetivos
-- `stencil_local` - 0.85 ms, ~794 GB/s
-- L1 é tão eficiente para padrões espaciais que LDS não compensa o overhead
-
-## Limitação metodológica importante (a ser tratada)
-
-**Não tenho garantia direta** de que os acessos stride/aleatórios estão "pulando" o cache. O que tenho é evidência indireta via bandwidth efetiva. A análise ISA mostrou que TODAS as instruções têm GLC=0/SLC=0, então tecnicamente todos os acessos passam pelo L1/L2 — apenas o cache não consegue ajudar quando não há localidade.
-
-**Linguagem correta a usar**: "padrão cache-hostile", "baixa localidade espacial/temporal", "cache miss frequente inferido pela bandwidth efetiva". Evitar termos como "bypass do L1/L2" que sugerem controle direto.
-
-**Possível adição futura**: implementar microbenchmark P-chase (pointer chasing, técnica de Wong et al. 2010 e Mei & Chu 2016) para mapear experimentalmente os tamanhos do L1 e L2 da Ellesmere e provar diretamente quando cada nível é usado.
-
-## Estrutura de arquivos do projeto
-
-```
-projeto/
-├── experimentos/              # Código dos experimentos que funcionaram
-│   ├── matmul.cpp             # 4 kernels matmul (etapa 1)
-│   ├── mem_hierarchy.cpp      # Benchmarks de padrões de acesso (etapa 5)
-│   └── pchase.cpp             # P-chase microbenchmark (etapa 6)
-├── tentativas/                # Código de abordagens que falharam (etapa 4)
-│   ├── asm_test.cpp           # Inline asm (não suportado no OpenCL Windows)
-│   ├── patch_cache.cpp        # Binary patching (crasha na execução)
-│   └── debug_patch.cpp        # Versão debug do binary patching
-├── isa/                       # Binários ISA e análises de compilador
-│   ├── matmul_kernel_dump.bin # Binário ISA extraído do driver
-│   ├── kernel_dump.bin        # Binário ISA do main.cpp original
-│   ├── kernels.cl             # Kernels standalone para análise RGA
-│   ├── gfx950_*.txt           # Saídas RGA para GFX950 (validação cruzada)
-│   ├── debug_original.bin     # Binário original (debug)
-│   └── debug_patched.bin      # Binário patchado (debug)
-├── output/                    # Executáveis compilados
-├── resultados/                # Saídas dos benchmarks
-│   ├── resultado.txt          # Resultados do matmul
-│   ├── resultado_patch.txt    # Resultados do binary patching
-│   └── debug_log.txt          # Log do debug_patch
-├── Documentação/              # Artigo LaTeX (formato SBC)
-│   ├── main.tex               # Artigo principal
-│   ├── sbc-template.bib       # 12 referências bibliográficas
-│   ├── sbc-template.sty       # Estilo SBC
-│   └── sbc.bst                # Estilo de bibliografia SBC
-├── CLAUDE.md                  # Contexto do projeto
-└── Regulamento_TCC_CC (1).pdf # Regulamento do TCC
+```bash
+source setup/env_rocm.sh
+g++ -Wall -Wextra -O2 experimentos/<prog>.cpp -o output/<prog> -lOpenCL
+./output/<prog> ...        # rodar SEMPRE da raiz do projeto
 ```
 
-## Bibliografia (12 referências no projeto)
+## Regulamento (Regulamento_TCC_CC (1).pdf) — o que o artigo precisa ter
 
-1. Fang et al. (2011) - "A Comprehensive Performance Comparison of CUDA and OpenCL" - IEEE ICPP
-2. Seo et al. (2011) - "Performance Characterization of NAS Parallel Benchmarks in OpenCL" - IEEE IISWC
-3. Bernal et al. (2012) - "Stochastic Memory Hierarchy Model" - ACM PPoPP
-4. Vidye et al. (2023) - "OpenCL Performance Evaluation on Multiple OSs" - IJSRCSEIT
-5. Fraire et al. (2013) - "OpenCL Overview, Implementation, and Performance Comparison" - IEEE Latin America
-6. Memeti et al. (2017) - "Benchmarking OpenCL/OpenACC/OpenMP/CUDA" - ACM ARMS-CC
-7. Balen et al. (2022) - "Performance Evaluation of Linux Operating Systems" - IEEE SoftCOM
-8. Gupta et al. (1991) - "Impact of OS Scheduling Policies on Parallel Applications" - ACM SIGMETRICS
-9. Chen & Bershad (1993) - "Impact of OS Structure on Memory System Performance" - ACM SOSP
-10. Wong et al. (2010) - "Demystifying GPU Microarchitecture through Microbenchmarking" - IEEE ISPASS
-11. Mei & Chu (2017) - "Dissecting GPU Memory Hierarchy through Microbenchmarking" - IEEE TPDS
-12. Jia et al. (2018) - "Dissecting the NVIDIA Volta GPU Architecture via Microbenchmarking" - arXiv
+- Introdução: contextualização, motivação, justificativa, problema, objetivos geral e específicos, **síntese do que foi feito e principais resultados**, organização do texto.
+- Referencial teórico e revisão de literatura.
+- Metodologia **com diagramas/fluxogramas/figuras** e citação das ferramentas; descrita de modo **reproduzível** (Art. 5º, §3).
+- Resultados em gráficos, figuras ou tabelas, comentados e analisados.
+- **Conclusões e Trabalhos Futuros**: ressaltar contribuições e comparar os resultados **com os da literatura**.
+- ≥ 10 referências. Apêndice só se o orientador indicar (Art. 4º, §2).
+- Modelo SBC (Art. 3º): **resumo e abstract com no máximo 10 linhas cada, ambos na página 1**; Times 12; numeração de seções opcional.
+- Declaração de IA (Arts. 6º–8º): ferramenta, **versão**, finalidade e **seções** em que contribuiu.
+- **Não** incluir cronograma (é exigência do TCC I).
 
-## Cronograma do TCC I
+## Feito em 14/10/2026
 
-- **2º PC (concluído)**: introdução, motivações, problema, objetivos
-- **3º PC (06/05, atual)**: + revisão de literatura com análise de 10 trabalhos correlatos
-- **4º PC (03/06)**: + metodologia + resultados esperados + cronograma
-- **6º PC (24/06)**: + resultados preliminares
+- Reestruturação do artigo em torno da pergunta central: Introdução com síntese
+  dos resultados e objetivos realinhados; justificativa de SO (Chen, Gupta) fora
+  (13 referências); diagrama TikZ da hierarquia na Metodologia
+  (`Documentação/fig_hierarquia.tex`); Exp. 1 → §4.1; seção final renomeada
+  "Conclusões e Trabalhos Futuros", com três conclusões e comparação com a
+  literatura; resumo e abstract reescritos com paridade numérica.
+- Corrigidos: afirmação de reset em 60 s (agora "por precaução"); §Exp. 4 dizia
+  que houve lotes — não houve; 1,015× desatualizado (é 1,019×); parágrafo da CPU
+  movido para o Exp. 3; §2.2 prometia tratar a edição do binário (não trata).
 
-## O que pode me ajudar a fazer
+## Feito em 19/10/2026
 
-- Implementar novos benchmarks OpenCL (FFT, redução, ordenação, P-chase)
-- Refatorar/melhorar código existente
-- Analisar binários ISA AMD GCN
-- Escrever seções do artigo LaTeX
-- Gerar tabelas e gráficos de resultados
-- Resolver problemas de compilação MinGW/OpenCL
-- Discutir metodologia experimental
-- Sugerir próximos experimentos cientificamente relevantes
+- Incluído Jia, Shaw e Martonosi (ICS 2012), o trabalho mais próximo da pergunta
+  central (L1 ligado/desligado no Fermi, taxonomia de localidade): §3.2, Tabela 1,
+  §3.4 e comparação nas Conclusões. Não confundir com Jia et al. 2018 (Zhe Jia).
+- Corrigida a geometria da *wavefront* no Exp. 4: com `ls = {16,16}` cada
+  *wavefront* cobre 4 `row` × 16 `col` (verificado com
+  `experimentos/sonda_wavefront.cpp`); `linha` toca 4 linhas por instrução,
+  `coluna` 1, `dispersa` 19 — o texto dizia 1 e 64. Detalhes em `CORTES.md`.
+- Escopo do SLC restrito a leituras FLAT sobre a VRAM (resumo, abstract,
+  Introdução, §2.2, Metodologia, Exp. 2, Conclusões, Limitações). A §2.2 cita as
+  duas descrições do manual (Tabelas 8.2 e 9.1) no lugar de "é comum encontrar".
+- Auditoria: todos os CSVs são a última execução completa e o código atual mede
+  igual (detalhes em `CORTES.md`). Corrigidos no texto: cv do Exp. 4 (até 19,4%
+  em `dispersa`), cv da `coluna` e "indistinguível de zero" → "pequeno, mas
+  mensurável"; variação entre campanhas em N=1024 (1,19–1,237×); orçamento de
+  execuções do Exp. 4. **Reexecutar programas grava nos CSVs das campanhas** —
+  ver `COMO_RODAR.md` antes.
 
-## Diretrizes importantes
+## Feito em 20/10/2026
 
-1. **Sempre usar linguagem científica precisa** sobre comportamento de cache (sem afirmar "bypass" sem prova direta)
-2. **Manter compatibilidade com Ellesmere/GFX8** — não sugerir HIP, RDNA, ou recursos não disponíveis
-3. **Testar no Windows com MinGW** — não assumir Linux ou MSVC
-4. **Seguir formato SBC** para qualquer texto destinado ao artigo
-5. **Documentar resultados quantitativamente** com tabelas claras (tempo, bandwidth, speedup)
-6. **Citar a literatura existente** quando fizer sentido (especialmente Mei & Chu 2016, Wong et al. 2010 para metodologia de microbenchmarking)
+- Conferidas as Tabelas 2 a 7 contra os CSVs (todas batem). Corrigidos: CPU
+  contra cenário 1 usava uma execução isolada (7,191 ms) — agora mediana 7,223 e
+  34×; legendas das Tabelas 2 e 5 com o número real de execuções da CPU; **"fator
+  de 256 em volume de dados"** (era 4.096, que é o fator do trabalho N³) no resumo,
+  abstract, Exp. 3 e Conclusões.
+- Novo `analise/gera_tabelas.py`, que reproduz byte a byte os `tab_*.tex`.
+- Figura 2 refeita: um eixo, três curvas com numerador ÷ denominador por extenso
+  na legenda; texto passou de "painel" a "curva"; corrigido "cresce
+  monotonicamente" (o slc cai em N=2048).
+- Disco liberado (421 MB → 2,3 GB livres: *journal* reduzido a 100 MB e 7 revisões
+  desativadas de *snap* removidas). 2ª remedição da `dispersa`
+  (`resultados/linha_coluna_remedicao2.csv`): `glc slc` 3,360× (N=8192) e 2,515×
+  (N=16384). A queda 8192 → 16384 persiste nas três campanhas (−37%, −17%, −25%);
+  medianas das três: 3,360× e 2,500×. `glc` reproduz a ≤ 2,3%. Texto do Exp. 4
+  atualizado com as três campanhas (aprovado pelo aluno). A Tabela 6 fica
+  só com a campanha original, sem nota (decisão do aluno).
 
-Por favor, leia este contexto antes de começar qualquer tarefa. Se eu pedir algo que entre em conflito com a metodologia ou que não faça sentido para a Ellesmere/Windows, me avise antes de implementar.
+## Feito em 04/11/2026
+
+- Orientador pediu revisão da afirmação dos 222 GB/s do Exp. 2. Novo
+  `experimentos/teto_vram.cpp` (+ `.cl`; `slc_l2.cl` intocado) →
+  `resultados/teto_vram.csv`; binário original reexecutado 3× →
+  `resultados/slc_l2_reexecucao.txt`. Texto do Exp. 2 reescrito em torno do
+  contrafactual (um *bypass* limitaria 1 MB a 256 GB/s, na prática ~222); Tabela 4
+  passou a ser a varredura (`tab_slc.tex`, gerada); resumo, abstract e Conclusões
+  trocam "teto de 222,3" por "pico teórico de 256". Cortes e ajustes mínimos de
+  redação para manter 16 páginas: `Documentação/CORTES.md`.
+- Depois, a pedido do aluno (sem se preocupar com as 16 páginas por ora): Tabela 4
+  no formato original (tempo e vazão por variante), em dois blocos, campanha
+  original (1 e 64 MB) e varredura (14 tamanhos), mais a razão `glc slc`/`glc`;
+  Exp. 2 na versão completa; os ajustes de redação em texto do aluno revertidos.
+- Travessões usados como vírgula trocados (63 de 70) por vírgula, parênteses,
+  dois-pontos ou ponto e vírgula; ficam as células "não se aplica" de tabela.
+  Detalhes no `CORTES.md`.
+- Declaração de IA encurtada a pedido do aluno (de 8 para 3 linhas): sem citar
+  artigos do regulamento nem a frase de autoria; mantém o que os Arts. 7º e 8º
+  pedem (ferramenta, fornecedor, versões, finalidade e seções). Versões tiradas
+  dos registros das sessões do Claude Code nesta máquina: Opus 5 e Opus 5.5.
+  A análise fica fora da finalidade declarada, como na versão anterior (decisão
+  do aluno).
+- Pico teórico desta placa: 256 GB/s (`pp_dpm_mclk` 2000 MHz × 4 × 256 bits / 8).
+  "Teto de 222,3" é vazão medida, não limite físico; o argumento forte é
+  555,9 > 256 (2,17×).
+- Patamar independe do tamanho: de 8 MB a 2 GB, sem flag e `glc` dão 222,3–223,9
+  GB/s. Até 16× mais bytes em voo por *wavefront* não passam de 223,3 na mediana
+  (225,3 na melhor execução, 88%): ~222 é o teto prático de leitura.
+- Terceira evidência contra o *bypass*: de 2 a 64 MB, `glc slc` é **mais rápido**
+  que `glc` (até 1,51× em 4 MB), e o ganho segue a fração 2 MB/W que fica no L2
+  (erro ≤ 1,7% de 8 a 128 MB). Explica o 226,3 da Tabela 4.
+- Controles: com o L2 ocupado por outro buffer antes de cada execução, `glc slc`
+  em 1 MB dá 555,9 (não depende da ordem dos kernels). O valor de 1 MB varia
+  com a alocação: 17 medidas, mediana 548,6, faixa 431,5–564,1.
+- Protocolo de `slc_l2` (3 aquecimentos < 1 ms) mediu uma vez 115,4 GB/s em
+  64 MB (memória a 1000 MHz); a Tabela 4 não foi afetada.
+
+## Feito em 05/11/2026
+
+- Artigo levado ao Overleaf (TeX Live 2026): `Documentação/overleaf.zip` com os 13
+  arquivos necessários (testado em pasta vazia). No LaTeX 2026 o `\input` dentro de
+  `tabular` quebra o `\midrule`/`\bottomrule` seguinte ("Misplaced \noalign");
+  as tabelas geradas entram por `\tabinput{tab_x}` (`\@@input` primitivo, definido
+  no preâmbulo). `babel` passou de `brazil` (obsoleto) a `brazilian`. PDF local
+  idêntico. Ao mudar arquivos aqui, reenviar ao Overleaf (ou refazer o zip).
+
+## Pendências
+
+- [ ] Revisão do aluno da nova redação do Exp. 2 (04/11/2026).
+- [ ] Voltar a 16 páginas (Art. 4º): o artigo está com 18; candidatos de corte no `CORTES.md`.
+- [x] Declaração de IA: versão curta do aluno (04/11/2026), que substitui a
+  redação do orientador mantida desde 19/10/2026. Ao mexer, manter ferramenta,
+  fornecedor, versão, finalidade e seções (Arts. 7º e 8º).
+- [ ] Revisão do aluno sobre o texto reestruturado antes da entrega de 21/10/2026.
+
+Estado em 04/11/2026: **18 páginas** (acima do limite; enquadramento adiado pelo
+aluno), 0 erros, 0 Overfull, 14 referências; resumo e abstract com 10 linhas cada.
+
+## Regras de trabalho
+
+1. **Números do artigo saem dos CSVs.** Antes de escrever ou revisar um número, recalcular a partir do CSV. Tabelas `Documentação/tab_*.tex` são geradas por `analise/gera_tabelas.py` (`--conferir` imprime as Tabelas 2 e 3, digitadas no `main.tex`).
+2. **Nunca sobrescrever o CSV de uma campanha.** Remedição vai para arquivo próprio. (As Tabelas 3 e 4 já ficaram irreproduzíveis uma vez por isso.)
+3. **Descrever a metodologia pelo que de fato rodou:** conferir o fonte e os argumentos usados (`tools/*.sh`), não a memória da sessão.
+4. **Cortes seguem o regulamento e a coerência**, não só a contagem de páginas: objetivos ↔ metodologia ↔ resultados ↔ conclusões. Ao cortar, checar se alguma conclusão perde a evidência. Registro dos cortes em `Documentação/CORTES.md`.
+5. Antes de propor cortes: `pdfinfo main.pdf`; procurar figuras e tabelas órfãs (`grep -c 'ref{<label>}'`).
+6. Linguagem precisa: "contornar o L1" é afirmação verificada (ISA + desempenho); "bypass do L2" **não** é — o SLC é política de evicção.
+7. Texto do artigo em pt-BR, vírgula decimal, formato SBC; resumo e abstract com **os mesmos números**.
+8. Jobs longos: terminal visível na tela (`gnome-terminal`), log com `tee`, espera e kill **por PID** (nunca `pgrep -f`/`pkill -f`). Antes de deixar rodando à noite, checar `df -h /` (o snap do Discord inunda o journal).
+9. Lançamentos longos: o limite de 60 s do amdgpu **não** se confirmou (218 s rodou sem reset). Lotes por `global_work_offset` são precaução opcional, não necessidade.

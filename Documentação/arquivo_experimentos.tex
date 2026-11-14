@@ -286,3 +286,99 @@ A Tabela~\ref{tab:pchase} resume os resultados do P-chase em modo \textit{single
 \end{table}
 
 O salto de latência em 20~KB confirma experimentalmente que o \textit{cache} L1 da Ellesmere possui 16~KB por CU, consistente com a especificação da AMD. No modo \textit{multi work-item} (36 instâncias, uma por CU), a transição L2$\to$VRAM torna-se visível: a latência salta de 203~ns (\textit{working set} de 64~KB/CU, \textit{footprint} total de 2,3~MB $\approx$ L2) para 301~ns (256~KB/CU, \textit{footprint} de 9~MB $\gg$ L2), um aumento de $\sim$48\%. A VRAM sob contenção real (36 CUs simultâneos) apresenta latência 2,3$\times$ maior que no teste com 1 \textit{work-item}, evidenciando o efeito da contenção no barramento de memória.
+
+
+%% =====================================================
+%% TERCEIRA RODADA DE ARQUIVAMENTO — 11/09/2026
+%% Comparativo Windows x Linux retirado do texto e reservado
+%% para a apresentacao a banca. Restou uma linha na metodologia.
+%% =====================================================
+
+%% BLOCO: MET-AMBIENTE-DOIS-SO
+
+Os experimentos são conduzidos em uma GPU AMD Ellesmere (RX 580 8~GB, arquitetura GCN 4\textordfeminine{} geração, GFX8) com 36 \textit{Compute Units} a 1350~MHz, \textit{cache} L1 de 16~KB por CU (\textit{write-through}), \textit{cache} L2 de 2~MB compartilhado, LDS de 64~KB por CU e 8~GB de VRAM GDDR5. O mesmo dispositivo físico é acessado
+a partir de dois ambientes de software, em \textit{dual boot}: com isso o
+\textit{hardware} permanece constante e a pilha de compilação é a única variável
+entre eles. A Tabela~\ref{tab:ambiente} descreve os dois ambientes; a metodologia
+compreende cinco experimentos, distribuídos entre eles conforme a última linha
+da tabela.
+
+%% BLOCO: TAB-AMBIENTE
+
+\begin{table}[ht]
+\centering
+\caption{Ambientes de execução. O dispositivo é o mesmo nos dois; varia apenas a
+pilha de software.}
+\label{tab:ambiente}
+\small
+\begin{tabular}{@{}lll@{}}
+\toprule
+ & \textbf{Ambiente Windows} & \textbf{Ambiente Linux} \\
+\midrule
+Sistema operacional & Windows~11 & Ubuntu, \textit{kernel} 5.15 \\
+\textit{Runtime} OpenCL & AMD Adrenalin (OpenCL~1.2) & ROCm~5.2$^\ast$ \\
+Compilador de \textit{kernel} & AMDOCL (proprietário) & Clang/LLVM (\texttt{comgr}) \\
+Compilador \textit{host} & MinGW GCC & GCC \\
+Desmontagem de ISA & decodificador próprio, \texttt{clrxdisasm}, RGA & \texttt{llvm-objdump} \\
+\textit{Runtimes} adicionais & --- & Mesa Clover, PoCL \\
+Experimentos & 1 & 2 a 5 \\
+\bottomrule
+\end{tabular}
+
+\vspace{2pt}
+{\footnotesize $^\ast$ A arquitetura Polaris é depreciada no ROCm~5.2 e o
+dispositivo só é enumerado com \texttt{ROC\_ENABLE\_PRE\_VEGA=1}.}
+\end{table}
+
+%% BLOCO: MET-EXP1-WINDOWS
+
+\subsection{Experimento 1: Antecedentes --- \texttt{volatile} e Análise ISA em Windows}
+
+Quatro \textit{kernels} de multiplicação de matrizes $1024 \times 1024$ avaliam a
+hipótese inicial do trabalho: que o qualificador \texttt{volatile} forçaria o
+\textit{bypass} do L1 pela \textit{flag} GLC. As variantes são o acesso padrão, duas
+com \texttt{volatile} em graus distintos e uma \textit{tiled} com memória local.
+
+Para verificar se o qualificador de fato altera as instruções emitidas, o binário
+compilado pelo \textit{driver} é extraído via
+\texttt{clGetProgramInfo(CL\_PROGRAM\_BINARIES)} e desmontado por duas ferramentas
+independentes: um decodificador próprio, em C++, que percorre a estrutura ELF
+aninhada do binário e extrai os campos GLC e SLC, e o CLRadeonExtender
+(\texttt{clrxdisasm}). O Radeon GPU Analyzer (RGA) compila os mesmos
+\textit{kernels} \textit{offline}, o que isola a variável ``ambiente de execução''.
+Investigam-se ainda mecanismos alternativos de controle direto: \textit{inline
+assembly} GCN, edição dos bits GLC/SLC no binário (\textit{binary patching}) e o
+HIP SDK da AMD.
+
+%% BLOCO: RES-EXP1-WINDOWS
+
+\subsection{Experimento 1: Antecedentes --- \texttt{volatile} e Análise ISA em Windows}
+
+Sob o \textit{driver} Windows, a variante normal e as duas com \texttt{volatile}
+produziram tempos indistinguíveis ($\sim$6,2~ms, $\sim$346~GFLOPS), enquanto a
+\textit{tiled} com memória local foi cerca de três vezes mais rápida (2,07~ms,
+1.038~GFLOPS). A análise de ISA explica o empate: as ferramentas convergem em que
+todos os \textit{kernels}, com e sem o qualificador, geram \texttt{DC500000} ---
+\texttt{flat\_load\_dword} com GLC=0. O \texttt{volatile} não é ignorado: atua como
+barreira de otimização, impedindo o reuso de valores em registradores (10 contra
+11 VGPRs) e a reordenação de \textit{loads}; sob esse compilador, porém, a barreira
+não se traduz em \textit{flags} de \textit{cache}.
+
+A compilação \textit{offline} para o mesmo \textit{target} reproduz o resultado, o
+que afasta o \textit{driver} e o sistema operacional como responsáveis pela ausência
+de \textit{flags}. Para \textit{targets} posteriores (gfx900, gfx950) o mesmo fonte
+passa a gerar \texttt{glc} e \texttt{sc0 sc1}, o que sugere decisão de
+\textit{codegen}; como as versões do RGA diferem entre alvos, porém, essa comparação
+isolada não separa arquitetura de evolução do \textit{backend} --- questão que o
+Experimento~2 resolve de forma direta.
+
+Nenhum mecanismo alternativo se mostrou viável neste ambiente: o \textit{inline
+assembly} produz GLC=1 (\texttt{DC510000}) na compilação \textit{offline},
+confirmando que a instrução existe na ISA do GFX8, mas o AMDOCL não reconhece a
+sintaxe \texttt{\_\_asm\_\_}; o \textit{binary patching} é carregado pelo
+\textit{driver} e falha na execução, por inconsistência dos metadados HSA; e o HIP
+SDK para Windows exige no mínimo RDNA2. Em GFX8/OpenCL/Windows, portanto,
+\textbf{não existe mecanismo suportado para controle de \textit{cache} em tempo de
+execução} --- e o \textit{kernel} nomeado \texttt{matmul\_direto\_VRAM} não realiza
+acesso direto à VRAM: gera código idêntico ao \texttt{matmul\_via\_L2}, refletindo a
+expectativa corrente sobre as \textit{flags} e não o que a ISA oferece.

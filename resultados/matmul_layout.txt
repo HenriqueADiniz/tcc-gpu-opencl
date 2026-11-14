@@ -1,0 +1,49 @@
+=== Layout de B na multiplicação de matrizes — gfx803 ===
+
+--- N = 1024  (2.15 GFLOP, 4.0 MB por matriz) ---
+  B normal  GLC=0        10.472 ms  cv  2.61%    205.1 GFLOPS   1.000x  n=100  OK
+  B normal  glc          12.421 ms  cv  2.35%    172.9 GFLOPS   1.186x  n=100  OK
+  B normal  glc slc      12.608 ms  cv  2.26%    170.3 GFLOPS   1.204x  n=100  OK
+  B transp  GLC=0        24.441 ms  cv  3.46%     87.9 GFLOPS   1.000x  n=100  OK
+  B transp  glc          47.896 ms  cv 14.49%     44.8 GFLOPS   1.960x  n=100  OK
+  B transp  glc slc      50.049 ms  cv 10.21%     42.9 GFLOPS   2.048x  n=100  OK
+
+--- N = 2048  (17.18 GFLOP, 16.0 MB por matriz) ---
+  B normal  GLC=0        83.132 ms  cv  0.40%    206.7 GFLOPS   1.000x  n=77   OK
+  B normal  glc          89.222 ms  cv  1.03%    192.6 GFLOPS   1.073x  n=67   OK
+  B normal  glc slc      90.566 ms  cv  1.26%    189.7 GFLOPS   1.089x  n=66   OK
+  B transp  GLC=0       192.377 ms  cv  4.73%     89.3 GFLOPS   1.000x  n=31   OK
+  B transp  glc         342.486 ms  cv  8.12%     50.2 GFLOPS   1.780x  n=16   OK
+  B transp  glc slc     370.123 ms  cv  6.62%     46.4 GFLOPS   1.924x  n=14   OK
+
+--- N = 4096  (137.44 GFLOP, 64.0 MB por matriz)  [lotes de 2048 linhas] ---
+  B normal  GLC=0       666.680 ms  cv  0.07%    206.2 GFLOPS   1.000x  n=9    OK
+  B normal  glc         705.330 ms  cv  0.22%    194.9 GFLOPS   1.058x  n=8    OK
+  B normal  glc slc     725.355 ms  cv  0.15%    189.5 GFLOPS   1.088x  n=8    OK
+  B transp  GLC=0      1581.439 ms  cv  1.17%     86.9 GFLOPS   1.000x  n=5    OK
+  B transp  glc        2677.813 ms  cv  2.15%     51.3 GFLOPS   1.693x  n=5    OK
+  B transp  glc slc    3160.548 ms  cv  2.52%     43.5 GFLOPS   1.999x  n=5    OK
+
+--- N = 8192  (1099.51 GFLOP, 256.0 MB por matriz)  [lotes de 2048 linhas] ---
+  B normal  GLC=0      5361.280 ms  cv  0.04%    205.1 GFLOPS   1.000x  n=5    OK
+  B normal  glc        5639.605 ms  cv  0.05%    195.0 GFLOPS   1.052x  n=5    OK
+  B normal  glc slc    5956.662 ms  cv  0.15%    184.6 GFLOPS   1.111x  n=5    OK
+  B transp  GLC=0     12771.617 ms  cv  0.87%     86.1 GFLOPS   1.000x  n=5    OK
+  B transp  glc       20361.681 ms  cv  1.64%     54.0 GFLOPS   1.594x  n=5    OK
+  B transp  glc slc   25920.242 ms  cv  3.15%     42.4 GFLOPS   2.030x  n=5    OK
+
+Resultados: resultados/matmul_layout.csv
+
+############ N=16384 iniciado 28/09 00:32:31 ############
+=== Layout de B na multiplicação de matrizes — gfx803 ===
+
+--- N = 16384  (8796.09 GFLOP, 1024.0 MB por matriz)  [lotes de 1024 linhas] ---
+  B normal  GLC=0     43419.606 ms  cv  0.57%    202.6 GFLOPS   1.000x  n=5    OK
+  B normal  glc       46385.265 ms  cv  0.29%    189.6 GFLOPS   1.068x  n=5    OK
+  B normal  glc slc   51845.450 ms  cv  0.12%    169.7 GFLOPS   1.194x  n=5    OK
+  B transp  GLC=0    106723.850 ms  cv  0.03%     82.4 GFLOPS   1.000x  n=5    OK
+  B transp  glc      157970.486 ms  cv  0.01%     55.7 GFLOPS   1.480x  n=5    OK
+  B transp  glc slc  279524.839 ms  cv  0.96%     31.5 GFLOPS   2.619x  n=5    OK
+
+Resultados: resultados/matmul_layout.csv
+############ concluído 28/09 01:41:17 ############

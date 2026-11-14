@@ -1,0 +1,23 @@
+############ 2ª remedição iniciada 20/10 20:38:56 ############
+dispersa glc slc / GLC=0 — original: N=8192 3,376x  N=16384 2,111x
+                           1ª remedição: N=8192 3,016x  N=16384 2,500x
+Duração esperada: ~1 h. Lançamentos de até ~4 min: a tela pode engasgar.
+/dev/sdb5        18G   15G  2,3G  87% /
+
+PID do linha_coluna: 17297
+=== Localidade de acesso x flags de cache — gfx803 ===
+
+--- N = 8192  (matriz de 256.0 MB; linha de 32.0 KB, coluna toca 8192 linhas de cache) ---
+  dispersa GLC=0    12119.280 ms  cv  0.24%    181.4 GB/s   1.000x  n=5    OK
+  dispersa glc      19254.290 ms  cv  0.32%    114.2 GB/s   1.589x  n=5    OK
+  dispersa glc slc  40719.374 ms  cv  1.65%     54.0 GB/s   3.360x  n=5    OK
+
+--- N = 16384  (matriz de 1024.0 MB; linha de 64.0 KB, coluna toca 16384 linhas de cache) ---
+  dispersa GLC=0    104138.812 ms  cv  0.08%    168.9 GB/s   1.000x  n=5    OK
+  dispersa glc      155086.697 ms  cv  0.04%    113.4 GB/s   1.489x  n=5    OK
+  dispersa glc slc  261876.174 ms  cv  1.31%     67.2 GB/s   2.515x  n=5    OK
+
+Resultados: resultados/linha_coluna_remedicao2.csv
+código de saída: 0
+############ concluída 20/10 21:38:33 ############
+Pode fechar esta janela.

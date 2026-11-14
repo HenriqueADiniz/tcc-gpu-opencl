@@ -75,16 +75,87 @@ g++ -Wall -O2 experimentos/matmul.cpp -o output/matmul -lOpenCL
 Todos assumem `source setup/env_rocm.sh` já executado e o terminal na raiz do
 projeto.
 
-### Multiplicação de matrizes — 4 kernels (`matmul`)
+### Experimentos do artigo — comandos que geraram os dados
 
-Naive, dois com `volatile` e um *tiled* com LDS, em 1024×1024.
+Atualizado em 14/10/2026. Numeração do artigo a partir dessa data (o antigo
+Exp. 1 virou a §4.1 e os demais desceram um número); contexto em `CLAUDE.md`.
+Rodar sempre da raiz, com `source setup/env_rocm.sh`.
+
+| Exp. | Comando | Saída | Duração |
+|---|---|---|---|
+| §4.1 e 1 | `./output/matmul 1000 1024 10` | `resultados/matmul_cache_flags.csv` + ISA em `isa/` | ~2 min |
+| 2 | `./output/slc_l2 > resultados/slc_l2.txt` | só texto | segundos |
+| 2 (extensão, 04/11/2026) | `./output/teto_vram \| tee resultados/teto_vram.txt` | `resultados/teto_vram.csv` (o programa se recusa a sobrescrevê-lo) + ISA em `isa/rocm_gfx803_teto_vram.bin` | ~20 s |
+| 3 (GPU) | `./output/matmul 100 N 5` para N = 4096, 8192; `./output/matmul 100 16384 3 2048` (ver `tools/cadeia_sweep.sh`) | `resultados/matmul_sweep.csv` | ~11 h em 16384 |
+| 3 (CPU) | `./output/matmul_cpu "1024 2048 4096 8192 16384" 60` (`tools/cpu_sweep.sh`) | `resultados/matmul_cpu_sweep.csv` | horas |
+| 4 (padrões) | `./output/linha_coluna "1024 2048 4096 8192 16384" 4000` | `resultados/linha_coluna.csv` | ~1,5 h (estimativa; quase todo em N=16384) |
+| 4 (B transposta) | `./output/matmul_layout "1024 2048 4096 8192" 6000 2048` e `./output/matmul_layout 16384 6000 1024` | `resultados/matmul_layout.csv` | ~1,5 h |
+
+Observações que afetam a reprodução:
+
+- **Exp. 2, extensão (04/11/2026):** `teto_vram` compila `slc_l2.cl` (intocado)
+  junto com `teto_vram.cl` e tem quatro partes: A, varredura de 256 KB a 2 GB
+  com os kernels originais; B, kernels com 256 B a 4 KB em voo por wavefront
+  (conferidos em `isa/teto_vram_disasm.txt`); C, L2 ocupado por outro buffer
+  de 64 MB antes de cada execução; D, 1 MB em 10 buffers distintos. Aquece
+  0,2 s antes de cada buffer: sem isso, o protocolo de `slc_l2` chegou a medir
+  64 MB a 115,4 GB/s, com a memória no estado de 1000 MHz
+  (`resultados/slc_l2_reexecucao.txt`, três execuções do binário de 19/08).
+  Na parte C, o kernel de limpeza termina (`clFinish`) antes do medido: logo
+  atrás de outro kernel, o START do ROCm sai antes do fim do anterior.
+- **Exp. 3:** N=1024 e 2048 foram rodados com `RUNS=100` e aquecimento de 5
+  antes do script de cadeia (registrado em `resultados/sweep_log.txt`); N=4096 e
+  8192, pela cadeia, também com 5; N=16384 com 3 (`resultados/cadeia_log.txt`).
+  O N=4096 do `sweep_log.txt` foi interrompido no kernel 6 e refeito pela cadeia;
+  o CSV contém a execução completa.
+- **Os programas gravam nos CSVs das campanhas** — antes de qualquer reexecução,
+  copiar `resultados/` ou redirecionar a saída (regra 2 do `CLAUDE.md`):
+  `matmul` acrescenta a `matmul_sweep.csv` e **sobrescreve**
+  `matmul_amostras_N<N>.csv`; `matmul_layout` acrescenta a `matmul_layout.csv`
+  (caminho fixo no fonte); `linha_coluna` acrescenta a `linha_coluna.csv` quando
+  o 4º argumento é omitido. A amostra do Exp. 1 (`matmul_cache_flags.csv`) foi
+  gravada por uma versão anterior do programa e não é mais regravada.
+- **Exp. 4, `linha_coluna`:** cada medição é **um lançamento único**, sem lotes.
+  Na campanha original o 3º argumento recebeu `2048`/`1024`, mas era ignorado; a
+  partir de 14/10/2026 o 3º argumento é o **filtro de padrão**
+  (`linha|dispersa|coluna|todos`) e o 4º é o CSV de saída. **Não repetir** o
+  comando antigo com número no 3º argumento: nenhum kernel casaria com o filtro.
+- **Remedição** (14/10/2026): `tools/remedicao_dispersa.sh` →
+  `resultados/linha_coluna_remedicao.csv`. Remedição nunca vai para o CSV da
+  campanha original.
+- **2ª remedição** (20/10/2026, 20:38–21:38): `tools/remedicao_dispersa_2.sh` →
+  `resultados/linha_coluna_remedicao2.csv` (log em `…_remedicao2.txt`). Mesmas
+  condições (`dispersa`, N=8192 e 16384, orçamento de 4000 ms, 5 execuções). O
+  script recusa rodar se o CSV já existir. Uma 3ª remedição precisa de script e
+  arquivo próprios.
+- **`matmul_layout`:** o 3º argumento é o tamanho do lote em linhas
+  (fatiamento por `global_work_offset`), usado como precaução.
+
+### Tabelas do artigo a partir dos CSVs
 
 ```bash
-./output/matmul
+python3 analise/gera_tabelas.py              # regrava Documentação/tab_*.tex (Tabelas 4, 5, 6 e 7)
+python3 analise/gera_tabelas.py --saida DIR  # grava em outro diretório, para comparar antes
+python3 analise/gera_tabelas.py --conferir   # imprime as Tabelas 2 e 3 e os números do texto do Exp. 2
 ```
 
-*Duração: ~4 s.* Sem CSV — a saída é o próprio terminal. Também grava o binário
-ISA em `output/matmul_kernel_dump.bin`.
+As Tabelas 2 e 3 estão digitadas no `main.tex`; o `--conferir` serve para
+compará-las com o CSV. Desde 04/11/2026 a Tabela 4 tem dois blocos gerados:
+`tab_slc_original.tex` (campanha original, de `slc_l2.txt`) e `tab_slc.tex`
+(varredura, de `resultados/teto_vram.csv`, parte A), com tempo, vazão e a razão
+`glc slc`/`glc`; os
+números do texto do Exp. 2 (patamar, variantes, 17 medições de 1 MB, controle
+do L2, modelo) saem do `--conferir`, que também lê a campanha original
+(`slc_l2.txt`) e as reexecuções (`slc_l2_reexecucao.txt`).
+Em 20/10/2026 o script reproduziu byte a byte os `tab_*.tex` existentes; em
+04/11/2026, de novo, os cinco anteriores (os `tab_slc*.tex` são novos).
+
+### Experimentos arquivados (fora do artigo)
+
+Os itens abaixo são do percurso anterior e estão reservados para a banca
+(texto em `Documentação/arquivo_experimentos.tex`). A descrição de `matmul` como
+"4 kernels" está **desatualizada**: o programa hoje tem 10 cenários e os
+argumentos `[RUNS] [N] [WARMUP] [LINHAS_POR_LOTE]`.
 
 ### Padrões de acesso à memória (`mem_hierarchy`)
 

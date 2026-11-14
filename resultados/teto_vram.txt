@@ -1,0 +1,58 @@
+# ./output/teto_vram, 04/11/2026 15:45:33, git 2f9cd64 + arvore de trabalho
+Dispositivo: gfx803; pico teorico da GDDR5: 256 GB/s
+
+A) Varredura do working set (kernels de slc_l2.cl, GS=65536, mediana de 25 execucoes, GB/s)
+   buffer      R  GLC=0 SLC=0          glc      glc slc   slc/glc
+   256 KB    512        594.5        568.7        567.5    1.002x
+   512 KB    512        585.8        566.0        568.7    0.995x
+     1 MB    512        561.5        540.8        539.8    1.002x
+     2 MB    512        449.8        442.9        509.3    0.870x
+     4 MB    512        232.9        232.7        350.4    0.664x
+     8 MB    512        223.5        223.9        265.4    0.844x
+    16 MB    512        222.4        222.7        241.6    0.922x
+    32 MB    512        222.3        222.7        231.4    0.962x
+    64 MB    512        222.6        222.3        226.4    0.982x
+   128 MB   1024        222.7        222.5        224.4    0.992x
+   256 MB   2048        222.6        222.6        223.4    0.996x
+   512 MB   4096        222.8        222.7        223.2    0.998x
+     1 GB   8192        223.0        222.7        223.0    0.999x
+     2 GB  16384        222.4        222.5        222.1    1.002x
+
+B) Bytes em voo por wavefront (mediana e melhor de 25 execucoes)
+buffer kernel             flags         B/wave      GS   GB/s med   GB/s max   %pico
+1 GB   sweep_noflag       GLC=0 SLC=0      256   65536      222.6      223.2   87.0%
+1 GB   le_f1_u4           GLC=0 SLC=0     1024   65536      216.8      217.5   84.7%
+1 GB   le_f4_u1           GLC=0 SLC=0     1024   65536      216.3      217.0   84.5%
+1 GB   le_f4_u4           GLC=0 SLC=0     2048   16384      223.3      225.3   87.2%
+1 GB   le_f4_u4           GLC=0 SLC=0     2048   65536      215.0      216.1   84.0%
+1 GB   le_f4_u4           GLC=0 SLC=0     2048  262144      216.7      217.2   84.7%
+1 GB   asm_f4_u4          GLC=0 SLC=0     4096   16384      219.0      221.2   85.6%
+1 GB   asm_f4_u4          GLC=0 SLC=0     4096   65536      196.3      198.8   76.7%
+1 GB   le_f4_u4_nt        GLC=1 SLC=1     2048   65536      215.4      216.2   84.2%
+1 GB   asm_f4_u4_glc_slc  GLC=1 SLC=1     4096   65536      196.5      198.6   76.8%
+1 MB   sweep_glc_slc      GLC=1 SLC=1      256   65536      544.0      549.0  212.5%
+1 MB   le_f4_u4_nt        GLC=1 SLC=1     2048   16384      668.4      671.6  261.1%
+1 MB   asm_f4_u4_glc_slc  GLC=1 SLC=1     4096   16384      666.8      670.5  260.5%
+
+C) Antes de cada execucao, sweep_noflag le outro buffer de 64 MB (fora do tempo medido)
+   buffer      R  GLC=0 SLC=0          glc      glc slc   slc/glc
+   256 KB    512        597.9        570.2        568.7    1.003x
+     1 MB    512        580.9        557.0        555.9    1.002x
+     4 MB    512        231.7        231.7        350.1    0.662x
+    16 MB    512        222.6        222.6        241.7    0.921x
+    64 MB    512        222.1        222.1        226.8    0.979x
+
+D) 1 MB em 10 buffers distintos, protocolo de A
+   buffer      R  GLC=0 SLC=0          glc      glc slc   slc/glc
+  1 MB #1    512        547.5        526.2        542.2    0.971x
+  1 MB #2    512        581.7        557.0        553.7    1.006x
+  1 MB #3    512        566.4        559.6        560.3    0.999x
+  1 MB #4    512        569.5        544.7        539.8    1.009x
+  1 MB #5    512        578.9        564.5        563.0    1.003x
+  1 MB #6    512        545.8        530.2        431.5    1.229x
+  1 MB #7    512        573.0        547.5        548.6    0.998x
+  1 MB #8    512        540.1        524.9        533.6    0.984x
+  1 MB #9    512        573.0        564.9        564.1    1.001x
+ 1 MB #10    512        565.6        557.7        557.7    1.000x
+
+CSV: resultados/teto_vram.csv

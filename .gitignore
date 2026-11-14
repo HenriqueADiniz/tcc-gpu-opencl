@@ -5,3 +5,9 @@
 *.blg
 *.out
 *.toc
+
+# fora do repositório público
+output/
+Regulamento_TCC_CC*.pdf
+tools/*.dll
+tools/clrxdisasm.exe

@@ -1,3 +1,7 @@
+> **DOCUMENTO HISTÓRICO** (marcado em 14/10/2026). Superado pelo `CLAUDE.md`, que é a
+> fonte única de contexto. Mantido só como registro do percurso; não use como
+> referência do estado atual.
+
 # Contexto para o Agente no Linux — TCC: Hierarquia de Memória em GPU AMD
 
 ## Quem sou e o que estou fazendo
