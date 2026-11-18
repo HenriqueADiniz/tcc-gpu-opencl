@@ -194,6 +194,9 @@ g++ -Wall -Wextra -O2 experimentos/<prog>.cpp -o output/<prog> -lOpenCL
   A figura de razões virou Figura 3. Trabalho futuro com RDNA 4 (ideia do
   aluno). Cortes e ajustes tipográficos no `CORTES.md`.
 - `overleaf.zip` com 14 arquivos (inclui `fig_tempos.pdf`). **Reenviar ao Overleaf.**
+- Conferência com o regulamento: síntese com números, contribuições explícitas
+  nas Conclusões, Python/matplotlib citados. Folga: ~3 linhas. Entrega à banca
+  (4º PC do TCC II): **até 23/11/2026, já revisada pelo orientador**.
 - Atenção: `analise/plot_sensibilidade.py` usa `set_xscale("log", basex=2)`,
   que não existe no matplotlib ≥ 3.5; roda no 3.1 do Ubuntu 20.04. O
   `plot_tempos.py` funciona nos dois.

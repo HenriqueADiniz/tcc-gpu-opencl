@@ -83,7 +83,7 @@ O objetivo geral é analisar experimentalmente o impacto da hierarquia de memór
 \item Verificar como o custo de contornar o L1 varia com o tamanho do problema e com a localidade do padrão de acesso, inclusive em um algoritmo completo.
 \end{enumerate}
 
-Em síntese, o instrumento foi obtido por \textit{inline assembly} e empregado em quatro experimentos centrados na multiplicação de matrizes: o custo de contornar o L1 cai com o tamanho do problema e é governado pelo reúso dentro da linha de \textit{cache}, e o SLC altera a política do L2 sem contorná-lo. A Seção~2 traz o referencial teórico; a Seção~3, os trabalhos relacionados; a Seção~4, a metodologia; a Seção~5, os resultados; e a Seção~6, as conclusões.
+Em síntese, o instrumento foi obtido por \textit{inline assembly} e empregado em quatro experimentos centrados na multiplicação de matrizes. O custo de contornar o L1 cai de 1,20$\times$ para 1,06$\times$ com o tamanho do problema e vai de 2,19$\times$ a 1,01$\times$ com a localidade, governado pelo reúso dentro da linha de \textit{cache}; transpor uma das matrizes torna a multiplicação 2,3 a 2,5$\times$ mais lenta; o SLC altera a política do L2 sem contorná-lo; e a comparação ingênua superestima o efeito do \textit{cache}. A Seção~2 traz o referencial teórico; a Seção~3, os trabalhos relacionados; a Seção~4, a metodologia; a Seção~5, os resultados; e a Seção~6, as conclusões.
 
 \section{Referencial Teórico}
 
@@ -163,7 +163,8 @@ desmontados com o \texttt{llvm-objdump} do LLVM~12. A escolha do ambiente decorr
 anterior, conduzida sobre o mesmo dispositivo em Windows, cujo compilador
 proprietário (AMDOCL) não aceita \textit{inline assembly} nem emite \textit{flags}
 sob \texttt{volatile} (Seção~\ref{sec:multi}).\footnote{Código, dados brutos e
-\textit{scripts} de análise: \url{https://github.com/HenriqueADiniz/tcc-gpu-opencl}.}
+\textit{scripts} de análise (Python e matplotlib):
+\url{https://github.com/HenriqueADiniz/tcc-gpu-opencl}.}
 
 O desenho parte dos três caminhos que a nomenclatura das \textit{flags} sugere
 para uma mesma leitura: pelo L1; pelo L2, contornando o L1 (\textit{bypass}); e
@@ -340,7 +341,7 @@ A Tabela~\ref{tab:razoes} decompõe os fatores. O desenho se apoia no cenário~2
 
 Três leituras decorrem da tabela. A primeira é que \textbf{a construção em \textit{assembly} responde sozinha por 1,512$\times$}, sem alterar o caminho de memória: sem o cenário de controle, esse custo seria atribuído ao \textit{cache}. Na ISA, o bloco emite as duas leituras seguidas de um único \texttt{s\_waitcnt vmcnt(0)}, como o código do cenário normal, sem serializá-las; o custo vem do laço de 20 instruções contra 15, pois o endereço de $A$ é recalculado em 64 bits a cada iteração.
 
-A segunda é que \textbf{o valor medido para a mesma \textit{flag} depende da linha de base}. Comparado diretamente ao cenário normal, o cenário~4 aparenta custar 1,871$\times$; com a construção constante nos dois lados, \texttt{glc} custa 1,237$\times$. A diferença entre as duas razões é o custo de construção, e elas respondem a perguntas distintas: quanto custa perder o L1 em código escrito dessa forma, e qual o efeito do bit isolado de todo o resto.
+A segunda é que \textbf{o valor medido para a mesma \textit{flag} depende da linha de base}. Comparado diretamente ao cenário normal, o cenário~4 aparenta custar 1,871$\times$; com a construção constante nos dois lados, \texttt{glc} custa 1,237$\times$. As duas respondem a perguntas distintas: quanto custa perder o L1 em código escrito dessa forma, e qual o efeito do bit isolado de todo o resto.
 
 A terceira é que a proximidade entre os dois mecanismos que emitem GLC=1 (o \texttt{volatile} e o \textit{assembly} com \texttt{glc}, a 4,9\% um do outro) não valida nenhum deles: o primeiro serializa as leituras, e o segundo alonga o laço. Já o efeito do \texttt{slc}, de 1,019$\times$, tem IC acima do piso de ruído, mas é pequeno neste tamanho.
 
@@ -392,9 +393,8 @@ campanhas e as reexecuções, fica entre 431,5 e 564,1~GB/s (mediana de 548,6), 
 o menor ainda supera o pico em 69\%. O resultado tampouco depende de os
 \textit{kernels} anteriores terem deixado o \textit{buffer} no L2: com o L2
 ocupado por outro \textit{buffer} antes de cada execução, \texttt{glc slc} difere
-no máximo 3,0\% da varredura nos cinco tamanhos testados. Esse controle mostra
-ainda que a leitura com SLC=1 aloca a linha no L2; do contrário, o
-\textit{buffer} nunca passaria a residir nele.
+no máximo 3,0\% da varredura nos cinco tamanhos testados, o que mostra também
+que a leitura com SLC=1 aloca a linha no L2.
 
 \textbf{Entre 2 e 64~MB, \texttt{glc slc} é mais rápido que \texttt{glc}}, até
 1,506$\times$ em 4~MB (última coluna da Tabela~\ref{tab:slc}). Um \textit{bypass}
@@ -508,10 +508,9 @@ sobre a memória: também um custo de construção pode variar com o tamanho, à
 medida que o \textit{kernel} passa a ser limitado pela memória. A evidência
 decisiva de que \texttt{glc} retira o L1 é a combinação do bit verificado na ISA,
 da semântica documentada e do Experimento~4. Este experimento estabelece a
-dependência do tamanho, não o seu mecanismo: com todos os tamanhos potências de
-dois, o crescimento do conjunto de trabalho e o agravamento das condições de
-conflito avançam juntos. Ainda assim, mostra que \textbf{uma medida em um único
-tamanho não caracteriza o efeito do \textit{cache}}.
+dependência do tamanho, não o seu mecanismo (Seção~\ref{sec:conclusao}), e mostra
+que \textbf{uma medida em um único tamanho não caracteriza o efeito do
+\textit{cache}}.
 
 \textbf{O efeito de \texttt{slc} emerge apenas em problemas grandes} (curva~c).
 A \textit{flag} custa 1,9\% em $N=1024$, fica entre 1,2\% e 2,6\% até $N=4096$ e
@@ -526,8 +525,7 @@ reusada depois de expulsa. Esse custo não acompanha a ocupação total (em
 $N=1024$ as três matrizes já somam 12~MB, seis vezes o L2), e sim, por hipótese
 não testada aqui, a distância de reúso: a faixa de $B$ lida por um
 \textit{work-group}, $N$ linhas de 64~B, passa de 64~KB em $N=1024$ a 1~MB em
-$N=16384$. A análise corrobora, sob carga real, a conclusão da
-Seção~\ref{sec:slc}.
+$N=16384$.
 
 \subsection{Experimento 4: Localidade do Padrão de Acesso}
 \label{sec:localidade}
@@ -631,8 +629,9 @@ percentuais.
 \section{Conclusões e Trabalhos Futuros}
 \label{sec:conclusao}
 
-Os quatro experimentos, conduzidos numa GPU AMD Polaris (gfx803) sob OpenCL com
-controle explícito das \textit{flags} de \textit{cache}, permitem três conclusões.
+As contribuições deste trabalho são um instrumento, verificado na ISA, para retirar
+o L1 do caminho de leituras a partir de OpenCL numa GPU AMD Polaris (gfx803), e
+as três conclusões que ele permitiu nos quatro experimentos.
 
 A primeira é que \textbf{o valor do L1 não é uma constante da arquitetura, e sim
 função do problema e do padrão de acesso}. Ao longo de um fator de 256 em volume

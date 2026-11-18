@@ -975,3 +975,22 @@ com 10 linhas cada, na página 1.
 
 Estado: **16 páginas**, 0 erros, 0 Overfull, 22 referências, 3 figuras; resumo e
 abstract com 10 linhas cada.
+
+## Conferência com o regulamento (mesmo dia)
+
+- Introdução: a síntese passou a trazer os principais resultados com números
+  (1,20→1,06×; 2,19→1,01×; 2,3–2,5×; SLC; comparação ingênua), como pede o 4º PC
+  do TCC II ("síntese do que foi feito e principais resultados obtidos").
+- Conclusões: abertura explicita as contribuições (Art. 5º, §3º): o instrumento
+  verificado na ISA e as três conclusões.
+- Ferramentas de análise citadas (Art. 4º, §1º, III): Python e matplotlib, na
+  nota de rodapé do repositório.
+- Para caber: a ressalva das potências de dois fica só nas Limitações (saiu do
+  Exp. 3, que remete à Seção 6); saíram duas frases de fecho redundantes;
+  Figura 2 com 3,7 cm de altura.
+- Pontos deixados ao aluno: a finalidade declarada da IA não cita análise de
+  dados nem geração de figuras (Art. 7º, II; Art. 11); a declaração fica numa
+  seção própria após as Conclusões ("nota específica" do Art. 7º).
+
+Estado: **16 páginas** (~3 linhas de folga), 0 erros, 0 Overfull, 22 referências;
+resumo e abstract com 10 linhas cada.

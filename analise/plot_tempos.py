@@ -85,8 +85,8 @@ plt.rcParams.update({
 })
 
 CM = 1 / 2.54
-fig = plt.figure(figsize=(10.0 * CM, 4.0 * CM))
-ax = fig.add_axes([0.125, 0.245, 0.865, 0.735])
+fig = plt.figure(figsize=(10.0 * CM, 3.7 * CM))
+ax = fig.add_axes([0.125, 0.265, 0.865, 0.715])
 
 SERIES = [("CPU: laço triplo, 14 threads", yc, LARANJA, "s"),
           ("GPU: cenário 1 (OpenCL C)", yg, AZUL, "o")]
