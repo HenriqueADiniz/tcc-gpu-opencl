@@ -935,3 +935,43 @@ resultados, linguagem e enquadramento em 16 páginas. Feita numa cópia do
 
 Estado: **16 páginas**, 0 erros, 0 Overfull, 22 referências; resumo e abstract
 com 10 linhas cada, na página 1.
+
+# Revisão de 18/11/2026 — figura de tempos (pedido do orientador) e RDNA 4
+
+## Figura nova
+
+- Nova **Figura 2**: tempo da multiplicação na CPU e na GPU (cenário 1) por
+  $N$, em escala logarítmica, com as razões das extremidades anotadas (35× e
+  400×). Gerada por `analise/plot_tempos.py` a partir de `matmul_sweep.csv` e
+  `matmul_cpu_sweep.csv` → `Documentação/fig_tempos.pdf`. Mesma paleta da
+  figura de razões (slots 1–2, validados também contra fundo branco).
+- Um eixo só, logarítmico, e não um segundo eixo para a CPU: com dois eixos a
+  distância entre as curvas seria arbitrária (poderiam até se cruzar); em
+  escala log, a distância vertical é a própria razão CPU/GPU.
+- A figura de razões passa a ser a Figura 3. O "Tabela 5" escrito dentro de
+  `fig_sensibilidade.pdf` continua certo (a numeração das tabelas não mudou).
+
+## Trabalhos futuros
+
+- Acrescentada a repetição do estudo numa GPU RDNA 4 (ideia do aluno). No GFX12
+  a política de cache é expressa por dicas temporais e de escopo (`th:`,
+  `scope:`), e não por GLC/SLC (conferido no guia do AMDGPU do LLVM): o
+  instrumento teria de ser refeito, e o estudo testaria a reflexão das
+  Conclusões (se a política de retenção fica controlável pelo programador).
+
+## Cortes e ajustes para manter 16 páginas
+
+- Saíram: a frase da CPU no Exp. 1 (247,3 ms, 34×; a comparação está na
+  Figura 2 e no Exp. 3), a nota de rodapé de `CL_DEVICE_GLOBAL_MEM_CACHE_SIZE`,
+  os valores das duas remedições da `dispersa` (3,016× e 2,515×; ficam a queda,
+  a amplitude e as medianas das três campanhas), o parágrafo da vazão absoluta
+  da `dispersa` (170–189 contra 783–798 GB/s) e "algumas caem a 196,3".
+- Encurtados: Baghsorkhi et al., Tee et al., o posicionamento após a Tabela 1,
+  a terceira leitura do Exp. 1 e o parágrafo do piso de ruído.
+- Tipografia: espaço entre floats e texto de 20/14/14 pt (padrão do article
+  12pt) para 12/10/10 pt; listas sem espaço extra entre itens. Fonte, margens e
+  formato SBC intocados. Figura de razões de 0,8 para 0,9 da largura (o texto
+  dela estava a ~6 pt).
+
+Estado: **16 páginas**, 0 erros, 0 Overfull, 22 referências, 3 figuras; resumo e
+abstract com 10 linhas cada.

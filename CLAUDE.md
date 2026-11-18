@@ -187,6 +187,17 @@ g++ -Wall -Wextra -O2 experimentos/<prog>.cpp -o output/<prog> -lOpenCL
   pede a versão). Redação de resto intacta.
 - `overleaf.zip` refeito com os 13 arquivos atuais. **Reenviar ao Overleaf.**
 
+## Feito em 18/11/2026
+
+- Orientador pediu mais figuras: nova Figura 2, tempo da CPU e da GPU por N em
+  escala logarítmica (`analise/plot_tempos.py` → `Documentação/fig_tempos.pdf`).
+  A figura de razões virou Figura 3. Trabalho futuro com RDNA 4 (ideia do
+  aluno). Cortes e ajustes tipográficos no `CORTES.md`.
+- `overleaf.zip` com 14 arquivos (inclui `fig_tempos.pdf`). **Reenviar ao Overleaf.**
+- Atenção: `analise/plot_sensibilidade.py` usa `set_xscale("log", basex=2)`,
+  que não existe no matplotlib ≥ 3.5; roda no 3.1 do Ubuntu 20.04. O
+  `plot_tempos.py` funciona nos dois.
+
 ## Pendências
 
 - [ ] Revisão do aluno da nova redação do Exp. 2 (04/11/2026).
@@ -199,8 +210,8 @@ g++ -Wall -Wextra -O2 experimentos/<prog>.cpp -o output/<prog> -lOpenCL
   fornecedor, versão, finalidade e seções (Arts. 7º e 8º).
 - [ ] Revisão do aluno sobre o texto reestruturado antes da entrega de 21/10/2026.
 
-Estado em 13/11/2026: **16 páginas**, 0 erros, 0 Overfull, 22 referências; resumo e
-abstract com 10 linhas cada.
+Estado em 18/11/2026: **16 páginas**, 0 erros, 0 Overfull, 22 referências, 3 figuras;
+resumo e abstract com 10 linhas cada.
 
 ## Regras de trabalho
 

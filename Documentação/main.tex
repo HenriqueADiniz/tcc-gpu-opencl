@@ -19,6 +19,11 @@
 
 \sloppy
 
+% Espaço entre floats e texto (padrão do article 12pt: 20pt, 14pt e 14pt).
+\setlength{\textfloatsep}{12pt plus 2pt minus 2pt}
+\setlength{\floatsep}{10pt plus 2pt minus 2pt}
+\setlength{\intextsep}{10pt plus 2pt minus 2pt}
+
 \title{Análise do Impacto da Hierarquia de Memória em GPU AMD Utilizando OpenCL}
 
 \author{Henrique de Almeida Diniz\inst{1}, Pedro Henrique Ramos Costa\inst{1}}
@@ -71,7 +76,7 @@ A pergunta que orienta este trabalho é: qual é o impacto quantitativo da hiera
 
 O objetivo geral é analisar experimentalmente o impacto da hierarquia de memória no desempenho de uma GPU AMD (arquitetura Polaris/GCN) sob OpenCL, tendo a multiplicação de matrizes como caso de estudo. Os objetivos específicos são:
 
-\begin{enumerate}
+\begin{enumerate}\setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}
 \item Obter e verificar, na ISA, um mecanismo que permita retirar o L1 do caminho de uma leitura a partir de código OpenCL no GFX8.
 \item Isolar, por desenho controlado, o custo de contornar o L1, separando-o dos fatores que a comparação ingênua confunde com ele.
 \item Determinar quais níveis da hierarquia podem ser contornados por \textit{flags} de instrução, testando a hipótese de que SLC=1 contorna o L2.
@@ -89,7 +94,7 @@ As GPUs maximizam a vazão de operações simultâneas~\cite{owens2008}, o que a
 \subsection{Hierarquia de Memória em GPUs AMD (GCN/Polaris)}
 \label{sec:hier}
 
-Nas GPUs AMD da arquitetura GCN (\textit{Graphics Core Next}), os \textit{work-items} executam em \textit{wavefronts} de 64 \textit{lanes}, que avançam em conjunto, instrução a instrução. O dispositivo estudado, o \textit{chip} Polaris~10 (codinome Ellesmere, GCN de 4\textordfeminine{} geração), compartilha com a 3\textordfeminine{} geração a ISA GFX8 e o alvo \texttt{gfx803} do LLVM, de modo que o manual da ISA GCN3 se aplica a ele~\cite{rocmspecs, amdgcn3}. Sua hierarquia compreende os registradores, privados de cada \textit{work-item}; o LDS (\textit{Local Data Share}), de 64~KB por CU, que implementa a memória \texttt{\_\_local}; o \textit{cache} L1 vetorial, de 16~KB por CU; o \textit{cache} L2, de 2~MB, compartilhado por todas as CUs e dividido em canais que atendem faixas disjuntas de endereços; e a VRAM~\cite{rocmspecs, llvmamdgpu}.\footnote{A consulta \texttt{CL\_DEVICE\_GLOBAL\_MEM\_CACHE\_SIZE} retorna 16~KB neste dispositivo, a capacidade do L1 por CU, não a do L2, que a API não expõe.} A GDDR5 da placa usada (2.000~MHz no estado máximo do \textit{driver}, quatro transferências por ciclo, barramento de 256~bits) tem pico teórico de 256~GB/s.
+Nas GPUs AMD da arquitetura GCN (\textit{Graphics Core Next}), os \textit{work-items} executam em \textit{wavefronts} de 64 \textit{lanes}, que avançam em conjunto, instrução a instrução. O dispositivo estudado, o \textit{chip} Polaris~10 (codinome Ellesmere, GCN de 4\textordfeminine{} geração), compartilha com a 3\textordfeminine{} geração a ISA GFX8 e o alvo \texttt{gfx803} do LLVM, de modo que o manual da ISA GCN3 se aplica a ele~\cite{rocmspecs, amdgcn3}. Sua hierarquia compreende os registradores, privados de cada \textit{work-item}; o LDS (\textit{Local Data Share}), de 64~KB por CU, que implementa a memória \texttt{\_\_local}; o \textit{cache} L1 vetorial, de 16~KB por CU; o \textit{cache} L2, de 2~MB, compartilhado por todas as CUs e dividido em canais que atendem faixas disjuntas de endereços; e a VRAM~\cite{rocmspecs, llvmamdgpu}. A GDDR5 da placa usada (2.000~MHz no estado máximo do \textit{driver}, quatro transferências por ciclo, barramento de 256~bits) tem pico teórico de 256~GB/s.
 
 Três noções sustentam a análise. Os \textit{caches} operam em linhas de 64~bytes: uma falta (\textit{miss}) traz a linha inteira, e os acessos seguintes a ela são acertos enquanto ela não for expulsa. A linha a expulsar é escolhida pela política de substituição, de que a LRU (\textit{least recently used}) é o exemplo clássico, e linhas que disputam o mesmo conjunto do \textit{cache} expulsam-se mutuamente (faltas de conflito). Por fim, dentro de uma instrução de \textit{load}, os endereços pedidos pelos \textit{lanes} que caem numa mesma linha são atendidos por uma única busca, a coalescência; no caso-limite, todos os \textit{lanes} pedem o mesmo endereço (\textit{broadcast})~\cite[Seção~8.1.9]{amdgcn3}.
 
@@ -105,11 +110,11 @@ Na ISA, as instruções de leitura da memória global (\texttt{buffer\_load\_dwo
 
 \subsection{Hierarquia de Memória em GPUs}
 
-\cite{wong2010} levaram às GPUs o microbenchmarking por \textit{pointer chasing}: percorre-se uma estrutura encadeada cujo tamanho define o conjunto de trabalho, e os saltos de latência revelam a capacidade de cada nível; com ele mapearam os \textit{caches} de uma GeForce GTX~280. \cite{mei2017} refinaram a técnica, registrando a latência de cada acesso, e a aplicaram às gerações Fermi, Kepler e Maxwell, expondo também a estrutura dos \textit{caches}. \cite{jia2018}, em relatório técnico, estenderam a abordagem à arquitetura Volta, combinando-a com a desmontagem de instruções. \cite{baghsorkhi2012} seguem outra via: um modelo da hierarquia baseado em traços de memória, com método de Monte Carlo, que estima limites estatísticos das medidas de desempenho sem instrumentar a execução. Todos se restringem a GPUs NVIDIA com CUDA. A combinação de microbenchmarks com análise da ISA é o método aqui adaptado, embora o desenho meça vazão sob carga, e não latência isolada.
+\cite{wong2010} levaram às GPUs o microbenchmarking por \textit{pointer chasing}: percorre-se uma estrutura encadeada cujo tamanho define o conjunto de trabalho, e os saltos de latência revelam a capacidade de cada nível; com ele mapearam os \textit{caches} de uma GeForce GTX~280. \cite{mei2017} refinaram a técnica, registrando a latência de cada acesso, e a aplicaram às gerações Fermi, Kepler e Maxwell, expondo também a estrutura dos \textit{caches}. \cite{jia2018}, em relatório técnico, estenderam a abordagem à arquitetura Volta, combinando-a com a desmontagem de instruções. \cite{baghsorkhi2012} seguem outra via: um modelo estatístico da hierarquia, baseado em traços de memória e no método de Monte Carlo. Todos se restringem a GPUs NVIDIA com CUDA. A combinação de microbenchmarks com análise da ISA é o método aqui adaptado, embora o desenho meça vazão sob carga, e não latência isolada.
 
 Mais próximos da pergunta deste trabalho, \cite{jia2012} ligaram e desligaram o L1 de uma GPU Fermi: ele acelerou alguns programas e retardou outros, e o tráfego L1--L2 previu o efeito melhor que a taxa de acerto. Daí derivaram uma taxonomia de localidade (dentro do \textit{warp}, entre \textit{warps} e entre instruções) para decidir, por \textit{load}, se o L1 deve ser usado. Trabalhos posteriores partem da mesma constatação para automatizar a decisão de contornar o \textit{cache}, por compilador~\cite{xie2013} ou de forma adaptativa em tempo de execução~\cite{tian2015}.
 
-Em GPUs AMD a caracterização é mais escassa. \cite{tee2025} aplicaram \textit{pointer chasing} às MI300A e MI300X (CDNA~3) e à MI250X, medindo a latência do L1 escalar, do L2, do \textit{Infinity Cache} e da memória HBM. O trabalho mostra que a técnica se transporta para GPUs AMD, mas incide sobre arquiteturas de centro de dados muito posteriores à GCN e não trata dos mecanismos que selecionam o nível de \textit{cache}, objeto deste estudo.
+Em GPUs AMD a caracterização é mais escassa. \cite{tee2025} aplicaram \textit{pointer chasing} às MI300A e MI300X (CDNA~3) e à MI250X, medindo a latência do L1 escalar, do L2, do \textit{Infinity Cache} e da memória HBM; incide, porém, sobre arquiteturas de centro de dados muito posteriores à GCN e não trata dos mecanismos que selecionam o nível de \textit{cache}.
 
 \subsection{Síntese e Posicionamento}
 
@@ -141,7 +146,7 @@ Tee et al. (2025) & AMD (CDNA) & ROCm & Sim & Não & Latência dos \textit{cache
 }
 \end{table}
 
-Conforme a Tabela~\ref{tab:trabalhos}, a literatura concentra-se em GPUs NVIDIA. Este estudo investiga uma GPU AMD GCN/Polaris sob OpenCL e desloca o objeto de análise: onde o microbenchmarking caracteriza a \emph{geometria} da hierarquia (capacidade e latência de cada nível), aqui se mede quanto um nível vale, como \cite{jia2012} no Fermi. Lá o controle é oferecido pelo CUDA; aqui precisa ser construído e verificado na ISA, e seu custo, separado do efeito do \textit{cache}.
+Conforme a Tabela~\ref{tab:trabalhos}, a literatura concentra-se em GPUs NVIDIA. Este estudo investiga uma GPU AMD sob OpenCL e desloca o objeto de análise: onde o microbenchmarking caracteriza a \emph{geometria} da hierarquia (capacidade e latência de cada nível), aqui se mede quanto um nível vale, como \cite{jia2012} no Fermi; lá o controle é oferecido pelo CUDA, aqui precisa ser construído e verificado na ISA.
 
 \section{Metodologia}
 \label{sec:metodologia-ambiente}
@@ -254,7 +259,7 @@ com o \textbf{mesmo número de \textit{loads}}, $N$ por \textit{work-item}, $N^3
 no total, e diferem apenas nos índices; com \textit{work-groups} de $16\times16$,
 cada \textit{wavefront} reúne 4 valores de $\mathrm{row}$ e 16 de $\mathrm{col}$:
 
-\begin{itemize}
+\begin{itemize}\setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}
 \item \textbf{linha}, $A[\,\mathrm{row}\,N + k\,]$: o endereço avança 4~bytes por
 iteração, de modo que 16 acessos consecutivos caem na mesma linha de
 \textit{cache}; numa \textit{wavefront} há 4 endereços, cada um pedido por 16
@@ -291,7 +296,7 @@ $N=4096$ e orçamento de 6~s por ponto (5 a 100 execuções).
 \subsection{Experimento 1: Isolamento do Efeito do L1}
 \label{sec:fatorial}
 
-A Tabela~\ref{tab:cenarios} apresenta os cinco cenários para $N=1024$. Todos foram verificados contra a CPU, sem divergência, e a deriva ficou abaixo de 2\% em todos, o que afasta a variação de \textit{clock} como explicação das diferenças maiores; para as de poucos por cento, o controle é a réplica descrita a seguir. Como referência de escala, a CPU leva 247,3~ms com o mesmo algoritmo (mediana de 25 execuções), 34 vezes o tempo do cenário~1.
+A Tabela~\ref{tab:cenarios} apresenta os cinco cenários para $N=1024$. Todos foram verificados contra a CPU, sem divergência, e a deriva ficou abaixo de 2\% em todos, o que afasta a variação de \textit{clock} como explicação das diferenças maiores; para as de poucos por cento, o controle é a réplica descrita a seguir.
 
 \begin{table}[ht]
 \centering
@@ -337,7 +342,7 @@ Três leituras decorrem da tabela. A primeira é que \textbf{a construção em \
 
 A segunda é que \textbf{o valor medido para a mesma \textit{flag} depende da linha de base}. Comparado diretamente ao cenário normal, o cenário~4 aparenta custar 1,871$\times$; com a construção constante nos dois lados, \texttt{glc} custa 1,237$\times$. A diferença entre as duas razões é o custo de construção, e elas respondem a perguntas distintas: quanto custa perder o L1 em código escrito dessa forma, e qual o efeito do bit isolado de todo o resto.
 
-A terceira é que a proximidade entre os dois mecanismos que emitem GLC=1 (o \texttt{volatile} e o \textit{assembly} com \texttt{glc}, a 4,9\% um do outro) não valida nenhum deles: o primeiro serializa as leituras, o segundo alonga o laço, e é o controle que isola a \textit{flag}. Já o efeito do \texttt{slc}, de 1,019$\times$, tem IC inteiramente acima do piso de ruído, mas é pequeno neste tamanho; os Experimentos~2 e~3 o caracterizam.
+A terceira é que a proximidade entre os dois mecanismos que emitem GLC=1 (o \texttt{volatile} e o \textit{assembly} com \texttt{glc}, a 4,9\% um do outro) não valida nenhum deles: o primeiro serializa as leituras, e o segundo alonga o laço. Já o efeito do \texttt{slc}, de 1,019$\times$, tem IC acima do piso de ruído, mas é pequeno neste tamanho.
 
 \subsection{Experimento 2: Semântica do Bit SLC}
 \label{sec:slc}
@@ -377,7 +382,7 @@ pico, qualquer que seja o tamanho. O \textit{clock} de memória não foi
 monitorado, mas esse valor o situa no estado máximo: a 1.000~MHz, o pico seria de
 128~GB/s. O patamar é da memória, e não do
 \textit{kernel}: nenhuma das nove variantes com mais bytes em voo passa de
-223,3~GB/s na mediana, e algumas caem a 196,3.
+223,3~GB/s na mediana.
 
 \textbf{O que se mede.} Em 1~MB, \texttt{glc slc} sustenta \textbf{555,9~GB/s} na
 campanha original e 539,8~GB/s na varredura: 2,2 e 2,1 vezes o pico teórico.
@@ -447,10 +452,18 @@ foram validados sem divergência (Tabela~\ref{tab:sens}).
 {\footnotesize $^\ast$ depende do compilador, conforme a Seção~\ref{sec:multi}.}
 \end{table}
 
+\begin{figure}[ht]
+\centering
+\includegraphics[width=10cm]{fig_tempos}
+\caption{Mediana do tempo da multiplicação na CPU e na GPU (cenário~1), em escala
+logarítmica: a distância vertical entre as curvas é a razão entre os tempos.}
+\label{fig:tempos}
+\end{figure}
+
 A vazão da GPU é quase invariante (307,2~GFLOPS em $N=1024$ contra 293,9 em
 $N=16384$, queda de 4\%), ao passo que a da CPU cai de 8,68 para 0,73~GFLOPS,
 11,8 vezes; a razão entre os dispositivos cresce, assim, de \textbf{35$\times$
-para 400$\times$}. Nenhum dos dois está limitado pela aritmética: o cenário~1 usa
+para 400$\times$} (Figura~\ref{fig:tempos}). Nenhum dos dois está limitado pela aritmética: o cenário~1 usa
 menos de 5\% do pico de precisão simples da GPU, de cerca de 6,2~TFLOPS. A
 explicação mais provável está no acesso à memória: na CPU, o laço percorre
 $B[k\,N+j]$ com passo de $4N$ bytes, uma linha de \textit{cache} nova por
@@ -464,16 +477,15 @@ reduziria. Os pontos de CPU em $N\geq4096$ resumem três execuções, com $cv$ d
 15,4\% em $N=8192$.
 
 Na GPU, o $cv$ de cada ponto cai de cerca de 4\% em $N=1024$ para 0,02\% em
-$N=16384$. O piso de ruído tem, porém, alcance limitado: o cenário~1 em $N=1024$
-dá 7,223~ms na Tabela~\ref{tab:cenarios} e 6,99~ms na Tabela~\ref{tab:sens},
-diferença de 3,3\% para o mesmo \textit{kernel}. Medido \emph{dentro} de uma
-campanha, o piso \textbf{subestima a variação entre campanhas}, que incorpora
-estado térmico e política de \textit{clock}; por isso, as razões entre cenários
-de GPU são sempre calculadas dentro de uma mesma campanha.
+$N=16384$. O piso de ruído, porém, \textbf{subestima a variação entre campanhas},
+que incorpora estado térmico e política de \textit{clock}: o cenário~1 em
+$N=1024$ dá 7,223~ms na Tabela~\ref{tab:cenarios} e 6,99~ms na
+Tabela~\ref{tab:sens}, 3,3\% de diferença; por isso, as razões entre cenários de
+GPU são sempre calculadas dentro de uma mesma campanha.
 
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.8\textwidth]{fig_sensibilidade}
+\includegraphics[width=0.9\textwidth]{fig_sensibilidade}
 \caption{Razões entre as medianas de dois cenários da Tabela~\ref{tab:sens}, no
 mesmo $N$. Acima de 1,00$\times$, o cenário do numerador é mais lento.}
 \label{fig:sens}
@@ -562,10 +574,6 @@ com GLC=1~\cite[Seção~8.1.9]{amdgcn3}. O que \textbf{linha} e \textbf{dispersa
 têm em comum, e \textbf{coluna} não tem, são os 16 acessos sucessivos que
 aproveitam cada busca de 64~bytes; é esse reúso que confere valor ao L1.
 
-\textbf{Dispersa} é também o padrão mais caro em termos absolutos: sem
-\textit{flag}, sustenta 170--189~GB/s de dados pedidos pelos \textit{lanes},
-contra 783--798 de \textbf{linha}.
-
 \textbf{O \texttt{slc} comporta-se como política de substituição também aqui.}
 A metade inferior da Tabela~\ref{tab:localidade} combina os dois bits;
 dividindo-a pela superior, isola-se o \texttt{slc}. Em \textbf{linha}, ele custa
@@ -574,16 +582,14 @@ antes que a linha seja expulsa. Em \textbf{coluna}, custa de 4\% a 6\% até
 $N=4096$ e chega a 13\% e 22\% nos dois tamanhos maiores. Em \textbf{dispersa},
 que mantém 19 linhas vivas por instrução, cresce de 1,22$\times$ em $N=1024$ a
 2,08$\times$ em $N=8192$ e recua a 1,41$\times$ em $N=16384$, a única queda do
-conjunto. Duas remedições independentes desses dois pontos reproduzem o custo do
-\texttt{glc} a menos de 2,5\%, mas não o de \texttt{glc slc} (3,016$\times$ e
-3,360$\times$ em $N=8192$; 2,500$\times$ e 2,515$\times$ em $N=16384$, contra os
-3,376$\times$ e 2,111$\times$ da tabela): a queda persiste nas três campanhas, de
-17\% a 37\%, mas a amplitude entre elas, de até 12\% e 19\%, supera a dispersão
-interna, de até 7,4\%. Pelas medianas das três campanhas (3,360$\times$ e
-2,500$\times$), o \texttt{slc} isolado vale 2,08$\times$ e 1,67$\times$. Esses
-dois pontos devem ser lidos com essa incerteza; e a queda não reflete saturação
-da política, pois, com $B$ transposta (Tabela~\ref{tab:layout}), em padrão de
-acesso análogo, o efeito do \texttt{slc} continua crescendo em $N=16384$.
+conjunto. Duas remedições independentes desses pontos reproduzem o custo do
+\texttt{glc} a menos de 2,5\%, mas não o de \texttt{glc slc}: a queda persiste nas
+três campanhas, de 17\% a 37\%, mas a amplitude entre elas, de até 12\% e 19\%,
+supera a dispersão interna, de até 7,4\%; pelas medianas das três (3,360$\times$
+e 2,500$\times$), o \texttt{slc} isolado vale 2,08$\times$ e 1,67$\times$. A queda
+não reflete saturação da política, pois, com $B$ transposta
+(Tabela~\ref{tab:layout}), em padrão análogo, o efeito do \texttt{slc} continua
+crescendo em $N=16384$.
 
 \begin{table}[ht]
 \centering
@@ -683,8 +689,11 @@ as escritas, o formato MUBUF e outros tipos de memória (MTYPE); e todos os
 tamanhos são potências de dois, o que confunde o crescimento do conjunto de
 trabalho com o agravamento das condições de conflito. Como trabalhos futuros,
 propõem-se um desenho fatorial cruzando magnitude e alinhamento, que separe esses
-dois efeitos, e a caracterização por latência, com \textit{pointer chasing} sob
-controle de \textit{flags} e contadores de \textit{hardware}.
+dois efeitos; a caracterização por latência, com \textit{pointer chasing} sob
+controle de \textit{flags} e contadores de \textit{hardware}; e a repetição do
+estudo numa GPU RDNA~4, cuja ISA expressa a política de \textit{cache} por dicas
+temporais e de escopo, e não por GLC e SLC~\cite{llvmamdgpu}, o que permitiria
+testar se a política de retenção se torna controlável pelo programador.
 
 \section*{Declaração de uso de ferramentas de Inteligência Artificial}
 
