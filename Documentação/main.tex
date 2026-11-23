@@ -39,31 +39,28 @@
 \maketitle
 
 \begin{abstract}
-This work analyses the impact of the memory hierarchy on the performance of an
-AMD Ellesmere GPU (GCN, GFX8) under OpenCL. Its instrument is the control of
-cache flags through inline assembly, verified in the ISA, as
-\texttt{volatile} is compiler-dependent. Across four experiments, the cost of
-bypassing the L1, isolated by a controlled design, falls from 1.20$\times$ to
+This work analyses the impact of the memory hierarchy on the performance of
+matrix multiplication on an AMD RX~580 GPU (GCN, GFX8) under OpenCL. Its instrument is the control of cache flags through inline assembly,
+verified in the ISA. The cost of bypassing the L1 falls from 1.20$\times$ to
 1.06$\times$ over a 256-fold range in data volume and spans 2.19$\times$ to
-1.01$\times$ with locality; because coalescing across lanes is lost,
-transposing a matrix, a classic CPU optimization, makes the multiplication
-2.3--2.5$\times$ slower. For FLAT loads, SLC=1 does not bypass the L2 but changes
-its replacement policy: a working set that fits in it sustains 555.9~GB/s, above
-the VRAM's 256~GB/s theoretical peak.
+1.01$\times$ with locality; transposing one matrix makes the multiplication
+2.3--2.5$\times$ slower, as coalescing across lanes is lost. For FLAT loads,
+SLC=1 does not bypass the L2 (a working set that fits in it sustains about
+550~GB/s, above the VRAM's 256~GB/s peak) but changes its replacement policy,
+speeding up sweeps slightly larger than the L2 by up to 1.51$\times$.
 \end{abstract}
 
 \begin{resumo}
-Este trabalho analisa o impacto da hierarquia de memória no desempenho de uma
-GPU AMD Ellesmere (GCN, GFX8) sob OpenCL. O instrumento é o controle das
-\textit{flags} de \textit{cache} por \textit{inline assembly}, verificado na ISA,
-pois o \texttt{volatile} depende do compilador. Em quatro
-experimentos, o custo de contornar o L1, isolado por desenho controlado, cai de
+Este trabalho analisa o impacto da hierarquia de memória no desempenho da
+multiplicação de matrizes numa GPU AMD RX~580 (GCN, GFX8) sob OpenCL. O instrumento é o controle das \textit{flags} de \textit{cache}
+por \textit{inline assembly}, verificado na ISA. O custo de contornar o L1 cai de
 1,20$\times$ para 1,06$\times$ num fator de 256 em volume de dados e vai de
-2,19$\times$ a 1,01$\times$ com a localidade; por perder a
-coalescência entre \textit{lanes}, transpor uma matriz, otimização clássica em
-CPU, torna a multiplicação 2,3 a 2,5$\times$ mais lenta. Em leituras FLAT, SLC=1
-não contorna o L2, mas altera sua política de substituição: um conjunto que cabe
-nele sustenta 555,9~GB/s, acima do pico teórico de 256~GB/s da VRAM.
+2,19$\times$ a 1,01$\times$ com a localidade; transpor uma das matrizes torna a
+multiplicação 2,3 a 2,5$\times$ mais lenta, por perder a coalescência entre
+\textit{lanes}. Em leituras FLAT, SLC=1 não contorna o L2 (um conjunto que cabe
+nele sustenta cerca de 550~GB/s, acima do pico de 256~GB/s da VRAM), mas altera
+sua política de substituição, acelerando em até 1,51$\times$ varreduras pouco
+maiores que ele.
 \end{resumo}
 
 \section{Introdução}
@@ -72,7 +69,7 @@ A computação paralela em unidades de processamento gráfico (GPUs) consolidou-
 
 O paralelismo massivo, porém, não basta: a forma como os dados são acessados pesa tanto quanto ele. As GPUs possuem uma hierarquia de memória (registradores, memória local, \textit{caches} L1 e L2 e memória global), em que os níveis mais próximos do processador são menores e mais rápidos~\cite{amdgcn3, rocmspecs}, e a eficiência de um algoritmo depende de quão bem ele a explora.
 
-A pergunta que orienta este trabalho é: qual é o impacto quantitativo da hierarquia de memória no desempenho de um algoritmo paralelo executado em GPU AMD sob OpenCL? A literatura concentra-se em GPUs NVIDIA~\cite{wong2010, jia2012, baghsorkhi2012, mei2017, jia2018}, e são escassos os estudos sobre o comportamento de \textit{cache} nas GPUs AMD da arquitetura GCN. A forma mais direta de medir esse impacto é retirar um nível do caminho de um acesso, e fazê-lo sem confundir o efeito do \textit{cache} com efeitos de geração de código exige um instrumento verificado no binário. Saber quanto um nível vale, e do que esse valor depende, orienta decisões de otimização, como a disposição dos dados na memória.
+A pergunta que orienta este trabalho é: qual é o impacto quantitativo da hierarquia de memória no desempenho de um algoritmo paralelo executado em GPU AMD sob OpenCL? A literatura concentra-se em GPUs NVIDIA~\cite{wong2010, jia2012, baghsorkhi2012, mei2017, jia2018}, e são escassos os estudos sobre o comportamento de \textit{cache} nas GPUs AMD da arquitetura GCN, que, no entanto, tem a ISA documentada publicamente e um compilador aberto, o LLVM, o que permite verificar no binário o efeito de cada mecanismo. A forma mais direta de medir esse impacto é retirar um nível do caminho de um acesso, e fazê-lo sem confundir o efeito do \textit{cache} com efeitos de geração de código exige um instrumento verificado no binário. Saber quanto um nível vale, e do que esse valor depende, orienta decisões de otimização, como a disposição dos dados na memória.
 
 O objetivo geral é analisar experimentalmente o impacto da hierarquia de memória no desempenho de uma GPU AMD (arquitetura Polaris/GCN) sob OpenCL, tendo a multiplicação de matrizes como caso de estudo. Os objetivos específicos são:
 
@@ -94,7 +91,7 @@ As GPUs maximizam a vazão de operações simultâneas~\cite{owens2008}, o que a
 \subsection{Hierarquia de Memória em GPUs AMD (GCN/Polaris)}
 \label{sec:hier}
 
-Nas GPUs AMD da arquitetura GCN (\textit{Graphics Core Next}), os \textit{work-items} executam em \textit{wavefronts} de 64 \textit{lanes}, que avançam em conjunto, instrução a instrução. O dispositivo estudado, o \textit{chip} Polaris~10 (codinome Ellesmere, GCN de 4\textordfeminine{} geração), compartilha com a 3\textordfeminine{} geração a ISA GFX8 e o alvo \texttt{gfx803} do LLVM, de modo que o manual da ISA GCN3 se aplica a ele~\cite{rocmspecs, amdgcn3}. Sua hierarquia compreende os registradores, privados de cada \textit{work-item}; o LDS (\textit{Local Data Share}), de 64~KB por CU, que implementa a memória \texttt{\_\_local}; o \textit{cache} L1 vetorial, de 16~KB por CU; o \textit{cache} L2, de 2~MB, compartilhado por todas as CUs e dividido em canais que atendem faixas disjuntas de endereços; e a VRAM~\cite{rocmspecs, llvmamdgpu}. A GDDR5 da placa usada (2.000~MHz no estado máximo do \textit{driver}, quatro transferências por ciclo, barramento de 256~bits) tem pico teórico de 256~GB/s.
+Nas GPUs AMD da arquitetura GCN (\textit{Graphics Core Next}), os \textit{work-items} executam em \textit{wavefronts} de 64 \textit{lanes}, que avançam em conjunto, instrução a instrução. O dispositivo estudado, o \textit{chip} Polaris~10 (codinome Ellesmere, GCN de 4\textordfeminine{} geração), compartilha com a 3\textordfeminine{} geração a ISA GFX8 e o alvo \texttt{gfx803} do LLVM, de modo que o manual da ISA GCN3 se aplica a ele~\cite{rocmspecs, amdgcn3}. Sua hierarquia compreende os registradores, privados de cada \textit{work-item}; o LDS (\textit{Local Data Share}), de 64~KB por CU, que implementa a memória \texttt{\_\_local}; o \textit{cache} L1 vetorial, de 16~KB por CU; o \textit{cache} L2, de 2~MB, compartilhado por todas as CUs e dividido em canais que atendem faixas disjuntas de endereços; e a VRAM~\cite{rocmspecs, llvmamdgpu} (a documentação do ROCm lista a Instinct MI6, de mesmo \textit{chip}). A GDDR5 da placa usada (2.000~MHz no estado máximo do \textit{driver}, quatro transferências por ciclo, barramento de 256~bits) tem pico teórico de 256~GB/s.
 
 Três noções sustentam a análise. Os \textit{caches} operam em linhas de 64~bytes: uma falta (\textit{miss}) traz a linha inteira, e os acessos seguintes a ela são acertos enquanto ela não for expulsa. A linha a expulsar é escolhida pela política de substituição, de que a LRU (\textit{least recently used}) é o exemplo clássico, e linhas que disputam o mesmo conjunto do \textit{cache} expulsam-se mutuamente (faltas de conflito). Por fim, dentro de uma instrução de \textit{load}, os endereços pedidos pelos \textit{lanes} que caem numa mesma linha são atendidos por uma única busca, a coalescência; no caso-limite, todos os \textit{lanes} pedem o mesmo endereço (\textit{broadcast})~\cite[Seção~8.1.9]{amdgcn3}.
 
@@ -104,9 +101,9 @@ Na ISA, as instruções de leitura da memória global (\texttt{buffer\_load\_dwo
 
 \subsection{\textit{Frameworks} e Plataformas}
 
-\cite{fang2011} compararam CUDA e OpenCL em 16 \textit{benchmarks} e concluíram que a vantagem de até 30\% do CUDA decorre de comparações injustas, entre cujas causas estão os compiladores: em condições equivalentes, o desempenho se iguala. \cite{memeti2017} compararam OpenMP, OpenACC, OpenCL e CUDA quanto a produtividade, desempenho e energia em sistemas com CPU, GPU e Xeon Phi. \cite{seo2011}, ao portarem os \textit{NAS Parallel Benchmarks} para OpenCL, mostraram que a portabilidade de código não traz portabilidade de desempenho: a aplicação precisa ser reotimizada para cada dispositivo. \cite{fraire2013} descrevem a arquitetura do OpenCL e medem um produto de matrizes até três ordens de grandeza mais rápido que o mesmo algoritmo em C++ simples. O conjunto estabelece a premissa deste trabalho: o desempenho em OpenCL depende do dispositivo e do \textbf{compilador}, fonte de variação que a Seção~\ref{sec:multi} retoma de forma direta.
+\cite{fang2011} compararam CUDA e OpenCL em 16 \textit{benchmarks} e concluíram que a vantagem de até 30\% do CUDA decorre de comparações injustas, entre cujas causas estão os compiladores: em condições equivalentes, o desempenho se iguala. \cite{memeti2017} compararam OpenMP, OpenACC, OpenCL e CUDA quanto a produtividade, desempenho e energia em sistemas com CPU, GPU e Xeon Phi. \cite{seo2011}, ao portarem os \textit{NAS Parallel Benchmarks} para OpenCL, mostraram que a portabilidade de código não traz portabilidade de desempenho: a aplicação precisa ser reotimizada para cada dispositivo. \cite{fraire2013} descrevem a arquitetura do OpenCL e medem um produto de matrizes até três ordens de grandeza mais rápido que o mesmo algoritmo em C++ simples. O conjunto estabelece a premissa deste trabalho: o desempenho em OpenCL depende do dispositivo e do compilador, fonte de variação que a Seção~\ref{sec:multi} retoma de forma direta.
 
-\cite{vidye2023} avaliaram o OpenCL em Windows, Linux, Android e macOS, e \cite{boras2020} compararam três distribuições Linux numa mesma máquina; ambos atribuem ao sistema operacional (SO) as diferenças observadas. Este estudo acrescenta uma ressalva a essa atribuição: sobre o mesmo dispositivo, o compilador de \textit{kernels} de cada ambiente gera ISA diferente a partir do mesmo código-fonte (Seção~\ref{sec:multi}). Como SO e compilador variam juntos, comparações entre plataformas que não fixem o compilador confundem os dois fatores.
+\cite{vidye2023} avaliaram o OpenCL em Windows, Linux, Android e macOS e atribuíram as diferenças à otimização feita pelo compilador e ao \textit{driver} de cada sistema, sem examinar o código gerado. Este estudo mostra essa diferença diretamente na ISA: sobre o mesmo dispositivo, o compilador de cada ambiente gera instruções diferentes a partir do mesmo código-fonte (Seção~\ref{sec:multi}).
 
 \subsection{Hierarquia de Memória em GPUs}
 
@@ -137,7 +134,6 @@ Baghsorkhi et al. (2012) & NVIDIA & CUDA & Sim & Não & Modelo estatístico da h
 Memeti et al. (2017) & CPU, GPU e Xeon Phi & Múltiplos & Não & Não & Produtividade, desempenho e energia \\
 Fraire et al. (2013) & CPU e GPU & OpenCL & Parcial & Não & Produto de matrizes em OpenCL \\
 Vidye et al. (2023) & Múltiplos & OpenCL e outros & Não & Não & Desempenho entre SOs \\
-Boras et al. (2020) & PC & --- & Não & Não & Distribuições Linux \\
 Tee et al. (2025) & AMD (CDNA) & ROCm & Sim & Não & Latência dos \textit{caches} \\
 \midrule
 \textbf{Este trabalho} & \textbf{AMD (GCN)} & \textbf{OpenCL} & \textbf{Sim} & \textbf{Sim (ISA)} & \textbf{Valor e controle dos níveis} \\
@@ -159,7 +155,14 @@ arquitetura Polaris já não tem suporte oficial nessa versão, e o dispositivo 
 enumerado com \texttt{ROC\_ENABLE\_PRE\_VEGA=1}. O código
 do anfitrião é compilado com GCC~9.4 (\texttt{-O2}; a referência em CPU
 acrescenta \texttt{-march=native -fopenmp}), e os binários dos \textit{kernels} são
-desmontados com o \texttt{llvm-objdump} do LLVM~12. A escolha do ambiente decorre de etapa
+desmontados com o \texttt{llvm-objdump} do LLVM~12. Os \textit{kernels} dos
+Experimentos~1 e~3 são compilados com \texttt{-cl-std=CL1.2 -cl-mad-enable}; os
+demais, com as opções padrão. Os tempos de GPU vêm dos eventos de
+\textit{profiling} do OpenCL, do início ao fim de cada \textit{kernel}, sem as
+transferências (nos lançamentos fatiados, somam-se os lotes), e os da CPU, de
+\texttt{clock\_gettime}. As saídas das multiplicações e dos padrões são
+validadas contra a CPU com tolerância proporcional a $N$ ($0{,}01$ a $0{,}02$ vezes
+$N/1024$), sobre matrizes de preenchimento determinístico. A escolha do ambiente decorre de etapa
 anterior, conduzida sobre o mesmo dispositivo em Windows, cujo compilador
 proprietário (AMDOCL) não aceita \textit{inline assembly} nem emite \textit{flags}
 sob \texttt{volatile} (Seção~\ref{sec:multi}).\footnote{Código, dados brutos e
@@ -168,9 +171,9 @@ sob \texttt{volatile} (Seção~\ref{sec:multi}).\footnote{Código, dados brutos 
 
 O desenho parte dos três caminhos que a nomenclatura das \textit{flags} sugere
 para uma mesma leitura: pelo L1; pelo L2, contornando o L1 (\textit{bypass}); e
-pela VRAM, contornando ambos. O Experimento~2 mostra que, em leituras FLAT, só os
-dois primeiros existem, de modo que os experimentos comparam \textbf{dois
-caminhos de memória} (Figura~\ref{fig:hierarquia}).
+pela VRAM, contornando ambos. O Experimento~2 testa se o terceiro existe (Figura~\ref{fig:hierarquia}). A
+multiplicação é usada sem \textit{tiling}, de propósito: com \textit{tiling}, o
+reúso passa ao LDS e deixa de depender do L1, objeto da medição.
 
 \begin{figure}[ht]
 \centering
@@ -221,7 +224,7 @@ Cada cenário é executado 1000 vezes após 10 de aquecimento. Os \textit{kernel
 
 Para decidir se \texttt{SLC=1} contorna o L2, mede-se a vazão da leitura repetida de um mesmo \textit{buffer} em função do seu tamanho. As três variantes (sem \textit{flags}, \texttt{glc} e \texttt{glc slc}) são construídas por \textit{inline assembly} com \texttt{flat\_load\_dword} sobre \textit{buffers} comuns, alocados na VRAM, de modo que a geração de código é idêntica e a única diferença são os bits da instrução. Cada lançamento percorre o \textit{buffer} ciclicamente: até 64~MB, lê 128~MB no total (128 passadas de um \textit{buffer} de 1~MB, que \textbf{cabe} no L2, e duas de um de 64~MB, que \textbf{não cabe}); acima disso, faz duas passadas. A campanha original mediu esses dois tamanhos; uma segunda repete os mesmos \textit{kernels} em 14 tamanhos, de 256~KB a 2~GB, e lê cada \textit{buffer} por 0,2~s antes de medir, para estabilizar os \textit{clocks}.
 
-O teste depende de saber quanto a VRAM entregaria sem o L2. Além do pico teórico da GDDR5, nove variantes com 4 a 16 vezes mais bytes em voo por \textit{wavefront} leem um \textit{buffer} de 1~GB, para separar o limite da memória do limite do \textit{kernel} de medição. Dois controles verificam o caso de 1~MB. Como, no programa original, \texttt{glc slc} roda depois de dois \textit{kernels} que deixam o \textit{buffer} no L2, o primeiro ocupa o L2 com outro \textit{buffer} de 64~MB, fora do tempo medido, antes de cada execução, em cinco tamanhos; o segundo repete o caso de 1~MB em dez \textit{buffers} distintos.
+O teste depende de saber quanto a VRAM entregaria sem o L2. Além do pico teórico da GDDR5, nove variantes com 4 a 16 vezes mais bytes em voo por \textit{wavefront} leem um \textit{buffer} de 1~GB, para separar o limite da memória do limite do \textit{kernel} de medição. Dois controles verificam o caso de 1~MB. Como, no programa original, \texttt{glc slc} roda depois de dois \textit{kernels} que deixam o \textit{buffer} no L2, o primeiro ocupa o L2 com outro \textit{buffer} de 64~MB, fora do tempo medido, antes de cada execução, em cinco tamanhos; o segundo repete o caso de 1~MB em dez \textit{buffers} distintos. O programa original foi ainda reexecutado três vezes.
 
 \subsection{Experimento 3: Análise de Sensibilidade ao Tamanho do Problema}
 \label{sec:met-sens}
@@ -243,7 +246,7 @@ Duas adaptações tornam a análise exequível. Na \textbf{referência amostrada
 cada cenário é comparado elemento a elemento com a saída do cenário~1, em
 $O(N^2)$, e o cenário~1 é conferido contra a CPU numa amostra aleatória de 4.096
 posições; a amostragem basta porque as falhas de cálculo esperadas não são
-pontuais (um descritor mal formado devolve zero em todas as posições). No
+pontuais (um erro de endereçamento atinge toda a matriz, não posições isoladas). No
 \textbf{lançamento em lotes}, adotado em $N=16384$ por precaução, já que a GPU
 também atende a saída de vídeo, a \textit{NDRange} é fatiada por
 \texttt{global\_work\_offset} em oito faixas de 2.048 linhas; verificou-se em
@@ -317,7 +320,7 @@ A Tabela~\ref{tab:cenarios} apresenta os cinco cenários para $N=1024$. Todos fo
 \end{tabular}
 \end{table}
 
-O cenário~3 foi medido em duplicata, a partir de código-fonte idêntico e com ISA idêntica instrução a instrução. As duas medições diferem em 0,14\%, e o teste não detecta diferença entre elas ($t=0{,}76$): o controle negativo passa. Essa diferença residual fixa o \textbf{piso de ruído} abaixo do qual nenhum efeito é afirmado.
+O cenário~3 foi medido em duplicata, a partir de código-fonte idêntico e com ISA idêntica instrução a instrução. As duas medições diferem em 0,14\%, e o teste $t$ de Welch não detecta diferença entre elas ($t=0{,}76$): o controle negativo passa. Essa diferença residual fixa o \textbf{piso de ruído} abaixo do qual nenhum efeito é afirmado.
 
 A Tabela~\ref{tab:razoes} decompõe os fatores. O desenho se apoia no cenário~2: ele reproduz a barreira de otimização dos cenários~4 e~5 sem alterar o caminho de memória, de modo que a comparação 2~$\to$~4 mede o bit \texttt{glc} com o custo da construção presente nos dois lados. As três variantes em \textit{assembly} geram ISA idêntica instrução a instrução, diferindo apenas nos modificadores \texttt{glc} e \texttt{slc} de dois \texttt{flat\_load\_dword}.
 
@@ -339,9 +342,9 @@ A Tabela~\ref{tab:razoes} decompõe os fatores. O desenho se apoia no cenário~2
 \end{tabular}
 \end{table}
 
-Três leituras decorrem da tabela. A primeira é que \textbf{a construção em \textit{assembly} responde sozinha por 1,512$\times$}, sem alterar o caminho de memória: sem o cenário de controle, esse custo seria atribuído ao \textit{cache}. Na ISA, o bloco emite as duas leituras seguidas de um único \texttt{s\_waitcnt vmcnt(0)}, como o código do cenário normal, sem serializá-las; o custo vem do laço de 20 instruções contra 15, pois o endereço de $A$ é recalculado em 64 bits a cada iteração.
+Três leituras decorrem da tabela. A primeira é que \textbf{a construção em \textit{assembly} responde sozinha por 1,512$\times$}, sem alterar o caminho de memória: sem o cenário de controle, esse custo seria atribuído ao \textit{cache}. Na ISA, o bloco emite as duas leituras seguidas de um único \texttt{s\_waitcnt vmcnt(0)}, como o código do cenário normal, sem serializá-las; o custo vem do laço de 20 instruções contra 15: os endereços de $A$ e de $B$ são recalculados em 64 bits antes de cada leitura, e o laço ganha uma espera escalar (\texttt{s\_waitcnt lgkmcnt(0)}).
 
-A segunda é que \textbf{o valor medido para a mesma \textit{flag} depende da linha de base}. Comparado diretamente ao cenário normal, o cenário~4 aparenta custar 1,871$\times$; com a construção constante nos dois lados, \texttt{glc} custa 1,237$\times$. As duas respondem a perguntas distintas: quanto custa perder o L1 em código escrito dessa forma, e qual o efeito do bit isolado de todo o resto.
+A segunda é que \textbf{o valor medido para a mesma \textit{flag} depende da linha de base}. Comparado diretamente ao cenário normal, o cenário~4 aparenta custar 1,871$\times$; com a construção constante nos dois lados, \texttt{glc} custa 1,237$\times$.
 
 A terceira é que a proximidade entre os dois mecanismos que emitem GLC=1 (o \texttt{volatile} e o \textit{assembly} com \texttt{glc}, a 4,9\% um do outro) não valida nenhum deles: o primeiro serializa as leituras, e o segundo alonga o laço. Já o efeito do \texttt{slc}, de 1,019$\times$, tem IC acima do piso de ruído, mas é pequeno neste tamanho.
 
@@ -403,13 +406,11 @@ abaixo de \texttt{glc}. O ganho acompanha a fração do conjunto que permanece n
 L2. Se uma fração $h = 2\,\textrm{MB}/W$ de um conjunto de $W$ bytes é atendida à
 vazão de 1~MB (539,8~GB/s) e o restante ao patamar (222,7~GB/s, média de
 \texttt{glc} de 8~MB a 2~GB), a vazão prevista, $1/v = h/539{,}8 +
-(1-h)/222{,}7$, difere da medida em no máximo 1,7\% de 8 a 128~MB; na campanha
-original, o modelo prevê 226,4~GB/s em 64~MB, contra 226,3 medidos. O teste
-discrimina sobretudo em 8 e 16~MB, onde o ganho previsto sobre o patamar é de
-17\% e 8\%; acima disso, qualquer modelo converge ao patamar. Em 2 e 4~MB o
+(1-h)/222{,}7$, difere da medida em no máximo 1,7\% de 8 a 128~MB (na campanha original,
+226,4~GB/s previstos em 64~MB, contra 226,3 medidos), embora discrimine sobretudo
+em 8 e 16~MB, pois acima disso qualquer modelo converge ao patamar. Em 2 e 4~MB o
 modelo erra por $+6\%$ e $-10\%$: no limite da capacidade a retenção não é total
-e, em 4~MB, acertos e faltas parecem sobrepor-se no tempo, o que a soma de tempos
-não descreve. Com \texttt{glc}, a varredura cíclica expulsa cada linha antes do
+e, em 4~MB, acertos e faltas parecem sobrepor-se no tempo. Com \texttt{glc}, a varredura cíclica expulsa cada linha antes do
 reúso, patologia conhecida da LRU; com \texttt{glc slc}, o L2 preserva o que já
 carregou, como se a linha recém-carregada entrasse como candidata preferencial à
 expulsão, comportamento análogo ao das políticas de inserção
@@ -419,8 +420,10 @@ de~\cite{qureshi2007}.
 desvio do nível. A leitura é coerente com a documentação: a descrição da
 codificação FLAT diz que o bit ``controla a política do \textit{cache}
 L2''~\cite[Seção~13.9]{amdgcn3}; o compilador emite \texttt{glc slc} para acessos
-não temporais; e o desvio do L2 é previsto por faixa de endereços, não por
-instrução~\cite{llvmamdgpu}. Segue daí que, \textbf{em leituras FLAT, apenas o L1
+não temporais, comentando no código que isso põe o L2 na política
+\textit{STREAM} e que \textit{``there is no L2 cache bypass policy at the ISA
+level''}~\cite{llvmlegalizer}; e o desvio do L2 é previsto por faixa de
+endereços, não por instrução~\cite{llvmamdgpu}. Segue daí que, \textbf{em leituras FLAT, apenas o L1
 pode ser contornado por \textit{flags} de instrução}: o caminho direto à VRAM que
 a descrição do MUBUF sugere não existe por esse meio.
 
@@ -504,10 +507,9 @@ razões entre medianas de 1,23$\times$ (Experimento~1) e 1,19$\times$
 (Seção~\ref{sec:localidade}); a queda com o tamanho excede essa variação.
 
 O contraste entre as curvas é indício, não prova, de que a \textit{flag} atua
-sobre a memória: também um custo de construção pode variar com o tamanho, à
-medida que o \textit{kernel} passa a ser limitado pela memória. A evidência
-decisiva de que \texttt{glc} retira o L1 é a combinação do bit verificado na ISA,
-da semântica documentada e do Experimento~4. Este experimento estabelece a
+sobre a memória, pois também um custo de construção pode variar com o tamanho; a
+evidência decisiva é o bit verificado na ISA, a semântica documentada e o
+Experimento~4. Este experimento estabelece a
 dependência do tamanho, não o seu mecanismo (Seção~\ref{sec:conclusao}), e mostra
 que \textbf{uma medida em um único tamanho não caracteriza o efeito do
 \textit{cache}}.
@@ -522,10 +524,9 @@ ao patamar de 222,7~GB/s, tomariam ao menos 24~ms, contra os 13,0~ms medidos. Um
 penalidade pequena, que cresce com o problema, é o que se espera de uma política
 de substituição: expulsar primeiro a linha recém-carregada só custa quando ela é
 reusada depois de expulsa. Esse custo não acompanha a ocupação total (em
-$N=1024$ as três matrizes já somam 12~MB, seis vezes o L2), e sim, por hipótese
-não testada aqui, a distância de reúso: a faixa de $B$ lida por um
-\textit{work-group}, $N$ linhas de 64~B, passa de 64~KB em $N=1024$ a 1~MB em
-$N=16384$.
+$N=1024$ as matrizes já somam 12~MB, seis vezes o L2), e sim, por hipótese não
+testada, a distância de reúso: a faixa de $B$ lida por um \textit{work-group}
+passa de 64~KB a 1~MB.
 
 \subsection{Experimento 4: Localidade do Padrão de Acesso}
 \label{sec:localidade}
@@ -579,21 +580,21 @@ de 1\% a 2\% em todos os tamanhos: o reúso ocorre em 16 iterações consecutiva
 antes que a linha seja expulsa. Em \textbf{coluna}, custa de 4\% a 6\% até
 $N=4096$ e chega a 13\% e 22\% nos dois tamanhos maiores. Em \textbf{dispersa},
 que mantém 19 linhas vivas por instrução, cresce de 1,22$\times$ em $N=1024$ a
-2,08$\times$ em $N=8192$ e recua a 1,41$\times$ em $N=16384$, a única queda do
-conjunto. Duas remedições independentes desses pontos reproduzem o custo do
-\texttt{glc} a menos de 2,5\%, mas não o de \texttt{glc slc}: a queda persiste nas
-três campanhas, de 17\% a 37\%, mas a amplitude entre elas, de até 12\% e 19\%,
-supera a dispersão interna, de até 7,4\%; pelas medianas das três (3,360$\times$
-e 2,500$\times$), o \texttt{slc} isolado vale 2,08$\times$ e 1,67$\times$. A queda
-não reflete saturação da política, pois, com $B$ transposta
-(Tabela~\ref{tab:layout}), em padrão análogo, o efeito do \texttt{slc} continua
-crescendo em $N=16384$.
+2,08$\times$ em $N=8192$ e recua a 1,67$\times$ em $N=16384$, a única queda do
+conjunto, pela mediana de três campanhas (na primeira, a da
+Tabela~\ref{tab:localidade}, o recuo vai a 1,41$\times$). As remedições
+reproduzem o custo do \texttt{glc} a menos de 2,5\%, mas não o de \texttt{glc
+slc}, cuja amplitude entre campanhas, de até 19\%, supera a dispersão interna; a
+queda, porém, aparece nas três. Ela não reflete saturação da política, pois, com
+$B$ transposta (Tabela~\ref{tab:layout}), em padrão análogo, o efeito do
+\texttt{slc} continua crescendo em $N=16384$.
 
 \begin{table}[ht]
 \centering
 \caption{Multiplicação com $B$ usual e transposta: razões entre medianas. A
-prevista soma os tempos dos padrões isolados da Tabela~\ref{tab:localidade}
-(\textbf{linha}+\textbf{dispersa} sobre \textbf{linha}+\textbf{coluna}).}
+prevista soma as medianas sem \textit{flag} dos padrões isolados do
+Experimento~4 (\textbf{linha}+\textbf{dispersa} sobre
+\textbf{linha}+\textbf{coluna}), disponíveis no repositório.}
 \label{tab:layout}
 \footnotesize
 \begin{tabular}{@{}lrrrrr@{}}
@@ -623,8 +624,7 @@ OpenCL~C (cerca de 300~GFLOPS).
 \textbf{A dependência do L1 acompanha o padrão.} Com $B$ transposta, contornar o
 L1 custa de 1,96 a 1,48$\times$, contra 1,19 a 1,05$\times$ no \textit{layout}
 usual; esta última série, o mesmo \textit{kernel} do Experimento~3 em campanha
-independente, reproduz a curva~b da Figura~\ref{fig:sens} a menos de 2,1 pontos
-percentuais.
+independente, reproduz a curva~b da Figura~\ref{fig:sens} com diferença máxima de 2,1 pontos percentuais.
 
 \section{Conclusões e Trabalhos Futuros}
 \label{sec:conclusao}
@@ -647,7 +647,7 @@ A segunda é que, \textbf{em leituras FLAT, apenas o L1 pode ser contornado por
 \textit{flags} de instrução}. O \texttt{glc} retira o L1 de forma verificável na
 ISA e mensurável em desempenho; o \texttt{slc} não contorna o L2, mas altera sua
 política de substituição, como indicam três evidências: um conjunto que cabe no
-L2 sustenta 555,9~GB/s, acima do pico teórico de 256~GB/s da VRAM; logo acima da
+L2 sustenta cerca de 550~GB/s, acima do pico teórico de 256~GB/s da VRAM; logo acima da
 capacidade do L2, a \textit{flag} \emph{acelera} a leitura em até 1,51$\times$;
 e, na multiplicação, seu custo em $N=1024$ é uma fração do que o tráfego pela
 VRAM imporia.
@@ -657,20 +657,20 @@ A terceira é metodológica: \textbf{a comparação ingênua superestima o efeit
 sob o compilador proprietário e, onde a emite, serializa os \textit{loads}; o
 bloco de \textit{inline assembly} custa por si só cerca de 1,5$\times$. Isolá-los
 exigiu um cenário de controle sem \textit{flag} e uma réplica de código-fonte
-idêntico, que fixa em 0,14\% o piso de ruído dentro de uma campanha.
+idêntico, que estima em 0,14\% o ruído entre blocos adjacentes de uma campanha.
 
 Frente à literatura, os resultados complementam os estudos de microbenchmarking
 em GPUs NVIDIA~\cite{wong2010, mei2017, jia2018}, que caracterizam latência e
 capacidade, ao medir quanto um nível vale para um algoritmo numa arquitetura
 AMD. Como em~\cite{jia2012}, o valor do L1 depende do tipo de localidade, embora
-lá o L1 tenha chegado a retardar programas. Às comparações entre
-plataformas~\cite{vidye2023, boras2020} acrescenta-se uma ressalva: o mesmo
-código-fonte gerou ISA diferente conforme o compilador, fator que
-\cite{fang2011} já apontavam.
+lá o L1 tenha chegado a retardar programas. E o mesmo código-fonte
+gerou ISA diferente conforme o compilador, o que confirma no binário a
+atribuição de~\cite{fang2011} e de~\cite{vidye2023} ao compilador.
 
-Quanto ao que o programador controla, os bits GLC e SLC existem para garantir
-coerência de memória, não para ajuste de desempenho, e o OpenCL não oferece meio portável de acioná-los: aqui só foram
-alcançados por \textit{inline assembly}, sob um dos dois compiladores. Contornar
+Quanto ao que o programador controla, o OpenCL não oferece meio portável de
+acionar os bits GLC e SLC: o \texttt{volatile} liga o GLC com efeitos colaterais,
+e o \textit{builtin} não temporal liga os dois juntos, ambos dependentes do
+compilador; só o \textit{inline assembly} controla cada bit isoladamente. Contornar
 o L1 nunca acelerou os \textit{kernels} medidos, mas a mudança de política do
 SLC acelerou a varredura cíclica em até 1,51$\times$. O controle útil parece ser,
 portanto, menos o desvio de um nível que a política de retenção, hoje inacessível
@@ -684,7 +684,7 @@ frequência de \textit{clock}; a versão do \textit{driver} usado na etapa em
 Windows não foi registrada; a
 transposição foi medida na construção de controle, e não no \textit{kernel} em
 OpenCL~C; apenas leituras FLAT sobre a VRAM foram investigadas, ficando em aberto
-as escritas, o formato MUBUF e outros tipos de memória (MTYPE); e todos os
+as escritas, o formato MUBUF, a combinação SLC=1 com GLC=0 e outros tipos de memória (MTYPE); e todos os
 tamanhos são potências de dois, o que confunde o crescimento do conjunto de
 trabalho com o agravamento das condições de conflito. Como trabalhos futuros,
 propõem-se um desenho fatorial cruzando magnitude e alinhamento, que separe esses

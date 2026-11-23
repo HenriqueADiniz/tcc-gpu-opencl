@@ -201,19 +201,26 @@ g++ -Wall -Wextra -O2 experimentos/<prog>.cpp -o output/<prog> -lOpenCL
   que não existe no matplotlib ≥ 3.5; roda no 3.1 do Ubuntu 20.04. O
   `plot_tempos.py` funciona nos dois.
 
+## Feito em 23/11/2026
+
+- Revisão de outro agente aplicada (detalhes no `CORTES.md`): Vidye et al.
+  conferido no PDF e descrito corretamente (atribuem ao compilador e ao driver);
+  comentários do LLVM 14 citados no Exp. 2; reprodutibilidade (opções de
+  compilação, medição de tempo, validação); Boras et al. retirado.
+
 ## Pendências
 
 - [ ] Revisão do aluno da nova redação do Exp. 2 (04/11/2026).
 - [x] Voltar a 16 páginas (Art. 4º): feito em 13/11/2026.
 - [ ] Leitura do orientador sobre a versão revisada (13/11/2026).
-- [ ] Confirmar volume e páginas de Vidye et al. (2023) na página da revista.
+- [x] Vidye et al. (2023) conferido no PDF (23/11/2026).
 - [ ] Conferir no PDF de Jia, Shaw e Martonosi (2012) as afirmações da §3.2 (tráfego L1–L2; taxonomia).
 - [x] Declaração de IA: versão curta do aluno (04/11/2026), que substitui a
   redação do orientador mantida desde 19/10/2026. Ao mexer, manter ferramenta,
   fornecedor, versão, finalidade e seções (Arts. 7º e 8º).
 - [ ] Revisão do aluno sobre o texto reestruturado antes da entrega de 21/10/2026.
 
-Estado em 18/11/2026: **16 páginas**, 0 erros, 0 Overfull, 22 referências, 3 figuras;
+Estado em 23/11/2026: **16 páginas**, 0 erros, 0 Overfull, 22 referências, 3 figuras;
 resumo e abstract com 10 linhas cada.
 
 ## Regras de trabalho

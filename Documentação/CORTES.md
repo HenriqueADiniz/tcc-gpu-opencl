@@ -994,3 +994,45 @@ abstract com 10 linhas cada.
 
 Estado: **16 páginas** (~3 linhas de folga), 0 erros, 0 Overfull, 22 referências;
 resumo e abstract com 10 linhas cada.
+
+# Revisão de 23/11/2026 — revisão de outro agente (dia da entrega à banca)
+
+Outro agente (Opus 5.5) revisou a versão final sem acesso ao código. O que foi
+aceito, conferido no código, nos CSVs e no PDF de Vidye et al.:
+
+- **Vidye et al.:** o PDF confirma vol. 9, n. 2, p. 145–152 (bloco "Cite this
+  article as"; a primeira página diz "Volume 10", erro da revista). A conclusão
+  deles atribui as diferenças ao compilador e ao *driver* de cada SO, não ao SO;
+  o texto dizia o contrário (vinha do resumo deles). Seção 3.1 e Conclusões
+  reescritas: nossos dados confirmam na ISA o que eles supuseram.
+- **LLVM 14** (`SIMemoryLegalizer.cpp`, `SIGfx6CacheControl`): "Setting both GLC
+  and SLC configures L1 cache policy to MISS_EVICT ... and the L2 cache policy to
+  STREAM" e, no tratamento do `volatile`, "there is no L2 cache bypass policy at
+  the ISA level". Citado no Exp. 2 (nova referência `llvmlegalizer`).
+- Reflexão das Conclusões corrigida: o `volatile` e o *builtin* não temporal
+  também ligam os bits; só o asm os controla isoladamente. Saiu a frase "existem
+  para coerência, não para desempenho" (sem fonte).
+- Resumo e abstract: escopo (multiplicação de matrizes) na primeira frase;
+  "cerca de 550 GB/s" prova o não-*bypass* e o ganho de 1,51× prova a mudança de
+  política. Saíram a oração do `volatile` e "otimização clássica em CPU".
+- Reprodutibilidade (conferido no código): opções de compilação dos kernels
+  (`-cl-std=CL1.2 -cl-mad-enable` nos Exps. 1 e 3), tempo por eventos de
+  *profiling* (soma dos lotes; CPU com `clock_gettime`), validação com tolerância
+  0,01–0,02 × N/1024 e preenchimento determinístico; três reexecuções do
+  programa original do Exp. 2 descritas.
+- Kernel sem *tiling* justificado como escolha; Introdução diz que a GCN tem ISA
+  documentada e compilador aberto; tabela do ROCm lista a MI6 (mesmo chip).
+- Correções pontuais: dispersa em N=16384 com um só valor (mediana de três
+  campanhas, 1,67×; a Tabela 6 traz a primeira); legenda da Tabela 7; "com
+  diferença máxima de 2,1 p.p."; exemplo de falha da amostragem (o descritor é
+  do MUBUF); teste t de Welch; custo do asm (endereços de A e B e espera escalar
+  `s_waitcnt lgkmcnt(0)`, conforme o comentário do `matmul.cpp`); piso "estima"
+  em vez de "fixa"; limitação da combinação SLC=1 com GLC=0.
+- Saíram: Boras et al. (texto, Tabela 1 e .bib) e a entrada órfã `hoefler2015`.
+- Não aceitos (excesso de zelo ou já tratados): fluxograma obrigatório, mudança
+  de título, listagem de código, novas referências, tabela-resumo (obrigaria
+  refazer a Figura 3), linha da réplica na Tabela 2, transposição em OpenCL C
+  (decisão do aluno).
+
+Estado: **16 páginas** (~3 linhas de folga), 0 erros, 0 Overfull, 22 referências;
+resumo e abstract com 10 linhas cada.
