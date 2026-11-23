@@ -1175,5 +1175,16 @@ em `isa/matmul_gfx803_disasm.txt`), que arredonda o produto antes da soma. A CPU
 soma em float, na mesma ordem de k, sem FMA (x86-64 básico, `-O2` sem
 `-march=native`).
 
+## Sexta rodada da revisão externa (mesmo dia)
+
+- 5.3: "e a referência em CPU foram validados" passou a "e a medição na CPU".
+  O `matmul_cpu.cpp` confere 4.096 posições contra um recálculo sequencial no
+  próprio programa (tol 0,01·N/1024, "OK" em todo N no `cpu_sweep_log.txt`; a
+  diferença máxima não é registrada). "Referência em CPU" fica só no sentido da
+  validação (4.1).
+- O revisor confirmou a explicação do zero dos Exps. 1 e 3 (`v_mac_f32` contra
+  mulss+addss, mesma ordem de k, sem denormais: o menor produto não nulo é 1e-4)
+  e não tem mais nada a apontar no texto.
+
 Estado: **16 páginas** (~7,5 linhas de folga), 0 erros, 0 Overfull, 21
 referências; resumo e abstract com 10 linhas cada.
