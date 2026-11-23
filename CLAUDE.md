@@ -215,8 +215,10 @@ g++ -Wall -Wextra -O2 experimentos/<prog>.cpp -o output/<prog> -lOpenCL
   *microbenchmarking*, separador de milhar e `\ref` no roteiro da Introdução.
 - Terceira rodada: E1–E7, conferência das saídas do Exp. 2 na §4.3 e limitação
   da tolerância do Exp. 4 (só distingue padrões em N=1024; ver CORTES.md e
-  `analise/poder_validacao_exp4.py`). Pendente para a versão final: refazer a
-  validação do Exp. 4 com tolerância fixa.
+  `analise/poder_validacao_exp4.py`). Nenhum código pode ser executado de novo
+  (aluno, 23/11/2026): a limitação é definitiva.
+- Quarta rodada: R1–R4 e a validação exata dos Exps. 1 e 3 (logs com diferença
+  máxima zero), ver CORTES.md.
 
 ## Pendências
 
@@ -230,7 +232,7 @@ g++ -Wall -Wextra -O2 experimentos/<prog>.cpp -o output/<prog> -lOpenCL
   fornecedor, versão, finalidade e seções (Arts. 7º e 8º).
 - [ ] Revisão do aluno sobre o texto reestruturado antes da entrega de 21/10/2026.
 
-Estado em 23/11/2026: **16 páginas** (~5 linhas de folga), 0 erros, 0 Overfull,
+Estado em 23/11/2026: **16 páginas** (~7,5 linhas de folga), 0 erros, 0 Overfull,
 21 referências, 3 figuras; resumo e abstract com 10 linhas cada.
 
 ## Regras de trabalho

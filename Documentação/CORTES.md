@@ -1122,5 +1122,37 @@ Aceitos (conferidos no código e nos CSVs):
 Não aplicado: retirar Memeti (fica como reserva de ~2 linhas, se a banca pedir
 acréscimos).
 
-Estado: **16 páginas** (~5 linhas de folga), 0 erros, 0 Overfull, 21 referências;
-resumo e abstract com 10 linhas cada.
+## Quarta rodada da revisão externa (mesmo dia)
+
+O aluno informou que **nenhum código pode ser executado de novo**. A sugestão de
+refazer a validação do Exp. 4 foi descartada, e a limitação fica definitiva.
+
+Aceitos (testados numa cópia antes de aplicar):
+- R1: `Hwu, Wen-mei W.` no .bib. O BibTeX lia "mei" como partícula, e a
+  referência saía "mei W. Hwu, W.". Agora sai "Hwu, W.-m. W.".
+- R2: o destaque na 5.2 passa para os 539,8 GB/s da varredura, cuja saída é
+  conferida. Os 555,9 vêm do `slc_l2.cpp`, que não confere.
+- R3: linha viúva ("pontos percentuais.") no topo da p. 14, resolvida com o
+  parágrafo reescrito e "2,1 p.p.".
+- R4: "passaram na validação (ver Seção 6)" na 5.4, e saiu "todos validados".
+- Exps. 1 e 3: "(maior diferença registrada: zero)" na Metodologia. Em todos os
+  logs (`matmul_cache_flags.txt`, `sweep_log.txt`, `cadeia_log.txt`, de N=1024
+  a 16384, inclusive o lançamento em lotes), a validação deu "max diferenca
+  0.00000000". A premissa do revisor (saídas ~1,7·10^6) usava o preenchimento do
+  Exp. 4. Com o dos Exps. 1 e 3, (i mod 100)/100, as saídas ficam em torno de
+  4.000, e a tolerância de 0,16 em N=16384 tem o tamanho do pior arredondamento
+  de uma soma em float32 (`analise/tolerancia_exp13.py`). Só a igualdade exata
+  observada explica que tudo tenha passado.
+- A versão curta dessa frase era necessária: a longa empurrava o parágrafo do R3,
+  e a p. 14 abria com "me-dida".
+
+Conferido nos dados, sem mudança no texto: as 13 medições conferidas de 1 MB
+(parte A, B, C e os dez buffers da parte D do `teto_vram.csv`) têm mediana de
+548,6 e faixa de 431,5 a 564,1 GB/s, iguais às das 17. O `gs` é sempre potência
+de dois (65536, 16384 e 262144).
+
+Não aplicado: subtítulo "saída não conferida" na Tabela 4 (redundante com a 4.3 e
+o R2).
+
+Estado: **16 páginas** (~7,5 linhas de folga), 0 erros, 0 Overfull, 21
+referências; resumo e abstract com 10 linhas cada.

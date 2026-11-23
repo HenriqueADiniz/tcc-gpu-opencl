@@ -166,7 +166,7 @@ demais, com as opções padrão. Os tempos de GPU vêm dos eventos de
 transferências (nos lançamentos fatiados, somam-se os lotes), e os da CPU, de
 \texttt{clock\_gettime}. As saídas das multiplicações e dos padrões são
 validadas contra a CPU, com tolerância absoluta de $0{,}01\,N/1024$ nos
-Experimentos~1 e~3 e, no Experimento~4, relativa mais absoluta, ambas de
+Experimentos~1 e~3 (maior diferença registrada: zero) e, no Experimento~4, relativa mais absoluta, ambas de
 $0{,}02\,N/1024$, sobre matrizes de preenchimento determinístico. A escolha do ambiente decorre de etapa
 anterior, conduzida sobre o mesmo dispositivo em Windows, cujo compilador
 proprietário (AMDOCL) não aceita \textit{inline assembly} nem emite \textit{flags}
@@ -394,8 +394,8 @@ monitorado, mas esse valor o situa no estado máximo: a 1.000~MHz, o pico seria 
 \textit{kernel}: nenhuma das nove variantes com mais bytes em voo passa de
 223,3~GB/s na mediana.
 
-\textbf{O que se mede.} Em 1~MB, \texttt{glc slc} sustenta \textbf{555,9~GB/s} na
-campanha original e 539,8~GB/s na varredura: 2,2 e 2,1 vezes o pico teórico.
+\textbf{O que se mede.} Em 1~MB, \texttt{glc slc} sustenta \textbf{539,8~GB/s} na
+varredura e 555,9~GB/s na campanha original: 2,1 e 2,2 vezes o pico teórico.
 \textbf{A hipótese é refutada}: o L2 continua atendendo os acessos. O valor varia
 entre alocações: em todas as medições de 1~MB com \texttt{glc slc} feitas no
 estudo, fica entre 431,5 e 564,1~GB/s (mediana de 548,6), e
@@ -535,7 +535,7 @@ passa de 64~KB em $N=1024$ a 1~MB em $N=16384$.
 \label{sec:localidade}
 
 Os 45 pontos (três padrões, três configurações de \textit{flag} e cinco
-tamanhos) foram validados sem divergência, com $cv$ entre 0,02\% e 4,1\% em
+tamanhos) passaram na validação (ver Seção~\ref{sec:conclusao}), com $cv$ entre 0,02\% e 4,1\% em
 \textbf{linha} e \textbf{coluna} e de até 19,4\% em \textbf{dispersa}; o ponto de
 maior razão, \textbf{dispersa} com \texttt{glc} em $N=1024$, tem 78 execuções e
 $cv$ de 12,9\%.
@@ -610,7 +610,7 @@ Experimento~4 (\textbf{linha}+\textbf{dispersa} sobre
 \end{table}
 
 \textbf{A conclusão vale para o algoritmo completo.} Nos 30 pontos que originam
-a Tabela~\ref{tab:layout}, todos validados, transpor $B$ torna a multiplicação
+a Tabela~\ref{tab:layout}, transpor $B$ torna a multiplicação
 \textbf{2,31 a 2,46$\times$ mais lenta} sem \textit{flag} alguma (203--207 contra
 82--89~GFLOPS), de modo estável nos cinco tamanhos. Ganha-se contiguidade dentro
 de cada \textit{lane} e perde-se a coalescência entre \textit{lanes}: o acesso a
@@ -626,8 +626,8 @@ OpenCL~C (cerca de 300~GFLOPS).
 
 \textbf{A dependência do L1 acompanha o padrão.} Com $B$ transposta, contornar o
 L1 custa de 1,96 a 1,48$\times$, contra 1,19 a 1,05$\times$ no \textit{layout}
-usual; esta última série, com a mesma construção do Experimento~3 (compilada sem
-\texttt{-cl-mad-enable}) e medida em campanha independente, reproduz a curva~b da Figura~\ref{fig:sens} com diferença máxima de 2,1 pontos percentuais.
+usual; esta última série, medida em outra campanha com a mesma construção do
+Experimento~3 (compilada sem \texttt{-cl-mad-enable}), reproduz a curva~b da Figura~\ref{fig:sens} com diferença máxima de 2,1~p.p.
 
 \section{Conclusões e Trabalhos Futuros}
 \label{sec:conclusao}
