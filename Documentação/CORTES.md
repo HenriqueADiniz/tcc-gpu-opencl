@@ -1154,5 +1154,26 @@ de dois (65536, 16384 e 262144).
 Não aplicado: subtítulo "saída não conferida" na Tabela 4 (redundante com a 4.3 e
 o R2).
 
+## Quinta rodada da revisão externa (mesmo dia)
+
+O revisor considerou o texto pronto para a banca. Aceitos (testados numa cópia):
+- S1: a limitação do Exp. 4 ganhou "embora as razões das Tabelas 6 e 7 os
+  distingam em todos os tamanhos". Os números conferem com as tabelas: linha
+  1,46–1,84× contra coluna ~1,01× (glc); linha 1,48× contra dispersa 2,11× em
+  N=16384 (glc slc); transposta/usual 2,31–2,46×. Um dos argumentos do revisor
+  estava impreciso: um B mandado sem transpor pelo anfitrião não mudaria o padrão
+  de acesso nem os tempos. A frase continua certa, porque fala dos padrões.
+- S2: "(mediana de 548,6, os mesmos valores sem o programa original)".
+- 4.1: "a referência em CPU acrescenta -march=native -fopenmp" passou a "a
+  medição na CPU acrescenta…". O texto usa "referência em CPU" também para a
+  validação, cuja referência está no `matmul.cpp`, compilado só com `-O2`. Foi
+  essa ambiguidade que levou o revisor a supor FMA na referência.
+
+Conferido, sem mudança no texto: a igualdade exata dos Exps. 1 e 3 se explica pelo
+mesmo arredondamento. A GPU usa `v_mac_f32` (25 ocorrências e nenhum `v_fma_f32`
+em `isa/matmul_gfx803_disasm.txt`), que arredonda o produto antes da soma. A CPU
+soma em float, na mesma ordem de k, sem FMA (x86-64 básico, `-O2` sem
+`-march=native`).
+
 Estado: **16 páginas** (~7,5 linhas de folga), 0 erros, 0 Overfull, 21
 referências; resumo e abstract com 10 linhas cada.

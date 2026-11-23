@@ -219,6 +219,9 @@ g++ -Wall -Wextra -O2 experimentos/<prog>.cpp -o output/<prog> -lOpenCL
   (aluno, 23/11/2026): a limitação é definitiva.
 - Quarta rodada: R1–R4 e a validação exata dos Exps. 1 e 3 (logs com diferença
   máxima zero), ver CORTES.md.
+- Quinta rodada (revisor deu o texto por pronto): S1, S2 e "a medição na CPU"
+  na 4.1. A igualdade exata dos Exps. 1 e 3 vem de `v_mac_f32` na GPU e de float
+  sem FMA na CPU.
 
 ## Pendências
 

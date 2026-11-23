@@ -157,7 +157,7 @@ ambiente de software é Ubuntu~20.04 com \textit{kernel} 5.15 e ROCm~5.2, cujo
 compilador de \textit{kernels} é o Clang~14 embutido no \texttt{comgr}; a
 arquitetura Polaris já não tem suporte oficial nessa versão, e o dispositivo só é
 enumerado com \texttt{ROC\_ENABLE\_PRE\_VEGA=1}. O código
-do anfitrião é compilado com GCC~9.4 (\texttt{-O2}; a referência em CPU
+do anfitrião é compilado com GCC~9.4 (\texttt{-O2}; a medição na CPU
 acrescenta \texttt{-march=native -fopenmp}), e os binários dos \textit{kernels} são
 desmontados com o \texttt{llvm-objdump} do LLVM~12. Os \textit{kernels} dos
 Experimentos~1 e~3 são compilados com \texttt{-cl-std=CL1.2 -cl-mad-enable}; os
@@ -398,7 +398,7 @@ monitorado, mas esse valor o situa no estado máximo: a 1.000~MHz, o pico seria 
 varredura e 555,9~GB/s na campanha original: 2,1 e 2,2 vezes o pico teórico.
 \textbf{A hipótese é refutada}: o L2 continua atendendo os acessos. O valor varia
 entre alocações: em todas as medições de 1~MB com \texttt{glc slc} feitas no
-estudo, fica entre 431,5 e 564,1~GB/s (mediana de 548,6), e
+estudo, fica entre 431,5 e 564,1~GB/s (mediana de 548,6, os mesmos valores sem o programa original), e
 o menor ainda supera o pico em 69\%. O resultado tampouco depende de os
 \textit{kernels} anteriores terem deixado o \textit{buffer} no L2: com o L2
 ocupado por outro \textit{buffer} antes de cada execução, \texttt{glc slc} difere
@@ -690,7 +690,7 @@ frequência de \textit{clock}; a versão do \textit{driver} usado na etapa em
 Windows não foi registrada; a
 transposição foi medida na construção de controle, e não no \textit{kernel} em
 OpenCL~C; no Experimento~4, a tolerância cresce com $N$, e a validação só
-distingue os padrões de acesso entre si em $N=1024$; apenas leituras FLAT sobre a VRAM foram investigadas, ficando em aberto
+distingue os padrões de acesso entre si em $N=1024$, embora as razões das Tabelas~\ref{tab:localidade} e~\ref{tab:layout} os distingam em todos os tamanhos; apenas leituras FLAT sobre a VRAM foram investigadas, ficando em aberto
 as escritas, o formato MUBUF, a combinação SLC=1 com GLC=0 e outros tipos de memória (MTYPE); e todos os
 tamanhos são potências de dois, o que confunde o crescimento do conjunto de
 trabalho com o agravamento das condições de conflito. Como trabalhos futuros,
