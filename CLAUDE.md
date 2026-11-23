@@ -222,6 +222,9 @@ g++ -Wall -Wextra -O2 experimentos/<prog>.cpp -o output/<prog> -lOpenCL
 - Quinta rodada (revisor deu o texto por pronto): S1, S2 e "a medição na CPU"
   na 4.1. A igualdade exata dos Exps. 1 e 3 vem de `v_mac_f32` na GPU e de float
   sem FMA na CPU.
+- Negrito reduzido (tabelas, títulos em linha, rótulos da 4.5 e as três
+  conclusões); padrões em itálico; "(diferença máxima na GPU: zero)" na 4.1.
+  Pendente para a versão final: o \resizebox da Tabela 1.
 
 ## Pendências
 

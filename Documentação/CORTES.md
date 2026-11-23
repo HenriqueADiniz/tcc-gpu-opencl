@@ -1186,5 +1186,20 @@ soma em float, na mesma ordem de k, sem FMA (x86-64 básico, `-O2` sem
   mulss+addss, mesma ordem de k, sem denormais: o menor produto não nulo é 1e-4)
   e não tem mais nada a apontar no texto.
 
+## Negrito e "zero" da GPU (mesmo dia, antes da entrega)
+
+- Negrito do corpo reduzido com uma regra única (`negrito.py` no scratchpad da
+  sessão). Mantido: tabelas, títulos em linha no início de parágrafo dos
+  Resultados, rótulos dos três padrões na lista da 4.5 e as três conclusões da
+  Seção 6. Em itálico: os nomes dos padrões no resto do texto (37 ocorrências,
+  com os termos definidos na Metodologia). Removido: números e afirmações no meio
+  da frase (14 ocorrências, entre elas 539,8 GB/s, 35× para 400×, 11,8%, 2,31 a
+  2,46×, "A hipótese é refutada" e as duas leituras da 5.1).
+- 4.1: "(maior diferença registrada: zero)" passou a "(diferença máxima na GPU:
+  zero)". A medição na CPU só registra OK ou FALHOU. A versão "registrada na GPU"
+  alongava uma linha e derrubava a folga para ~1,6 linha; a mais curta mantém as
+  quebras de página.
+- O `\resizebox` da Tabela 1 continua para a versão final.
+
 Estado: **16 páginas** (~7,5 linhas de folga), 0 erros, 0 Overfull, 21
 referências; resumo e abstract com 10 linhas cada.
