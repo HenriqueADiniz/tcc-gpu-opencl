@@ -213,6 +213,10 @@ g++ -Wall -Wextra -O2 experimentos/<prog>.cpp -o output/<prog> -lOpenCL
   disponível): só na defesa.
 - Fechamento: Conclusões ligadas à pergunta e aos objetivos 1 a 4; itálico em
   *microbenchmarking*, separador de milhar e `\ref` no roteiro da Introdução.
+- Terceira rodada: E1–E7, conferência das saídas do Exp. 2 na §4.3 e limitação
+  da tolerância do Exp. 4 (só distingue padrões em N=1024; ver CORTES.md e
+  `analise/poder_validacao_exp4.py`). Pendente para a versão final: refazer a
+  validação do Exp. 4 com tolerância fixa.
 
 ## Pendências
 

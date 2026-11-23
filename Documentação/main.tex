@@ -42,7 +42,7 @@
 This work analyses the impact of the memory hierarchy on the performance of
 matrix multiplication on an AMD RX~580 GPU under OpenCL. Its instrument is the
 control of cache flags through inline assembly, verified in the ISA; a control
-kernel shows that the assembly itself costs 1.5$\times$, which a
+kernel isolates the assembly construction's cost (1.5$\times$), which a
 naive comparison would attribute to the cache. The cost of bypassing the L1
 falls from 1.20$\times$ to a plateau of 1.06$\times$ from $N=4096$ on and spans
 2.19$\times$ to 1.01$\times$ with locality; transposing one matrix makes the
@@ -56,8 +56,8 @@ larger than it by up to 1.51$\times$.
 Este trabalho analisa o impacto da hierarquia de memória na multiplicação de
 matrizes numa GPU AMD RX~580 sob OpenCL. O instrumento é o
 controle das \textit{flags} de \textit{cache} por \textit{inline assembly},
-verificado na ISA; um \textit{kernel} de controle mostra que o próprio
-\textit{assembly} custa 1,5$\times$, custo que a comparação ingênua atribuiria
+verificado na ISA; um \textit{kernel} de controle isola o custo da
+construção em \textit{assembly} (1,5$\times$), que a comparação ingênua atribuiria
 ao \textit{cache}. O custo de contornar o L1 cai de 1,20$\times$ a um patamar
 de 1,06$\times$ desde $N=4096$ e vai de 2,19$\times$ a 1,01$\times$ com a
 localidade; transpor uma matriz torna a multiplicação 2,3 a 2,5$\times$
@@ -130,7 +130,7 @@ Em GPUs AMD a caracterização é mais escassa. \cite{tee2025} aplicaram \textit
 \midrule
 Fang et al. (2011) & NVIDIA e outros & CUDA/OpenCL & Não & Não & Comparação de \textit{frameworks} \\
 Seo et al. (2011) & CPUs e GPU & OpenCL/OpenMP & Parcial & Não & Caracterização de \textit{benchmarks} \\
-Wong et al. (2010) & NVIDIA & CUDA & Sim & Não & Microbenchmarking de \textit{cache} \\
+Wong et al. (2010) & NVIDIA & CUDA & Sim & Não & \textit{Microbenchmarking} de \textit{cache} \\
 Mei e Chu (2017) & NVIDIA & CUDA & Sim & Não & Estrutura e latência dos \textit{caches} \\
 Jia et al. (2018) & NVIDIA & CUDA & Sim & Não & Microarquitetura Volta \\
 Jia, Shaw e Martonosi (2012) & NVIDIA & CUDA & Sim & Sim (CUDA) & Valor do L1 e localidade \\
@@ -222,14 +222,14 @@ A comparação direta entre o \textit{kernel} normal e um com \textit{bypass} n�
 
 Para separá-los, o experimento emprega seis \textit{kernels} com o mesmo algoritmo e \textit{work-groups} de $16\times16$: (1)~o normal, em OpenCL~C; (2)~um \textbf{controle} em \textit{assembly} sem \textit{flag}, que reproduz a construção das variantes com \textit{flag} sem alterar o caminho de memória; (3)~o \texttt{volatile}; (4)~o \textit{assembly} com \texttt{glc}; (5)~o \textit{assembly} com \texttt{glc slc}; e uma réplica do cenário~3.
 
-Cada cenário é executado 1.000 vezes após 10 de aquecimento. Os \textit{kernels} rodam em blocos sequenciais, sem intercalação nem sorteio, na ordem 1, 3, réplica, 2, 4 e 5 (numeração da Tabela~\ref{tab:cenarios}), e os \textit{clocks} da GPU ficam sob o gerenciamento dinâmico padrão, sem fixação. Registram-se média, mediana, desvio padrão, coeficiente de variação ($cv$) e a deriva entre o primeiro e o último décimo das execuções, esta para detectar variação de \textit{clock} sob carga sustentada; as razões vêm acompanhadas de intervalo de confiança (IC) de 95\% pelo método delta. Como, com $n=1000$, o erro padrão cai a ponto de o teste de significância acusar diferenças sem consequência prática, adota-se um \textbf{piso de ruído}: a diferença medida entre dois \textit{kernels} de código-fonte idêntico; efeitos menores não são afirmados. Como a réplica roda logo após o cenário~3, o piso mede a repetibilidade entre blocos adjacentes. Todos os resultados são verificados elemento a elemento contra a CPU.
+Cada cenário é executado 1.000 vezes após 10 de aquecimento. Os \textit{kernels} rodam em blocos sequenciais, sem intercalação nem sorteio, na ordem 1, 3, réplica, 2, 4 e 5, e os \textit{clocks} da GPU ficam sob o gerenciamento dinâmico padrão, sem fixação. Registram-se média, mediana, desvio padrão, coeficiente de variação ($cv$) e a deriva entre o primeiro e o último décimo das execuções, esta para detectar variação de \textit{clock} sob carga sustentada; as razões vêm acompanhadas de intervalo de confiança (IC) de 95\% pelo método delta. Como, com $n=1000$, o erro padrão cai a ponto de o teste de significância acusar diferenças sem consequência prática, adota-se um \textbf{piso de ruído}: a diferença medida entre dois \textit{kernels} de código-fonte idêntico; efeitos menores não são afirmados. Como a réplica roda logo após o cenário~3, o piso mede a repetibilidade entre blocos adjacentes. Todos os resultados são verificados elemento a elemento contra a CPU.
 
 \subsection{Experimento 2: Semântica do Bit SLC}
 \label{sec:met-slc}
 
 Para decidir se \texttt{SLC=1} contorna o L2, mede-se a vazão da leitura repetida de um mesmo \textit{buffer} em função do seu tamanho. As três variantes (sem \textit{flags}, \texttt{glc} e \texttt{glc slc}) são construídas por \textit{inline assembly} com \texttt{flat\_load\_dword} sobre \textit{buffers} comuns, alocados na VRAM, de modo que a geração de código é idêntica e a única diferença são os bits da instrução. Cada lançamento percorre o \textit{buffer} ciclicamente: até 64~MB, lê 128~MB no total (128 passadas de um \textit{buffer} de 1~MB, que \textbf{cabe} no L2, e duas de um de 64~MB, que \textbf{não cabe}); acima disso, faz duas passadas. A campanha original mediu esses dois tamanhos; uma segunda repete os mesmos \textit{kernels} em 14 tamanhos, de 256~KB a 2~GB, e lê cada \textit{buffer} por 0,2~s antes de medir, para estabilizar os \textit{clocks}.
 
-O teste depende de saber quanto a VRAM entregaria sem o L2. Além do pico teórico da GDDR5, nove variantes com 4 a 16 vezes mais bytes em voo por \textit{wavefront} leem um \textit{buffer} de 1~GB, para separar o limite da memória do limite do \textit{kernel} de medição. Dois controles verificam o caso de 1~MB. Como, no programa original, \texttt{glc slc} roda depois de dois \textit{kernels} que deixam o \textit{buffer} no L2, o primeiro ocupa o L2 com outro \textit{buffer} de 64~MB, fora do tempo medido, antes de cada execução, em cinco tamanhos; o segundo repete o caso de 1~MB em dez \textit{buffers} distintos. O programa original foi ainda reexecutado três vezes.
+O teste depende de saber quanto a VRAM entregaria sem o L2. Além do pico teórico da GDDR5, nove variantes com 4 a 16 vezes mais bytes em voo por \textit{wavefront} leem um \textit{buffer} de 1~GB, para separar o limite da memória do limite do \textit{kernel} de medição. Dois controles verificam o caso de 1~MB. Como, no programa original, \texttt{glc slc} roda depois de dois \textit{kernels} que deixam o \textit{buffer} no L2, o primeiro ocupa o L2 com outro \textit{buffer} de 64~MB, fora do tempo medido, antes de cada execução, em cinco tamanhos; o segundo repete o caso de 1~MB em dez \textit{buffers} distintos. O programa original foi ainda reexecutado três vezes. Exceto nele, cada saída é conferida: o \textit{buffer} contém apenas 1,0, e a soma lida por \textit{work-item} deve igualar o número de leituras.
 
 \subsection{Experimento 3: Análise de Sensibilidade ao Tamanho do Problema}
 \label{sec:met-sens}
@@ -296,8 +296,8 @@ Por fim, a multiplicação completa é executada com $B$ no \textit{layout} usua
 ($B[\,k\,N+\mathrm{col}\,]$, padrão \textbf{coluna}) e transposta no anfitrião,
 otimização clássica em CPU~\cite{drepper2007} ($B^{T}[\,\mathrm{col}\,N+k\,]$,
 análogo ao padrão \textbf{dispersa}), com $A$ no padrão \textbf{linha}. Usa-se a
-construção de controle do Experimento~1 (\textit{assembly} sem \textit{flag}),
-com validação em 4.096 posições amostradas, lançamentos fatiados a partir de
+construção em \textit{assembly} do Experimento~1, nas três configurações de
+\textit{flag}, com validação em 4.096 posições amostradas, lançamentos fatiados a partir de
 $N=4096$ e orçamento de 6~s por ponto (5 a 100 execuções).
 
 \section{Resultados}
@@ -397,8 +397,8 @@ monitorado, mas esse valor o situa no estado máximo: a 1.000~MHz, o pico seria 
 \textbf{O que se mede.} Em 1~MB, \texttt{glc slc} sustenta \textbf{555,9~GB/s} na
 campanha original e 539,8~GB/s na varredura: 2,2 e 2,1 vezes o pico teórico.
 \textbf{A hipótese é refutada}: o L2 continua atendendo os acessos. O valor varia
-entre alocações: em todas as medições de 1~MB com \texttt{glc slc}, somadas as duas
-campanhas e as reexecuções, fica entre 431,5 e 564,1~GB/s (mediana de 548,6), e
+entre alocações: em todas as medições de 1~MB com \texttt{glc slc} feitas no
+estudo, fica entre 431,5 e 564,1~GB/s (mediana de 548,6), e
 o menor ainda supera o pico em 69\%. O resultado tampouco depende de os
 \textit{kernels} anteriores terem deixado o \textit{buffer} no L2: com o L2
 ocupado por outro \textit{buffer} antes de cada execução, \texttt{glc slc} difere
@@ -441,7 +441,7 @@ foram validados sem divergência (Tabela~\ref{tab:sens}).
 
 \begin{table}[ht]
 \centering
-\caption{Mediana do tempo (ms) por tamanho e cenário: 100 execuções na GPU e de 3 a 25 na CPU.}
+\caption{Mediana do tempo (ms) por tamanho e cenário: 100 execuções na GPU e de 3 a 25 na CPU; $^\ast$depende do compilador, conforme a Seção~\ref{sec:multi}.}
 \label{tab:sens}
 \footnotesize
 \begin{tabular}{@{}llrrrrr@{}}
@@ -456,9 +456,6 @@ foram validados sem divergência (Tabela~\ref{tab:sens}).
 \tabinput{tab_medianas_artigo}
 \bottomrule
 \end{tabular}
-
-\vspace{2pt}
-{\footnotesize $^\ast$ depende do compilador, conforme a Seção~\ref{sec:multi}.}
 \end{table}
 
 \begin{figure}[ht]
@@ -637,7 +634,7 @@ usual; esta última série, com a mesma construção do Experimento~3 (compilada
 
 As contribuições deste trabalho são um instrumento, verificado na ISA, para retirar
 o L1 do caminho de leituras a partir de OpenCL numa GPU AMD Polaris (gfx803), e
-as três conclusões que ele permitiu nos quatro experimentos. Elas respondem à
+as três conclusões que ele permitiu nos quatro experimentos. Essas contribuições respondem à
 pergunta de pesquisa e cumprem os objetivos 1 a 4 (Seções~\ref{sec:multi},
 \ref{sec:fatorial}, \ref{sec:slc} e~\ref{sec:sens}--\ref{sec:localidade}).
 
@@ -692,7 +689,8 @@ nem uso do LDS, numa única placa, que também atende a saída de vídeo, e numa
 frequência de \textit{clock}; a versão do \textit{driver} usado na etapa em
 Windows não foi registrada; a
 transposição foi medida na construção de controle, e não no \textit{kernel} em
-OpenCL~C; apenas leituras FLAT sobre a VRAM foram investigadas, ficando em aberto
+OpenCL~C; no Experimento~4, a tolerância cresce com $N$, e a validação só
+distingue os padrões de acesso entre si em $N=1024$; apenas leituras FLAT sobre a VRAM foram investigadas, ficando em aberto
 as escritas, o formato MUBUF, a combinação SLC=1 com GLC=0 e outros tipos de memória (MTYPE); e todos os
 tamanhos são potências de dois, o que confunde o crescimento do conjunto de
 trabalho com o agravamento das condições de conflito. Como trabalhos futuros,

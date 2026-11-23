@@ -1089,5 +1089,37 @@ Fechamento da segunda rodada:
 - Ficam para a versão final, como o próprio parecer sugeriu: excesso de negrito e
   o `\resizebox` da Tabela 1.
 
+## Terceira rodada da revisão externa (mesmo dia)
+
+Aceitos (conferidos no código e nos CSVs):
+- E1: a Metodologia do Exp. 4 dizia que a multiplicação usava só a construção sem
+  flag, mas o `matmul_layout.csv` tem 30 pontos (2 layouts × 3 configurações × 5
+  tamanhos). Agora: "construção em assembly do Experimento 1, nas três
+  configurações de flag".
+- E2: as 17 medições de 1 MB com glc slc incluem os controles e a parte B, e o
+  texto dizia "somadas as duas campanhas e as reexecuções". Agora: "feitas no
+  estudo".
+- E3: saiu a remissão "(numeração da Tabela 2)" da §4.2.
+- E4: "Essas contribuições respondem…" (o objetivo 1 é cumprido pelo instrumento,
+  não por uma conclusão).
+- E5: resumo e abstract com "isola o custo da construção em assembly (1,5×)", para
+  não sugerir que as instruções em assembly são lentas.
+- E6: *Microbenchmarking* em itálico na Tabela 1.
+- E7: nota "depende do compilador" da Tabela 5 na legenda, como na Tabela 2.
+- Q2: o `teto_vram.cpp` confere toda saída (buffer só com 1,0; a soma por
+  work-item deve ser igual ao número de leituras; aborta em erro). O `slc_l2.cpp`
+  (programa original e reexecuções) não lê a saída. A §4.3 diz isso em uma frase.
+- Q1: a tolerância do Exp. 4 é tol·|ref| + tol, com tol = 0,02·N/1024 (de 2% a
+  32%). Com o preenchimento do código, trocar um padrão por outro (linha↔coluna,
+  linha→dispersa) ou ler B sem transpor só é reprovado em N=1024; de N=2048 em
+  diante, passa (`analise/poder_validacao_exp4.py`). A limitação foi acrescentada
+  às Conclusões. Para a versão final: refazer só a validação no Linux com
+  tolerância fixa e registrar o erro máximo. As somas dos padrões são exatas em
+  float32 (a maior, 528.384, é múltiplo de 0,125 abaixo de 2^21); na
+  multiplicação, ~1e-4 relativo basta.
+
+Não aplicado: retirar Memeti (fica como reserva de ~2 linhas, se a banca pedir
+acréscimos).
+
 Estado: **16 páginas** (~5 linhas de folga), 0 erros, 0 Overfull, 21 referências;
 resumo e abstract com 10 linhas cada.
