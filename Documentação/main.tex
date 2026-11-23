@@ -84,9 +84,10 @@ O objetivo geral é analisar experimentalmente o impacto da hierarquia de memór
 \item Verificar como o custo de contornar o L1 varia com o tamanho do problema e com a localidade do padrão de acesso, inclusive em um algoritmo completo.
 \end{enumerate}
 
-Em síntese, o instrumento foi obtido por \textit{inline assembly} e empregado em quatro experimentos, três deles sobre a multiplicação de matrizes. O custo de contornar o L1 cai de 1,20$\times$ para um patamar de 1,06$\times$ a partir de $N=4096$ e vai de 2,19$\times$ a 1,01$\times$ com a localidade, governado pelo reúso dentro da linha de \textit{cache}; transpor uma das matrizes torna a multiplicação 2,3 a 2,5$\times$ mais lenta; o SLC altera a política do L2 sem contorná-lo; e a comparação ingênua superestima o efeito do \textit{cache}. A Seção~2 traz o referencial teórico; a Seção~3, os trabalhos relacionados; a Seção~4, a metodologia; a Seção~5, os resultados; e a Seção~6, as conclusões.
+Em síntese, o instrumento foi obtido por \textit{inline assembly} e empregado em quatro experimentos, três deles sobre a multiplicação de matrizes. O custo de contornar o L1 cai de 1,20$\times$ para um patamar de 1,06$\times$ a partir de $N=4096$ e vai de 2,19$\times$ a 1,01$\times$ com a localidade, governado pelo reúso dentro da linha de \textit{cache}; transpor uma das matrizes torna a multiplicação 2,3 a 2,5$\times$ mais lenta; o SLC altera a política do L2 sem contorná-lo; e a comparação ingênua superestima o efeito do \textit{cache}. A Seção~\ref{sec:referencial} traz o referencial teórico; a Seção~\ref{sec:relacionados}, os trabalhos relacionados; a Seção~\ref{sec:metodologia-ambiente}, a metodologia; a Seção~\ref{sec:resultados}, os resultados; e a Seção~\ref{sec:conclusao}, as conclusões.
 
 \section{Referencial Teórico}
+\label{sec:referencial}
 
 \subsection{GPGPU e o Modelo de Memória do OpenCL}
 
@@ -102,6 +103,7 @@ Três noções sustentam a análise. Os \textit{caches} operam em linhas de 64~b
 Na ISA, as instruções de leitura da memória global (\texttt{buffer\_load\_dword}, no formato MUBUF, e \texttt{flat\_load\_dword}, no formato FLAT) têm dois bits de política de \textit{cache}: GLC (\textit{Globally Coherent}) e SLC (\textit{System Level Coherent}), nos bits 16 e 17 do FLAT e 14 e 17 do MUBUF. O manual documenta o GLC: com GLC=1, a leitura falta intencionalmente no L1 e busca no L2~\cite[Seção~8.1.9]{amdgcn3}. Já o SLC recebe duas descrições: no MUBUF e no MTBUF, os acessos com SLC=1 são forçados a faltar no L2 e ficam coerentes com a memória do sistema; no FLAT, o bit define a política de \textit{cache} em conjunto com o GLC e com o tipo de memória (MTYPE)~\cite[Tabelas~8.2 e~9.1]{amdgcn3}. Qual delas vale em leituras FLAT é o objeto da Seção~\ref{sec:slc}.
 
 \section{Trabalhos Relacionados}
+\label{sec:relacionados}
 
 \subsection{Comparação de \textit{Frameworks}}
 
@@ -109,7 +111,7 @@ Na ISA, as instruções de leitura da memória global (\texttt{buffer\_load\_dwo
 
 \subsection{Hierarquia de Memória em GPUs}
 
-\cite{wong2010} levaram às GPUs o microbenchmarking por \textit{pointer chasing}: percorre-se uma estrutura encadeada cujo tamanho define o conjunto de trabalho, e os saltos de latência revelam a capacidade de cada nível; com ele mapearam os \textit{caches} de uma GeForce GTX~280. \cite{mei2017} refinaram a técnica, registrando a latência de cada acesso, e a aplicaram às gerações Fermi, Kepler e Maxwell, expondo também a estrutura dos \textit{caches}. \cite{jia2018}, em relatório técnico, estenderam a abordagem à arquitetura Volta, combinando-a com a desmontagem de instruções. \cite{baghsorkhi2012} seguem outra via: um modelo estatístico da hierarquia, baseado em traços de memória e no método de Monte Carlo. Todos se restringem a GPUs NVIDIA com CUDA. A combinação de microbenchmarks com análise da ISA é o método aqui adaptado, embora o desenho meça vazão sob carga, e não latência isolada.
+\cite{wong2010} levaram às GPUs o \textit{microbenchmarking} por \textit{pointer chasing}: percorre-se uma estrutura encadeada cujo tamanho define o conjunto de trabalho, e os saltos de latência revelam a capacidade de cada nível; com ele mapearam os \textit{caches} de uma GeForce GTX~280. \cite{mei2017} refinaram a técnica, registrando a latência de cada acesso, e a aplicaram às gerações Fermi, Kepler e Maxwell, expondo também a estrutura dos \textit{caches}. \cite{jia2018}, em relatório técnico, estenderam a abordagem à arquitetura Volta, combinando-a com a desmontagem de instruções. \cite{baghsorkhi2012} seguem outra via: um modelo estatístico da hierarquia, baseado em traços de memória e no método de Monte Carlo. Todos se restringem a GPUs NVIDIA com CUDA. A combinação de \textit{microbenchmarks} com análise da ISA é o método aqui adaptado, embora o desenho meça vazão sob carga, e não latência isolada.
 
 Mais próximos da pergunta deste trabalho, \cite{jia2012} ligaram e desligaram o L1 de uma GPU Fermi: ele acelerou alguns programas e retardou outros, e o tráfego L1--L2 previu o efeito melhor que a taxa de acerto. Daí derivaram uma taxonomia de localidade (dentro do \textit{warp}, entre \textit{warps} e entre instruções) para decidir, por \textit{load}, se o L1 deve ser usado. Trabalhos posteriores partem da mesma constatação para automatizar a decisão de contornar o \textit{cache}, por compilador~\cite{xie2013} ou de forma adaptativa em tempo de execução~\cite{tian2015}.
 
@@ -144,13 +146,13 @@ Tee et al. (2025) & AMD (CDNA) & ROCm & Sim & Não & Latência dos \textit{cache
 }
 \end{table}
 
-Conforme a Tabela~\ref{tab:trabalhos}, a literatura concentra-se em GPUs NVIDIA. Este estudo investiga uma GPU AMD sob OpenCL e desloca o objeto de análise: onde o microbenchmarking caracteriza a \emph{geometria} da hierarquia (capacidade e latência de cada nível), aqui se mede quanto um nível vale, como \cite{jia2012} no Fermi; lá o controle é oferecido pelo CUDA, aqui precisa ser construído e verificado na ISA.
+Conforme a Tabela~\ref{tab:trabalhos}, a literatura concentra-se em GPUs NVIDIA. Este estudo investiga uma GPU AMD sob OpenCL e desloca o objeto de análise: onde o \textit{microbenchmarking} caracteriza a \emph{geometria} da hierarquia (capacidade e latência de cada nível), aqui se mede quanto um nível vale, como \cite{jia2012} no Fermi; lá o controle é oferecido pelo CUDA, aqui precisa ser construído e verificado na ISA.
 
 \section{Metodologia}
 \label{sec:metodologia-ambiente}
 
 Os experimentos são conduzidos em uma Radeon RX~580 de 8~GB (Ellesmere, alvo
-\texttt{gfx803}), com 36 CUs a 1350~MHz e a hierarquia descrita na Seção~\ref{sec:hier}. O
+\texttt{gfx803}), com 36 CUs a 1.350~MHz e a hierarquia descrita na Seção~\ref{sec:hier}. O
 ambiente de software é Ubuntu~20.04 com \textit{kernel} 5.15 e ROCm~5.2, cujo
 compilador de \textit{kernels} é o Clang~14 embutido no \texttt{comgr}; a
 arquitetura Polaris já não tem suporte oficial nessa versão, e o dispositivo só é
@@ -220,7 +222,7 @@ A comparação direta entre o \textit{kernel} normal e um com \textit{bypass} n�
 
 Para separá-los, o experimento emprega seis \textit{kernels} com o mesmo algoritmo e \textit{work-groups} de $16\times16$: (1)~o normal, em OpenCL~C; (2)~um \textbf{controle} em \textit{assembly} sem \textit{flag}, que reproduz a construção das variantes com \textit{flag} sem alterar o caminho de memória; (3)~o \texttt{volatile}; (4)~o \textit{assembly} com \texttt{glc}; (5)~o \textit{assembly} com \texttt{glc slc}; e uma réplica do cenário~3.
 
-Cada cenário é executado 1000 vezes após 10 de aquecimento. Os \textit{kernels} rodam em blocos sequenciais, sem intercalação nem sorteio, na ordem 1, 3, réplica, 2, 4 e 5 (numeração da Tabela~\ref{tab:cenarios}), e os \textit{clocks} da GPU ficam sob o gerenciamento dinâmico padrão, sem fixação. Registram-se média, mediana, desvio padrão, coeficiente de variação ($cv$) e a deriva entre o primeiro e o último décimo das execuções, esta para detectar variação de \textit{clock} sob carga sustentada; as razões vêm acompanhadas de intervalo de confiança (IC) de 95\% pelo método delta. Como, com $n=1000$, o erro padrão cai a ponto de o teste de significância acusar diferenças sem consequência prática, adota-se um \textbf{piso de ruído}: a diferença medida entre dois \textit{kernels} de código-fonte idêntico; efeitos menores não são afirmados. Como a réplica roda logo após o cenário~3, o piso mede a repetibilidade entre blocos adjacentes. Todos os resultados são verificados elemento a elemento contra a CPU.
+Cada cenário é executado 1.000 vezes após 10 de aquecimento. Os \textit{kernels} rodam em blocos sequenciais, sem intercalação nem sorteio, na ordem 1, 3, réplica, 2, 4 e 5 (numeração da Tabela~\ref{tab:cenarios}), e os \textit{clocks} da GPU ficam sob o gerenciamento dinâmico padrão, sem fixação. Registram-se média, mediana, desvio padrão, coeficiente de variação ($cv$) e a deriva entre o primeiro e o último décimo das execuções, esta para detectar variação de \textit{clock} sob carga sustentada; as razões vêm acompanhadas de intervalo de confiança (IC) de 95\% pelo método delta. Como, com $n=1000$, o erro padrão cai a ponto de o teste de significância acusar diferenças sem consequência prática, adota-se um \textbf{piso de ruído}: a diferença medida entre dois \textit{kernels} de código-fonte idêntico; efeitos menores não são afirmados. Como a réplica roda logo após o cenário~3, o piso mede a repetibilidade entre blocos adjacentes. Todos os resultados são verificados elemento a elemento contra a CPU.
 
 \subsection{Experimento 2: Semântica do Bit SLC}
 \label{sec:met-slc}
@@ -299,6 +301,7 @@ com validação em 4.096 posições amostradas, lançamentos fatiados a partir d
 $N=4096$ e orçamento de 6~s por ponto (5 a 100 execuções).
 
 \section{Resultados}
+\label{sec:resultados}
 
 \subsection{Experimento 1: Isolamento do Efeito do L1}
 \label{sec:fatorial}
@@ -307,7 +310,7 @@ A Tabela~\ref{tab:cenarios} apresenta os cinco cenários para $N=1024$. Todos fo
 
 \begin{table}[ht]
 \centering
-\caption{Cenários de caminho de \textit{cache}, $N=1024$; 1000 execuções por cenário. Tempos em ms; $cv$: desvio padrão sobre a média; GFLOPS calculados pela mediana.}
+\caption{Cenários de caminho de \textit{cache}, $N=1024$; 1.000 execuções por cenário. Tempos em ms; $cv$: desvio padrão sobre a média; GFLOPS calculados pela mediana.}
 \label{tab:cenarios}
 \footnotesize
 \begin{tabular}{@{}llrrrr@{}}
@@ -634,7 +637,9 @@ usual; esta última série, com a mesma construção do Experimento~3 (compilada
 
 As contribuições deste trabalho são um instrumento, verificado na ISA, para retirar
 o L1 do caminho de leituras a partir de OpenCL numa GPU AMD Polaris (gfx803), e
-as três conclusões que ele permitiu nos quatro experimentos.
+as três conclusões que ele permitiu nos quatro experimentos. Elas respondem à
+pergunta de pesquisa e cumprem os objetivos 1 a 4 (Seções~\ref{sec:multi},
+\ref{sec:fatorial}, \ref{sec:slc} e~\ref{sec:sens}--\ref{sec:localidade}).
 
 A primeira é que \textbf{o valor do L1 não é uma constante da arquitetura, e sim
 função do problema e do padrão de acesso}. Com o tamanho do problema, o custo
@@ -663,7 +668,7 @@ bloco de \textit{inline assembly} custa por si só cerca de 1,5$\times$. Isolá-
 exigiu um cenário de controle sem \textit{flag} e uma réplica de código-fonte
 idêntico, que estima em 0,14\% o ruído entre blocos adjacentes de uma campanha.
 
-Frente à literatura, os resultados complementam os estudos de microbenchmarking
+Frente à literatura, os resultados complementam os estudos de \textit{microbenchmarking}
 em GPUs NVIDIA~\cite{wong2010, mei2017, jia2018}, que caracterizam latência e
 capacidade, ao medir quanto um nível vale para um algoritmo numa arquitetura
 AMD. Como em~\cite{jia2012}, o valor do L1 depende do tipo de localidade, embora

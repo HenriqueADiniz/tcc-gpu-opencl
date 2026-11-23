@@ -1072,5 +1072,17 @@ justifica); "fixa" × "estima" (não é contradição); asterisco na Tabela 2;
 transposição em OpenCL C (decisão do aluno). O motivo da RX 580 (placa
 disponível) fica para a defesa, não para o texto (decisão do aluno).
 
-Estado: **16 páginas** (~6 linhas de folga), 0 erros, 0 Overfull, 21 referências;
+Fechamento da segunda rodada:
+- Conclusões: uma frase liga as conclusões à pergunta de pesquisa e aos objetivos
+  1 a 4 (Seções 4.1, 5.1, 5.2 e 5.3–5.4). Custou 1 linha. O item estava no
+  parecer e ficou de fora da primeira análise.
+- Polimento sem custo de espaço, apontado nas duas revisões: *microbenchmarking*
+  em itálico, como os demais termos em inglês; separador de milhar no texto
+  corrido (1.350 MHz, 1.000 execuções), como já em 2.000 MHz e 2.048 linhas;
+  roteiro da Introdução com `\ref` (rótulos novos `sec:referencial`,
+  `sec:relacionados` e `sec:resultados`).
+- Ficam para a versão final, como o próprio parecer sugeriu: excesso de negrito e
+  o `\resizebox` da Tabela 1.
+
+Estado: **16 páginas** (~5 linhas de folga), 0 erros, 0 Overfull, 21 referências;
 resumo e abstract com 10 linhas cada.

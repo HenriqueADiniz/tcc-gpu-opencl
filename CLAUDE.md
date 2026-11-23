@@ -211,6 +211,8 @@ g++ -Wall -Wextra -O2 experimentos/<prog>.cpp -o output/<prog> -lOpenCL
   LLVM no contexto certo, "mesma construção" nos Exps. 3 e 4, cenários definidos
   na §4.2, contribuição metodológica de volta ao resumo. Motivo da RX 580 (placa
   disponível): só na defesa.
+- Fechamento: Conclusões ligadas à pergunta e aos objetivos 1 a 4; itálico em
+  *microbenchmarking*, separador de milhar e `\ref` no roteiro da Introdução.
 
 ## Pendências
 
@@ -224,7 +226,7 @@ g++ -Wall -Wextra -O2 experimentos/<prog>.cpp -o output/<prog> -lOpenCL
   fornecedor, versão, finalidade e seções (Arts. 7º e 8º).
 - [ ] Revisão do aluno sobre o texto reestruturado antes da entrega de 21/10/2026.
 
-Estado em 23/11/2026: **16 páginas** (~6 linhas de folga), 0 erros, 0 Overfull,
+Estado em 23/11/2026: **16 páginas** (~5 linhas de folga), 0 erros, 0 Overfull,
 21 referências, 3 figuras; resumo e abstract com 10 linhas cada.
 
 ## Regras de trabalho
