@@ -40,26 +40,30 @@
 
 \begin{abstract}
 This work analyses the impact of the memory hierarchy on the performance of
-matrix multiplication on an AMD RX~580 GPU (GCN, GFX8) under OpenCL. Its instrument is the control of cache flags through inline assembly,
-verified in the ISA. The cost of bypassing the L1 falls from 1.20$\times$ to
-1.06$\times$ over a 256-fold range in data volume and spans 2.19$\times$ to
-1.01$\times$ with locality; transposing one matrix makes the multiplication
-2.3--2.5$\times$ slower, as coalescing across lanes is lost. For FLAT loads,
-SLC=1 does not bypass the L2 (a working set that fits in it sustains about
-550~GB/s, above the VRAM's 256~GB/s peak) but changes its replacement policy,
-speeding up sweeps slightly larger than the L2 by up to 1.51$\times$.
+matrix multiplication on an AMD RX~580 GPU under OpenCL. Its instrument is the
+control of cache flags through inline assembly, verified in the ISA; a control
+kernel shows that the assembly itself costs 1.5$\times$, which a
+naive comparison would attribute to the cache. The cost of bypassing the L1
+falls from 1.20$\times$ to a plateau of 1.06$\times$ from $N=4096$ on and spans
+2.19$\times$ to 1.01$\times$ with locality; transposing one matrix makes the
+multiplication 2.3--2.5$\times$ slower. For FLAT loads, SLC=1 does not bypass
+the L2 (a working set that fits in it sustains about 550~GB/s, above the VRAM's
+256~GB/s peak) but changes its replacement policy, speeding up sweeps slightly
+larger than it by up to 1.51$\times$.
 \end{abstract}
 
 \begin{resumo}
-Este trabalho analisa o impacto da hierarquia de memória no desempenho da
-multiplicação de matrizes numa GPU AMD RX~580 (GCN, GFX8) sob OpenCL. O instrumento é o controle das \textit{flags} de \textit{cache}
-por \textit{inline assembly}, verificado na ISA. O custo de contornar o L1 cai de
-1,20$\times$ para 1,06$\times$ num fator de 256 em volume de dados e vai de
-2,19$\times$ a 1,01$\times$ com a localidade; transpor uma das matrizes torna a
-multiplicação 2,3 a 2,5$\times$ mais lenta, por perder a coalescência entre
-\textit{lanes}. Em leituras FLAT, SLC=1 não contorna o L2 (um conjunto que cabe
-nele sustenta cerca de 550~GB/s, acima do pico de 256~GB/s da VRAM), mas altera
-sua política de substituição, acelerando em até 1,51$\times$ varreduras pouco
+Este trabalho analisa o impacto da hierarquia de memória na multiplicação de
+matrizes numa GPU AMD RX~580 sob OpenCL. O instrumento é o
+controle das \textit{flags} de \textit{cache} por \textit{inline assembly},
+verificado na ISA; um \textit{kernel} de controle mostra que o próprio
+\textit{assembly} custa 1,5$\times$, custo que a comparação ingênua atribuiria
+ao \textit{cache}. O custo de contornar o L1 cai de 1,20$\times$ a um patamar
+de 1,06$\times$ desde $N=4096$ e vai de 2,19$\times$ a 1,01$\times$ com a
+localidade; transpor uma matriz torna a multiplicação 2,3 a 2,5$\times$
+mais lenta. Em leituras FLAT, SLC=1 não contorna o L2 (um conjunto que cabe nele
+sustenta cerca de 550~GB/s, acima do pico de 256~GB/s da VRAM), mas altera sua
+política de substituição, acelerando até 1,51$\times$ varreduras pouco
 maiores que ele.
 \end{resumo}
 
@@ -69,7 +73,7 @@ A computação paralela em unidades de processamento gráfico (GPUs) consolidou-
 
 O paralelismo massivo, porém, não basta: a forma como os dados são acessados pesa tanto quanto ele. As GPUs possuem uma hierarquia de memória (registradores, memória local, \textit{caches} L1 e L2 e memória global), em que os níveis mais próximos do processador são menores e mais rápidos~\cite{amdgcn3, rocmspecs}, e a eficiência de um algoritmo depende de quão bem ele a explora.
 
-A pergunta que orienta este trabalho é: qual é o impacto quantitativo da hierarquia de memória no desempenho de um algoritmo paralelo executado em GPU AMD sob OpenCL? A literatura concentra-se em GPUs NVIDIA~\cite{wong2010, jia2012, baghsorkhi2012, mei2017, jia2018}, e são escassos os estudos sobre o comportamento de \textit{cache} nas GPUs AMD da arquitetura GCN, que, no entanto, tem a ISA documentada publicamente e um compilador aberto, o LLVM, o que permite verificar no binário o efeito de cada mecanismo. A forma mais direta de medir esse impacto é retirar um nível do caminho de um acesso, e fazê-lo sem confundir o efeito do \textit{cache} com efeitos de geração de código exige um instrumento verificado no binário. Saber quanto um nível vale, e do que esse valor depende, orienta decisões de otimização, como a disposição dos dados na memória.
+A pergunta que orienta este trabalho é: qual é o impacto quantitativo da hierarquia de memória, em particular dos \textit{caches} L1 e L2, no desempenho de um algoritmo paralelo executado em GPU AMD sob OpenCL? A literatura concentra-se em GPUs NVIDIA~\cite{wong2010, jia2012, baghsorkhi2012, mei2017, jia2018}, e são escassos os estudos sobre o comportamento de \textit{cache} nas GPUs AMD da arquitetura GCN, que, no entanto, tem a ISA documentada publicamente e um compilador aberto, o LLVM, o que permite verificar no binário o efeito de cada mecanismo. A forma mais direta de medir esse impacto é retirar um nível do caminho de um acesso, e fazê-lo sem confundir o efeito do \textit{cache} com efeitos de geração de código exige um instrumento verificado no binário. Saber quanto um nível vale, e do que esse valor depende, orienta decisões de otimização, como a disposição dos dados na memória.
 
 O objetivo geral é analisar experimentalmente o impacto da hierarquia de memória no desempenho de uma GPU AMD (arquitetura Polaris/GCN) sob OpenCL, tendo a multiplicação de matrizes como caso de estudo. Os objetivos específicos são:
 
@@ -80,7 +84,7 @@ O objetivo geral é analisar experimentalmente o impacto da hierarquia de memór
 \item Verificar como o custo de contornar o L1 varia com o tamanho do problema e com a localidade do padrão de acesso, inclusive em um algoritmo completo.
 \end{enumerate}
 
-Em síntese, o instrumento foi obtido por \textit{inline assembly} e empregado em quatro experimentos centrados na multiplicação de matrizes. O custo de contornar o L1 cai de 1,20$\times$ para 1,06$\times$ com o tamanho do problema e vai de 2,19$\times$ a 1,01$\times$ com a localidade, governado pelo reúso dentro da linha de \textit{cache}; transpor uma das matrizes torna a multiplicação 2,3 a 2,5$\times$ mais lenta; o SLC altera a política do L2 sem contorná-lo; e a comparação ingênua superestima o efeito do \textit{cache}. A Seção~2 traz o referencial teórico; a Seção~3, os trabalhos relacionados; a Seção~4, a metodologia; a Seção~5, os resultados; e a Seção~6, as conclusões.
+Em síntese, o instrumento foi obtido por \textit{inline assembly} e empregado em quatro experimentos, três deles sobre a multiplicação de matrizes. O custo de contornar o L1 cai de 1,20$\times$ para um patamar de 1,06$\times$ a partir de $N=4096$ e vai de 2,19$\times$ a 1,01$\times$ com a localidade, governado pelo reúso dentro da linha de \textit{cache}; transpor uma das matrizes torna a multiplicação 2,3 a 2,5$\times$ mais lenta; o SLC altera a política do L2 sem contorná-lo; e a comparação ingênua superestima o efeito do \textit{cache}. A Seção~2 traz o referencial teórico; a Seção~3, os trabalhos relacionados; a Seção~4, a metodologia; a Seção~5, os resultados; e a Seção~6, as conclusões.
 
 \section{Referencial Teórico}
 
@@ -99,11 +103,9 @@ Na ISA, as instruções de leitura da memória global (\texttt{buffer\_load\_dwo
 
 \section{Trabalhos Relacionados}
 
-\subsection{\textit{Frameworks} e Plataformas}
+\subsection{Comparação de \textit{Frameworks}}
 
-\cite{fang2011} compararam CUDA e OpenCL em 16 \textit{benchmarks} e concluíram que a vantagem de até 30\% do CUDA decorre de comparações injustas, entre cujas causas estão os compiladores: em condições equivalentes, o desempenho se iguala. \cite{memeti2017} compararam OpenMP, OpenACC, OpenCL e CUDA quanto a produtividade, desempenho e energia em sistemas com CPU, GPU e Xeon Phi. \cite{seo2011}, ao portarem os \textit{NAS Parallel Benchmarks} para OpenCL, mostraram que a portabilidade de código não traz portabilidade de desempenho: a aplicação precisa ser reotimizada para cada dispositivo. \cite{fraire2013} descrevem a arquitetura do OpenCL e medem um produto de matrizes até três ordens de grandeza mais rápido que o mesmo algoritmo em C++ simples. O conjunto estabelece a premissa deste trabalho: o desempenho em OpenCL depende do dispositivo e do compilador, fonte de variação que a Seção~\ref{sec:multi} retoma de forma direta.
-
-\cite{vidye2023} avaliaram o OpenCL em Windows, Linux, Android e macOS e atribuíram as diferenças à otimização feita pelo compilador e ao \textit{driver} de cada sistema, sem examinar o código gerado. Este estudo mostra essa diferença diretamente na ISA: sobre o mesmo dispositivo, o compilador de cada ambiente gera instruções diferentes a partir do mesmo código-fonte (Seção~\ref{sec:multi}).
+\cite{fang2011} compararam CUDA e OpenCL em 16 \textit{benchmarks} e concluíram que a vantagem de até 30\% do CUDA decorre de comparações injustas, entre cujas causas estão os compiladores: em condições equivalentes, o desempenho se iguala. \cite{memeti2017} compararam OpenMP, OpenACC, OpenCL e CUDA quanto a produtividade, desempenho e energia em sistemas com CPU, GPU e Xeon Phi. \cite{seo2011}, ao portarem os \textit{NAS Parallel Benchmarks} para OpenCL, mostraram que a portabilidade de código não traz portabilidade de desempenho: a aplicação precisa ser reotimizada para cada dispositivo. \cite{fraire2013} descrevem a arquitetura do OpenCL e medem um produto de matrizes até três ordens de grandeza mais rápido que o mesmo algoritmo em C++ simples. O conjunto mostra que o desempenho em OpenCL depende do dispositivo e do compilador, fonte de variação que a Seção~\ref{sec:multi} retoma de forma direta.
 
 \subsection{Hierarquia de Memória em GPUs}
 
@@ -130,10 +132,10 @@ Wong et al. (2010) & NVIDIA & CUDA & Sim & Não & Microbenchmarking de \textit{c
 Mei e Chu (2017) & NVIDIA & CUDA & Sim & Não & Estrutura e latência dos \textit{caches} \\
 Jia et al. (2018) & NVIDIA & CUDA & Sim & Não & Microarquitetura Volta \\
 Jia, Shaw e Martonosi (2012) & NVIDIA & CUDA & Sim & Sim (CUDA) & Valor do L1 e localidade \\
+Xie et al. (2013) & NVIDIA & CUDA (PTX) & Sim & Sim (compilador) & Desvio do L1 por compilador \\
+Tian et al. (2015) & GPU simulada & --- & Sim & Sim (\textit{hardware}) & Desvio adaptativo do L1 \\
 Baghsorkhi et al. (2012) & NVIDIA & CUDA & Sim & Não & Modelo estatístico da hierarquia \\
-Memeti et al. (2017) & CPU, GPU e Xeon Phi & Múltiplos & Não & Não & Produtividade, desempenho e energia \\
 Fraire et al. (2013) & CPU e GPU & OpenCL & Parcial & Não & Produto de matrizes em OpenCL \\
-Vidye et al. (2023) & Múltiplos & OpenCL e outros & Não & Não & Desempenho entre SOs \\
 Tee et al. (2025) & AMD (CDNA) & ROCm & Sim & Não & Latência dos \textit{caches} \\
 \midrule
 \textbf{Este trabalho} & \textbf{AMD (GCN)} & \textbf{OpenCL} & \textbf{Sim} & \textbf{Sim (ISA)} & \textbf{Valor e controle dos níveis} \\
@@ -161,8 +163,9 @@ demais, com as opções padrão. Os tempos de GPU vêm dos eventos de
 \textit{profiling} do OpenCL, do início ao fim de cada \textit{kernel}, sem as
 transferências (nos lançamentos fatiados, somam-se os lotes), e os da CPU, de
 \texttt{clock\_gettime}. As saídas das multiplicações e dos padrões são
-validadas contra a CPU com tolerância proporcional a $N$ ($0{,}01$ a $0{,}02$ vezes
-$N/1024$), sobre matrizes de preenchimento determinístico. A escolha do ambiente decorre de etapa
+validadas contra a CPU, com tolerância absoluta de $0{,}01\,N/1024$ nos
+Experimentos~1 e~3 e relativa de $0{,}02\,N/1024$ no Experimento~4, sobre
+matrizes de preenchimento determinístico. A escolha do ambiente decorre de etapa
 anterior, conduzida sobre o mesmo dispositivo em Windows, cujo compilador
 proprietário (AMDOCL) não aceita \textit{inline assembly} nem emite \textit{flags}
 sob \texttt{volatile} (Seção~\ref{sec:multi}).\footnote{Código, dados brutos e
@@ -215,7 +218,7 @@ L2~\cite[Seção~8.1.9]{amdgcn3}.
 
 A comparação direta entre o \textit{kernel} normal e um com \textit{bypass} não permite atribuir a diferença ao \textit{cache}, porque dois outros fatores variam junto com a \textit{flag}: o código gerado sob \texttt{volatile}, que serializa os \textit{loads}; e o próprio bloco de \textit{inline assembly}, opaco ao otimizador, que impede a redução de força no cálculo de endereço~\cite{cooper2001} e acrescenta operações aritméticas por iteração.
 
-Para separá-los, o experimento emprega seis \textit{kernels} com o mesmo algoritmo e \textit{work-groups} de $16\times16$: os cinco cenários da Tabela~\ref{tab:cenarios} e uma réplica do cenário~3. Entre eles está um \textbf{controle} construído em \textit{assembly} sem \textit{flag} alguma, que reproduz a construção das variantes com \textit{flag} sem alterar o caminho de memória.
+Para separá-los, o experimento emprega seis \textit{kernels} com o mesmo algoritmo e \textit{work-groups} de $16\times16$: (1)~o normal, em OpenCL~C; (2)~um \textbf{controle} em \textit{assembly} sem \textit{flag}, que reproduz a construção das variantes com \textit{flag} sem alterar o caminho de memória; (3)~o \texttt{volatile}; (4)~o \textit{assembly} com \texttt{glc}; (5)~o \textit{assembly} com \texttt{glc slc}; e uma réplica do cenário~3.
 
 Cada cenário é executado 1000 vezes após 10 de aquecimento. Os \textit{kernels} rodam em blocos sequenciais, sem intercalação nem sorteio, na ordem 1, 3, réplica, 2, 4 e 5 (numeração da Tabela~\ref{tab:cenarios}), e os \textit{clocks} da GPU ficam sob o gerenciamento dinâmico padrão, sem fixação. Registram-se média, mediana, desvio padrão, coeficiente de variação ($cv$) e a deriva entre o primeiro e o último décimo das execuções, esta para detectar variação de \textit{clock} sob carga sustentada; as razões vêm acompanhadas de intervalo de confiança (IC) de 95\% pelo método delta. Como, com $n=1000$, o erro padrão cai a ponto de o teste de significância acusar diferenças sem consequência prática, adota-se um \textbf{piso de ruído}: a diferença medida entre dois \textit{kernels} de código-fonte idêntico; efeitos menores não são afirmados. Como a réplica roda logo após o cenário~3, o piso mede a repetibilidade entre blocos adjacentes. Todos os resultados são verificados elemento a elemento contra a CPU.
 
@@ -240,7 +243,7 @@ Como referência de escala, o mesmo laço triplo ingênuo é medido na CPU do
 anfitrião (Intel Core Ultra~5 245KF, 14 \textit{threads}, 16~GB de DDR5),
 paralelizado por OpenMP em todas as \textit{threads}; a comparação mantém a
 implementação constante e não representa o melhor desempenho da CPU. O número de
-execuções segue um orçamento de tempo, pois uma execução em $N=16384$ leva 3,3~h.
+execuções na CPU segue um orçamento de tempo, pois uma execução em $N=16384$ leva 3,3~h.
 
 Duas adaptações tornam a análise exequível. Na \textbf{referência amostrada},
 cada cenário é comparado elemento a elemento com a saída do cenário~1, em
@@ -391,7 +394,7 @@ monitorado, mas esse valor o situa no estado máximo: a 1.000~MHz, o pico seria 
 \textbf{O que se mede.} Em 1~MB, \texttt{glc slc} sustenta \textbf{555,9~GB/s} na
 campanha original e 539,8~GB/s na varredura: 2,2 e 2,1 vezes o pico teórico.
 \textbf{A hipótese é refutada}: o L2 continua atendendo os acessos. O valor varia
-entre alocações: nas 17 medições de 1~MB com \texttt{glc slc}, somadas as duas
+entre alocações: em todas as medições de 1~MB com \texttt{glc slc}, somadas as duas
 campanhas e as reexecuções, fica entre 431,5 e 564,1~GB/s (mediana de 548,6), e
 o menor ainda supera o pico em 69\%. O resultado tampouco depende de os
 \textit{kernels} anteriores terem deixado o \textit{buffer} no L2: com o L2
@@ -421,8 +424,8 @@ desvio do nível. A leitura é coerente com a documentação: a descrição da
 codificação FLAT diz que o bit ``controla a política do \textit{cache}
 L2''~\cite[Seção~13.9]{amdgcn3}; o compilador emite \texttt{glc slc} para acessos
 não temporais, comentando no código que isso põe o L2 na política
-\textit{STREAM} e que \textit{``there is no L2 cache bypass policy at the ISA
-level''}~\cite{llvmlegalizer}; e o desvio do L2 é previsto por faixa de
+\textit{STREAM}, e registra, ao tratar acessos voláteis, que \textit{``there is no
+L2 cache bypass policy at the ISA level''}~\cite{llvmlegalizer}; e o desvio do L2 é previsto por faixa de
 endereços, não por instrução~\cite{llvmamdgpu}. Segue daí que, \textbf{em leituras FLAT, apenas o L1
 pode ser contornado por \textit{flags} de instrução}: o caminho direto à VRAM que
 a descrição do MUBUF sugere não existe por esse meio.
@@ -502,7 +505,7 @@ monotônica de 4\% ao longo de um fator de 256 em volume de dados. O
 sobre a base em \textit{assembly}, cai de 1,20$\times$ em $N=1024$ para
 1,09$\times$ em $N=2048$ e estabiliza-se em torno de 1,06$\times$ a partir de
 $N=4096$ (IC de 95\% por \textit{bootstrap}, dentro da campanha: [1,191; 1,207]
-em $N=1024$ e [1,0616; 1,0619] em $N=16384$). Em $N=1024$, campanhas independentes do mesmo \textit{kernel} deram
+em $N=1024$ e [1,0616; 1,0619] em $N=16384$). Em $N=1024$, campanhas independentes da mesma construção deram
 razões entre medianas de 1,23$\times$ (Experimento~1) e 1,19$\times$
 (Seção~\ref{sec:localidade}); a queda com o tamanho excede essa variação.
 
@@ -526,7 +529,7 @@ de substituição: expulsar primeiro a linha recém-carregada só custa quando e
 reusada depois de expulsa. Esse custo não acompanha a ocupação total (em
 $N=1024$ as matrizes já somam 12~MB, seis vezes o L2), e sim, por hipótese não
 testada, a distância de reúso: a faixa de $B$ lida por um \textit{work-group}
-passa de 64~KB a 1~MB.
+passa de 64~KB em $N=1024$ a 1~MB em $N=16384$.
 
 \subsection{Experimento 4: Localidade do Padrão de Acesso}
 \label{sec:localidade}
@@ -623,8 +626,8 @@ OpenCL~C (cerca de 300~GFLOPS).
 
 \textbf{A dependência do L1 acompanha o padrão.} Com $B$ transposta, contornar o
 L1 custa de 1,96 a 1,48$\times$, contra 1,19 a 1,05$\times$ no \textit{layout}
-usual; esta última série, o mesmo \textit{kernel} do Experimento~3 em campanha
-independente, reproduz a curva~b da Figura~\ref{fig:sens} com diferença máxima de 2,1 pontos percentuais.
+usual; esta última série, com a mesma construção do Experimento~3 (compilada sem
+\texttt{-cl-mad-enable}) e medida em campanha independente, reproduz a curva~b da Figura~\ref{fig:sens} com diferença máxima de 2,1 pontos percentuais.
 
 \section{Conclusões e Trabalhos Futuros}
 \label{sec:conclusao}
@@ -634,8 +637,9 @@ o L1 do caminho de leituras a partir de OpenCL numa GPU AMD Polaris (gfx803), e
 as três conclusões que ele permitiu nos quatro experimentos.
 
 A primeira é que \textbf{o valor do L1 não é uma constante da arquitetura, e sim
-função do problema e do padrão de acesso}. Ao longo de um fator de 256 em volume
-de dados, o custo de contorná-lo cai de 1,20$\times$ para 1,06$\times$; com a
+função do problema e do padrão de acesso}. Com o tamanho do problema, o custo
+de contorná-lo cai de 1,20$\times$ para um patamar de 1,06$\times$ a partir de
+$N=4096$; com a
 localidade, vai de 2,19$\times$ no padrão \textbf{dispersa} a 1,01$\times$ no
 padrão \textbf{coluna}. O fator determinante é o reúso dentro da linha de 64~bytes, não o
 compartilhamento de endereço entre \textit{lanes}. No algoritmo completo,
@@ -664,8 +668,8 @@ em GPUs NVIDIA~\cite{wong2010, mei2017, jia2018}, que caracterizam latência e
 capacidade, ao medir quanto um nível vale para um algoritmo numa arquitetura
 AMD. Como em~\cite{jia2012}, o valor do L1 depende do tipo de localidade, embora
 lá o L1 tenha chegado a retardar programas. E o mesmo código-fonte
-gerou ISA diferente conforme o compilador, o que confirma no binário a
-atribuição de~\cite{fang2011} e de~\cite{vidye2023} ao compilador.
+gerou ISA diferente conforme o compilador, fator que~\cite{fang2011} já
+apontavam entre as causas de diferenças de desempenho.
 
 Quanto ao que o programador controla, o OpenCL não oferece meio portável de
 acionar os bits GLC e SLC: o \texttt{volatile} liga o GLC com efeitos colaterais,

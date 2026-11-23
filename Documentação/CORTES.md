@@ -1036,3 +1036,41 @@ aceito, conferido no código, nos CSVs e no PDF de Vidye et al.:
 
 Estado: **16 páginas** (~3 linhas de folga), 0 erros, 0 Overfull, 22 referências;
 resumo e abstract com 10 linhas cada.
+
+## Segunda rodada da revisão externa (mesmo dia)
+
+Aceitos (conferidos no código, no PDF do Vidye e no LLVM 14):
+- **Vidye et al. retirado** (texto, Tabela 1 e .bib), e com ele o tema dos
+  sistemas operacionais. O PDF tem hardware diferente entre os SOs (o macOS rodou
+  num MacBook com Intel Iris 550, embora a tabela diga RTX 2070 Super), driver da
+  tabela diferente do das capturas e execuções únicas; não sustenta o que o texto
+  dizia. As Conclusões ficam só com Fang et al. Seção 3.1 renomeada.
+- **Citação do LLVM:** o comentário "no L2 cache bypass policy at the ISA level"
+  está no ramo do `volatile` e em `enableLoadCacheBypass`, não no ramo não
+  temporal; a frase agora diz isso.
+- **"Mesmo kernel" → "mesma construção"** entre os Exps. 3 e 4: o `matmul_layout.cl`
+  tem a mesma construção em asm, mas fonte e opções diferentes (sem
+  `-cl-mad-enable`), e não há desmontagem dele para comparar a ISA. As opções dos
+  Exps. 1 e 3 (`-cl-std=CL1.2 -cl-mad-enable`) valem em todas as versões do
+  `matmul.cpp`.
+- **Medições de 1 MB:** são 17 nos dados (inclui o kernel padrão rodado em 1 MB na
+  parte B do `teto_vram.csv`, não descrito); o texto passou a "todas as
+  medições", sem número. Mediana de 548,6 mantida (17 valores).
+- Tolerância: absoluta de 0,01·N/1024 nos Exps. 1 e 3; relativa de 0,02·N/1024 no
+  Exp. 4. Cenários definidos na §4.2. Patamar de 1,06× a partir de N=4096 na
+  síntese, nas Conclusões e nos resumos. Pergunta de pesquisa com "em particular,
+  dos caches L1 e L2". "Três deles sobre a multiplicação". Orçamento de tempo
+  "na CPU". Valores de N na distância de reúso. Rótulo da Figura 1 sem a
+  resposta. Tabela 1: Memeti e Vidye dão lugar a Xie et al. e Tian et al.
+- Resumo e abstract: voltou a contribuição metodológica (o kernel de controle
+  mostra que o asm custa 1,5×); saíram "(GCN, GFX8)" e a explicação da
+  coalescência, que seguem no corpo.
+
+Não aceitos: retirar a Figura 2 e o parágrafo da CPU (pedido do orientador, que
+aprovou a versão); fluxograma; quatro casas do IC (a largura do intervalo as
+justifica); "fixa" × "estima" (não é contradição); asterisco na Tabela 2;
+transposição em OpenCL C (decisão do aluno). O motivo da RX 580 (placa
+disponível) fica para a defesa, não para o texto (decisão do aluno).
+
+Estado: **16 páginas** (~6 linhas de folga), 0 erros, 0 Overfull, 21 referências;
+resumo e abstract com 10 linhas cada.
