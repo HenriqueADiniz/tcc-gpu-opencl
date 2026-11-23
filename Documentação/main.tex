@@ -166,8 +166,8 @@ demais, com as opções padrão. Os tempos de GPU vêm dos eventos de
 transferências (nos lançamentos fatiados, somam-se os lotes), e os da CPU, de
 \texttt{clock\_gettime}. As saídas das multiplicações e dos padrões são
 validadas contra a CPU, com tolerância absoluta de $0{,}01\,N/1024$ nos
-Experimentos~1 e~3 e relativa de $0{,}02\,N/1024$ no Experimento~4, sobre
-matrizes de preenchimento determinístico. A escolha do ambiente decorre de etapa
+Experimentos~1 e~3 e, no Experimento~4, relativa mais absoluta, ambas de
+$0{,}02\,N/1024$, sobre matrizes de preenchimento determinístico. A escolha do ambiente decorre de etapa
 anterior, conduzida sobre o mesmo dispositivo em Windows, cujo compilador
 proprietário (AMDOCL) não aceita \textit{inline assembly} nem emite \textit{flags}
 sob \texttt{volatile} (Seção~\ref{sec:multi}).\footnote{Código, dados brutos e
@@ -310,7 +310,7 @@ A Tabela~\ref{tab:cenarios} apresenta os cinco cenários para $N=1024$. Todos fo
 
 \begin{table}[ht]
 \centering
-\caption{Cenários de caminho de \textit{cache}, $N=1024$; 1.000 execuções por cenário. Tempos em ms; $cv$: desvio padrão sobre a média; GFLOPS calculados pela mediana.}
+\caption{Cenários de caminho de \textit{cache}, $N=1024$; 1.000 execuções por cenário. Tempos em ms; $cv$: desvio padrão sobre a média; GFLOPS calculados pela mediana; $^\ast$depende do compilador, conforme a Seção~\ref{sec:multi}.}
 \label{tab:cenarios}
 \footnotesize
 \begin{tabular}{@{}llrrrr@{}}
@@ -319,7 +319,7 @@ A Tabela~\ref{tab:cenarios} apresenta os cinco cenários para $N=1024$. Todos fo
 \midrule
 1. Normal (OpenCL C) & GLC=0 SLC=0 & 7,265 & 7,223 & 3,50 & 297,3 \\
 2. Controle: \textit{asm} sem \textit{flag} & GLC=0 SLC=0 & 10,985 & 11,007 & 1,86 & 195,1 \\
-3. \texttt{volatile} & GLC=1 SLC=0 & 14,258 & 14,239 & 4,02 & 150,8 \\
+3. \texttt{volatile} & GLC=1$^\ast$ SLC=0 & 14,258 & 14,239 & 4,02 & 150,8 \\
 4. \textit{asm} com \texttt{glc} & GLC=1 SLC=0 & 13,591 & 13,585 & 4,43 & 158,1 \\
 5. \textit{asm} com \texttt{glc slc} & GLC=1 SLC=1 & 13,850 & 13,847 & 4,30 & 155,1 \\
 \bottomrule

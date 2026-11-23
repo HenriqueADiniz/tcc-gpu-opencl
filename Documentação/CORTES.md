@@ -1081,6 +1081,11 @@ Fechamento da segunda rodada:
   corrido (1.350 MHz, 1.000 execuções), como já em 2.000 MHz e 2.048 linhas;
   roteiro da Introdução com `\ref` (rótulos novos `sec:referencial`,
   `sec:relacionados` e `sec:resultados`).
+- Tolerância do Exp. 4 descrita como no código (`linha_coluna.cpp` e
+  `matmul_layout.cpp`: |c − ref| > tol·|ref| + tol): "relativa mais absoluta,
+  ambas de 0,02·N/1024". O texto anterior dizia só "relativa".
+- Tabela 2: GLC=1 do `volatile` com o asterisco "depende do compilador", como na
+  Tabela 5; a nota foi para a legenda, sem custo de linha.
 - Ficam para a versão final, como o próprio parecer sugeriu: excesso de negrito e
   o `\resizebox` da Tabela 1.
 
