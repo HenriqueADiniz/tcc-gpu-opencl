@@ -1116,7 +1116,8 @@ Aceitos (conferidos no código e nos CSVs):
   às Conclusões. Para a versão final: refazer só a validação no Linux com
   tolerância fixa e registrar o erro máximo. As somas dos padrões são exatas em
   float32 (a maior, 528.384, é múltiplo de 0,125 abaixo de 2^21); na
-  multiplicação, ~1e-4 relativo basta.
+  multiplicação, uma tolerância relativa da ordem de 1e-3 cobre o pior caso do
+  arredondamento da soma em float32 com N=16384 (γ ≈ N·2^-24).
 
 Não aplicado: retirar Memeti (fica como reserva de ~2 linhas, se a banca pedir
 acréscimos).
