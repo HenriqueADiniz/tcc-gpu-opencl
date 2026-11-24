@@ -1304,5 +1304,15 @@ Números da 5.4 conferidos contra `tab_loc_*.tex`, `tab_layout.tex` e os CSVs.
   (mediana 1,669). O 2,08× e o 1,67× vêm da mesma base.
 - Mesmas quebras de página.
 
+## Versão entregue à banca (4º PC, 23/11/2026)
+
+O PDF entregue é o deste commit. A única diferença em relação ao a08c5ee é a
+afiliação, corrigida pelo aluno no Overleaf: "Instituto de Ciências Exatas e
+Informática", como nos TCCs de exemplo da coordenação (era "e de Informática").
+Mesmas quebras de página. Conferências da entrega: 0 erros, 0 Overfull, 0
+indefinidos, 21 citações com entrada e 21 entradas citadas, 22 fontes embutidas.
+Ficam para a versão pós-defesa (até 48 h após o início da sessão): as correções
+da banca e o `\resizebox` da Tabela 1.
+
 Estado: **16 páginas** (~7,5 linhas de folga), 0 erros, 0 Overfull, 21
 referências; resumo e abstract com 10 linhas cada.
