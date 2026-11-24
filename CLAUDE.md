@@ -225,6 +225,9 @@ g++ -Wall -Wextra -O2 experimentos/<prog>.cpp -o output/<prog> -lOpenCL
 - Negrito reduzido (tabelas, títulos em linha, rótulos da 4.5 e as três
   conclusões); padrões em itálico; "(diferença máxima na GPU: zero)" na 4.1.
   Pendente para a versão final: o \resizebox da Tabela 1.
+- Réplica do cenário 3: na 4.2 entra à parte dos cinco kernels, como controle
+  negativo; a numeração dos cenários segue o desenho, não a execução (no log,
+  cenário 3 = Kernel 2, réplica = Kernel 3, controle = Kernel 4).
 
 ## Pendências
 

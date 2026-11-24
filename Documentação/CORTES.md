@@ -1201,5 +1201,31 @@ soma em float, na mesma ordem de k, sem FMA (x86-64 básico, `-O2` sem
   quebras de página.
 - O `\resizebox` da Tabela 1 continua para a versão final.
 
+## Réplica do cenário 3 (pedido do aluno, mesmo dia)
+
+Queixa: a 4.2 listava a réplica entre os kernels que "separam" os dois fatores, sem
+dizer para que servia; a finalidade só vinha duas frases depois, e a 5.1 a chamava
+de "duplicata" e "controle negativo" (três nomes para a mesma coisa). Também não se
+explicava por que o "cenário 3" roda antes do 2.
+
+- 4.2: "cinco kernels" separam os fatores; a réplica entra à parte: "Um sexto,
+  réplica do cenário 3 com código-fonte idêntico, é o controle negativo que mede o
+  ruído." Fica coerente com "os cinco cenários" da 5.1 e do Exp. 3.
+- 4.2: "(a numeração segue o desenho, não a execução)" depois da ordem dos blocos.
+  No programa e no log, o cenário 3 é o Kernel 2, a réplica é o Kernel 3
+  (`matmul_direto_VRAM`, fonte idêntico ao `matmul_via_L2`) e o controle é o
+  Kernel 4.
+- 4.2: o piso passa a dizer por que é preciso e o que é: com n=1000 o teste "pode
+  acusar até diferenças vindas apenas da ordem dos blocos e do estado da GPU"; o
+  piso é "a diferença entre o cenário 3 e sua réplica". "Pode", e não "acusa": nesta
+  campanha o teste não acusou a réplica (t = 0,76).
+- 5.1: "foi medido em duplicata" passou a "O cenário 3 e sua réplica, de
+  código-fonte idêntico, têm ISA idêntica instrução a instrução."
+- Por que o duplicado é o cenário 3 fica para a defesa: a hipótese original supunha
+  que um volatile "mais agressivo" chegaria à VRAM; a ISA saiu idêntica, e o kernel
+  virou a réplica (comentário em `experimentos/matmul.cpp`).
+- Custo zero: mesmas quebras de página. Uma versão mais longa ("entre os dois não
+  há diferença real a detectar") derrubava a folga para ~1,6 linha.
+
 Estado: **16 páginas** (~7,5 linhas de folga), 0 erros, 0 Overfull, 21
 referências; resumo e abstract com 10 linhas cada.
