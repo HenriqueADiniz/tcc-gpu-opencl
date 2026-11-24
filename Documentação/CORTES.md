@@ -1259,5 +1259,35 @@ itens aceitos; custo zero (mesmas quebras de página).
   (`matmul_sweep.csv`, 100 execuções) o par idêntico difere 0,9% em N=1024
   (medianas), daí a 5.3 só afirmar o slc em problemas grandes.
 
+## Oitava rodada da revisão externa (mesmo dia)
+
+Busca no texto inteiro por termos usados antes da definição, termos com dois nomes
+e um nome para duas coisas. Todos os itens aceitos.
+
+- T1 (Conclusões): "Isolá-los exigiu um cenário de controle sem flag; uma réplica
+  de código-fonte idêntico estima em 0,14%…". A réplica não isola o volatile nem o
+  bloco de assembly (mesmo erro da antiga lista dos "seis kernels").
+- T2 (4.2): "A comparação ingênua, entre o kernel normal e um com bypass, não
+  permite…" (era "direta"; o resto do texto diz "ingênua").
+- T3: "varredura" fica só para o padrão de acesso (resumo, 5.2, Conclusões). A
+  campanha passa a "segunda campanha": rótulo da Tabela 4 e duas frases da 5.2.
+- T4 (4.2): "cinco cenários" na lista e "Um sexto kernel, réplica do cenário 3 com
+  código-fonte idêntico, é o controle negativo que mede o ruído". Custa uma linha
+  na 4.2 e muda as quebras das páginas 7 a 9 (a 10 absorve); conferido: floats e
+  títulos nas mesmas páginas, sem linha isolada, folga final inalterada. A variante
+  "com o mesmo código" mantinha as quebras; o aluno preferiu a redação do revisor.
+- T5: "política de retenção" -> "política de substituição" nas Conclusões e no
+  último trabalho futuro (o "portanto" passa a decorrer da frase anterior).
+- T6 (5.1): "ele reproduz a construção dos cenários 4 e 5" (era "a barreira de
+  otimização").
+- T7 (objetivo 1): "a partir de código OpenCL nessa arquitetura" (GFX8 só é
+  definido na 2.2).
+- Menores: "anfitrião (host)"; "no MUBUF, os acessos" (MTBUF sem definição e sem
+  retorno); os três \texttt{SLC=1} sem \texttt, como as demais ocorrências.
+- Mantidos: "warp" sem definição; "patamar", "contornar/desvio/bypass",
+  "campanha/programa original" e "construção de controle em assembly" na 5.4.
+- Para a defesa: as duas remedições do Exp. 4 cobriram só a dispersa, N=8192 e
+  16384, nas três configurações (`linha_coluna_remedicao*.csv`).
+
 Estado: **16 páginas** (~7,5 linhas de folga), 0 erros, 0 Overfull, 21
 referências; resumo e abstract com 10 linhas cada.

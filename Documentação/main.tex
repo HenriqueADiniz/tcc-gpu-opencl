@@ -78,7 +78,7 @@ A pergunta que orienta este trabalho é: qual é o impacto quantitativo da hiera
 O objetivo geral é analisar experimentalmente o impacto da hierarquia de memória no desempenho de uma GPU AMD (arquitetura Polaris/GCN) sob OpenCL, tendo a multiplicação de matrizes como caso de estudo. Os objetivos específicos são:
 
 \begin{enumerate}\setlength{\itemsep}{0pt}\setlength{\parsep}{0pt}
-\item Obter e verificar, na ISA, um mecanismo que permita retirar o L1 do caminho de uma leitura a partir de código OpenCL no GFX8.
+\item Obter e verificar, na ISA, um mecanismo que permita retirar o L1 do caminho de uma leitura a partir de código OpenCL nessa arquitetura.
 \item Isolar, por desenho controlado, o custo de contornar o L1, separando-o dos fatores que a comparação ingênua confunde com ele.
 \item Determinar quais níveis da hierarquia podem ser contornados por \textit{flags} de instrução, testando a hipótese de que SLC=1 contorna o L2.
 \item Verificar como o custo de contornar o L1 varia com o tamanho do problema e com a localidade do padrão de acesso, inclusive em um algoritmo completo.
@@ -100,7 +100,7 @@ Nas GPUs AMD da arquitetura GCN (\textit{Graphics Core Next}), os \textit{work-i
 
 Três noções sustentam a análise. Os \textit{caches} operam em linhas de 64~bytes: uma falta (\textit{miss}) traz a linha inteira, e os acessos seguintes a ela são acertos enquanto ela não for expulsa. A linha a expulsar é escolhida pela política de substituição, de que a LRU (\textit{least recently used}) é o exemplo clássico, e linhas que disputam o mesmo conjunto do \textit{cache} expulsam-se mutuamente (faltas de conflito). Por fim, dentro de uma instrução de \textit{load}, os endereços pedidos pelos \textit{lanes} que caem numa mesma linha são atendidos por uma única busca, a coalescência; no caso-limite, todos os \textit{lanes} pedem o mesmo endereço (\textit{broadcast})~\cite[Seção~8.1.9]{amdgcn3}.
 
-Na ISA, as instruções de leitura da memória global (\texttt{buffer\_load\_dword}, no formato MUBUF, e \texttt{flat\_load\_dword}, no formato FLAT) têm dois bits de política de \textit{cache}: GLC (\textit{Globally Coherent}) e SLC (\textit{System Level Coherent}), nos bits 16 e 17 do FLAT e 14 e 17 do MUBUF. O manual documenta o GLC: com GLC=1, a leitura falta intencionalmente no L1 e busca no L2~\cite[Seção~8.1.9]{amdgcn3}. Já o SLC recebe duas descrições: no MUBUF e no MTBUF, os acessos com SLC=1 são forçados a faltar no L2 e ficam coerentes com a memória do sistema; no FLAT, o bit define a política de \textit{cache} em conjunto com o GLC e com o tipo de memória (MTYPE)~\cite[Tabelas~8.2 e~9.1]{amdgcn3}. Qual delas vale em leituras FLAT é o objeto da Seção~\ref{sec:slc}.
+Na ISA, as instruções de leitura da memória global (\texttt{buffer\_load\_dword}, no formato MUBUF, e \texttt{flat\_load\_dword}, no formato FLAT) têm dois bits de política de \textit{cache}: GLC (\textit{Globally Coherent}) e SLC (\textit{System Level Coherent}), nos bits 16 e 17 do FLAT e 14 e 17 do MUBUF. O manual documenta o GLC: com GLC=1, a leitura falta intencionalmente no L1 e busca no L2~\cite[Seção~8.1.9]{amdgcn3}. Já o SLC recebe duas descrições: no MUBUF, os acessos com SLC=1 são forçados a faltar no L2 e ficam coerentes com a memória do sistema; no FLAT, o bit define a política de \textit{cache} em conjunto com o GLC e com o tipo de memória (MTYPE)~\cite[Tabelas~8.2 e~9.1]{amdgcn3}. Qual delas vale em leituras FLAT é o objeto da Seção~\ref{sec:slc}.
 
 \section{Trabalhos Relacionados}
 \label{sec:relacionados}
@@ -157,7 +157,7 @@ ambiente de software é Ubuntu~20.04 com \textit{kernel} 5.15 e ROCm~5.2, cujo
 compilador de \textit{kernels} é o Clang~14 embutido no \texttt{comgr}; a
 arquitetura Polaris já não tem suporte oficial nessa versão, e o dispositivo só é
 enumerado com \texttt{ROC\_ENABLE\_PRE\_VEGA=1}. O código
-do anfitrião é compilado com GCC~9.4 (\texttt{-O2}; a medição na CPU
+do anfitrião (\textit{host}) é compilado com GCC~9.4 (\texttt{-O2}; a medição na CPU
 acrescenta \texttt{-march=native -fopenmp}), e os binários dos \textit{kernels} são
 desmontados com o \texttt{llvm-objdump} do LLVM~12. Os \textit{kernels} dos
 Experimentos~1 e~3 são compilados com \texttt{-cl-std=CL1.2 -cl-mad-enable}; os
@@ -218,16 +218,16 @@ L2~\cite[Seção~8.1.9]{amdgcn3}.
 \subsection{Experimento 1: Isolamento do Efeito do L1}
 \label{sec:met-fatorial}
 
-A comparação direta entre o \textit{kernel} normal e um com \textit{bypass} não permite atribuir a diferença ao \textit{cache}, porque dois outros fatores variam junto com a \textit{flag}: o código gerado sob \texttt{volatile}, que serializa os \textit{loads}; e o próprio bloco de \textit{inline assembly}, opaco ao otimizador, que impede a redução de força no cálculo de endereço~\cite{cooper2001} e acrescenta operações aritméticas por iteração.
+A comparação ingênua, entre o \textit{kernel} normal e um com \textit{bypass}, não permite atribuir a diferença ao \textit{cache}, porque dois outros fatores variam junto com a \textit{flag}: o código gerado sob \texttt{volatile}, que serializa os \textit{loads}; e o próprio bloco de \textit{inline assembly}, opaco ao otimizador, que impede a redução de força no cálculo de endereço~\cite{cooper2001} e acrescenta operações aritméticas por iteração.
 
-Para separá-los, o experimento emprega cinco \textit{kernels} com o mesmo algoritmo e \textit{work-groups} de $16\times16$: (1)~o normal, em OpenCL~C; (2)~um controle em \textit{assembly} sem \textit{flag}, que reproduz a construção das variantes com \textit{flag} sem alterar o caminho de memória; (3)~o \texttt{volatile}; (4)~o \textit{assembly} com \texttt{glc}; e (5)~o \textit{assembly} com \texttt{glc slc}. Um sexto, réplica do cenário~3 com código-fonte idêntico, é o controle negativo que mede o ruído.
+Para separá-los, o experimento emprega cinco cenários com o mesmo algoritmo e \textit{work-groups} de $16\times16$: (1)~o normal, em OpenCL~C; (2)~um controle em \textit{assembly} sem \textit{flag}, que reproduz a construção das variantes com \textit{flag} sem alterar o caminho de memória; (3)~o \texttt{volatile}; (4)~o \textit{assembly} com \texttt{glc}; e (5)~o \textit{assembly} com \texttt{glc slc}. Um sexto \textit{kernel}, réplica do cenário~3 com código-fonte idêntico, é o controle negativo que mede o ruído.
 
 Cada \textit{kernel} é executado 1.000 vezes após 10 de aquecimento. Os \textit{kernels} rodam em blocos sequenciais, sem intercalação nem sorteio, na ordem 1, 3, réplica, 2, 4 e 5 (a numeração segue o desenho, não a execução), e os \textit{clocks} da GPU ficam sob o gerenciamento dinâmico padrão, sem fixação. Registram-se média, mediana, desvio padrão, coeficiente de variação ($cv$) e a deriva entre o primeiro e o último décimo das execuções, esta para detectar variação de \textit{clock}; as razões vêm acompanhadas de intervalo de confiança (IC) de 95\% pelo método delta. Como, com $n=1000$, o teste de significância pode acusar até diferenças vindas apenas da ordem dos blocos e do estado da GPU, adota-se um \emph{piso de ruído}: a diferença entre o cenário~3 e sua réplica, que roda logo após ele e, assim, mede a repetibilidade entre blocos adjacentes, como 2~$\to$~4 e 4~$\to$~5; efeitos menores não são afirmados. Todas as saídas são conferidas elemento a elemento contra a CPU.
 
 \subsection{Experimento 2: Semântica do Bit SLC}
 \label{sec:met-slc}
 
-Para decidir se \texttt{SLC=1} contorna o L2, mede-se a vazão da leitura repetida de um mesmo \textit{buffer} em função do seu tamanho. As três variantes (sem \textit{flags}, \texttt{glc} e \texttt{glc slc}) são construídas por \textit{inline assembly} com \texttt{flat\_load\_dword} sobre \textit{buffers} comuns, alocados na VRAM, de modo que a geração de código é idêntica e a única diferença são os bits da instrução. Cada lançamento percorre o \textit{buffer} ciclicamente: até 64~MB, lê 128~MB no total (128 passadas de um \textit{buffer} de 1~MB, que \emph{cabe} no L2, e duas de um de 64~MB, que \emph{não cabe}); acima disso, faz duas passadas. A campanha original mediu esses dois tamanhos; uma segunda repete os mesmos \textit{kernels} em 14 tamanhos, de 256~KB a 2~GB, e lê cada \textit{buffer} por 0,2~s antes de medir, para estabilizar os \textit{clocks}.
+Para decidir se SLC=1 contorna o L2, mede-se a vazão da leitura repetida de um mesmo \textit{buffer} em função do seu tamanho. As três variantes (sem \textit{flags}, \texttt{glc} e \texttt{glc slc}) são construídas por \textit{inline assembly} com \texttt{flat\_load\_dword} sobre \textit{buffers} comuns, alocados na VRAM, de modo que a geração de código é idêntica e a única diferença são os bits da instrução. Cada lançamento percorre o \textit{buffer} ciclicamente: até 64~MB, lê 128~MB no total (128 passadas de um \textit{buffer} de 1~MB, que \emph{cabe} no L2, e duas de um de 64~MB, que \emph{não cabe}); acima disso, faz duas passadas. A campanha original mediu esses dois tamanhos; uma segunda repete os mesmos \textit{kernels} em 14 tamanhos, de 256~KB a 2~GB, e lê cada \textit{buffer} por 0,2~s antes de medir, para estabilizar os \textit{clocks}.
 
 O teste depende de saber quanto a VRAM entregaria sem o L2. Além do pico teórico da GDDR5, nove variantes com 4 a 16 vezes mais bytes em voo por \textit{wavefront} leem um \textit{buffer} de 1~GB, para separar o limite da memória do limite do \textit{kernel} de medição. Dois controles verificam o caso de 1~MB. Como, no programa original, \texttt{glc slc} roda depois de dois \textit{kernels} que deixam o \textit{buffer} no L2, o primeiro ocupa o L2 com outro \textit{buffer} de 64~MB, fora do tempo medido, antes de cada execução, em cinco tamanhos; o segundo mede a variação entre alocações, com dez \textit{buffers} distintos. O programa original foi ainda reexecutado três vezes. Exceto nele, cada saída é conferida: o \textit{buffer} contém apenas 1,0, e a soma lida por \textit{work-item} deve igualar o número de leituras.
 
@@ -328,7 +328,7 @@ A Tabela~\ref{tab:cenarios} apresenta os cinco cenários para $N=1024$. Todos fo
 
 O cenário~3 e sua réplica, de código-fonte idêntico, têm ISA idêntica instrução a instrução e só podem diferir por ruído. As duas medições diferem em 0,14\%, e o teste $t$ de Welch não detecta diferença entre elas ($t=0{,}76$): o controle negativo passa. Essa diferença residual fixa o piso de ruído abaixo do qual nenhum efeito é afirmado.
 
-A Tabela~\ref{tab:razoes} decompõe os fatores. O desenho se apoia no cenário~2: ele reproduz a barreira de otimização dos cenários~4 e~5 sem alterar o caminho de memória, de modo que a comparação 2~$\to$~4 mede o bit \texttt{glc} com o custo da construção presente nos dois lados. As três variantes em \textit{assembly} geram ISA idêntica instrução a instrução, diferindo apenas nos modificadores \texttt{glc} e \texttt{slc} de dois \texttt{flat\_load\_dword}.
+A Tabela~\ref{tab:razoes} decompõe os fatores. O desenho se apoia no cenário~2: ele reproduz a construção dos cenários~4 e~5 sem alterar o caminho de memória, de modo que a comparação 2~$\to$~4 mede o bit \texttt{glc} com o custo da construção presente nos dois lados. As três variantes em \textit{assembly} geram ISA idêntica instrução a instrução, diferindo apenas nos modificadores \texttt{glc} e \texttt{slc} de dois \texttt{flat\_load\_dword}.
 
 \begin{table}[ht]
 \centering
@@ -377,13 +377,13 @@ sem \textit{flag} & \texttt{glc} & \texttt{glc slc} & \textbf{Razão} \\
 \multicolumn{9}{@{}l}{\textit{Campanha original}}\\
 \tabinput{tab_slc_original}
 \midrule
-\multicolumn{9}{@{}l}{\textit{Varredura (segunda campanha)}}\\
+\multicolumn{9}{@{}l}{\textit{Segunda campanha}}\\
 \tabinput{tab_slc}
 \bottomrule
 \end{tabular}
 \end{table}
 
-\textbf{O que um \textit{bypass} produziria.} Se \texttt{SLC=1} tirasse o L2 do
+\textbf{O que um \textit{bypass} produziria.} Se SLC=1 tirasse o L2 do
 caminho, o \textit{buffer} de 1~MB seria lido da VRAM, sob dois limites. O
 primeiro é físico: o pico teórico de 256~GB/s da GDDR5. O segundo é o patamar que
 o mesmo \textit{kernel} atinge quando o conjunto não cabe no L2: de 8~MB a 2~GB,
@@ -395,14 +395,14 @@ monitorado, mas esse valor o situa no estado máximo: a 1.000~MHz, o pico seria 
 223,3~GB/s na mediana.
 
 \textbf{O que se mede.} Em 1~MB, \texttt{glc slc} sustenta 539,8~GB/s na
-varredura e 555,9~GB/s na campanha original: 2,1 e 2,2 vezes o pico teórico.
+segunda campanha e 555,9~GB/s na original: 2,1 e 2,2 vezes o pico teórico.
 A hipótese é refutada: o L2 continua atendendo os acessos. O valor varia
 entre alocações: em todas as medições de 1~MB com \texttt{glc slc} feitas no
 estudo, fica entre 431,5 e 564,1~GB/s (mediana de 548,6, os mesmos valores sem o programa original), e
 o menor ainda supera o pico em 69\%. O resultado tampouco depende de os
 \textit{kernels} anteriores terem deixado o \textit{buffer} no L2: com o L2
 ocupado por outro \textit{buffer} antes de cada execução, \texttt{glc slc} difere
-no máximo 3,0\% da varredura nos cinco tamanhos testados, o que mostra também
+no máximo 3,0\% da segunda campanha nos cinco tamanhos testados, o que mostra também
 que a leitura com SLC=1 aloca a linha no L2.
 
 \textbf{Entre 2 e 64~MB, \texttt{glc slc} é mais rápido que \texttt{glc}}, até
@@ -422,7 +422,7 @@ carregou, como se a linha recém-carregada entrasse como candidata preferencial 
 expulsão, comportamento análogo ao das políticas de inserção
 de~\cite{qureshi2007}.
 
-\texttt{SLC=1} atua, assim, sobre a política de substituição do L2, e não como
+SLC=1 atua, assim, sobre a política de substituição do L2, e não como
 desvio do nível. A leitura é coerente com a documentação: a descrição da
 codificação FLAT diz que o bit ``controla a política do \textit{cache}
 L2''~\cite[Seção~13.9]{amdgcn3}; o compilador emite \texttt{glc slc} para acessos
@@ -662,8 +662,8 @@ A terceira é metodológica: \textbf{a comparação ingênua superestima o efeit
 \textit{cache}}. O \texttt{volatile} emite a \textit{flag} sob o Clang/LLVM e não
 sob o compilador proprietário e, onde a emite, serializa os \textit{loads}; o
 bloco de \textit{inline assembly} custa por si só cerca de 1,5$\times$. Isolá-los
-exigiu um cenário de controle sem \textit{flag} e uma réplica de código-fonte
-idêntico, que estima em 0,14\% o ruído entre blocos adjacentes de uma campanha.
+exigiu um cenário de controle sem \textit{flag}; uma réplica de código-fonte
+idêntico estima em 0,14\% o ruído entre blocos adjacentes de uma campanha.
 
 Frente à literatura, os resultados complementam os estudos de \textit{microbenchmarking}
 em GPUs NVIDIA~\cite{wong2010, mei2017, jia2018}, que caracterizam latência e
@@ -679,7 +679,7 @@ e o \textit{builtin} não temporal liga os dois juntos, ambos dependentes do
 compilador; só o \textit{inline assembly} controla cada bit isoladamente. Contornar
 o L1 nunca acelerou os \textit{kernels} medidos, mas a mudança de política do
 SLC acelerou a varredura cíclica em até 1,51$\times$. O controle útil parece ser,
-portanto, menos o desvio de um nível que a política de retenção, hoje inacessível
+portanto, menos o desvio de um nível que a política de substituição, hoje inacessível
 ao código portável.
 
 Como limitações, os mecanismos são inferidos de tempos de execução, sem
@@ -699,7 +699,7 @@ dois efeitos; a caracterização por latência, com \textit{pointer chasing} sob
 controle de \textit{flags} e contadores de \textit{hardware}; e a repetição do
 estudo numa GPU RDNA~4, cuja ISA expressa a política de \textit{cache} por dicas
 temporais e de escopo, e não por GLC e SLC~\cite{llvmamdgpu}, o que permitiria
-testar se a política de retenção se torna controlável pelo programador.
+testar se a política de substituição se torna controlável pelo programador.
 
 \section*{Declaração de uso de ferramentas de Inteligência Artificial}
 

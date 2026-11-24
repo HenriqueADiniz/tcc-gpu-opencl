@@ -230,6 +230,10 @@ g++ -Wall -Wextra -O2 experimentos/<prog>.cpp -o output/<prog> -lOpenCL
   cenário 3 = Kernel 2, réplica = Kernel 3, controle = Kernel 4).
 - Termos uniformizados: "lançamento em lotes" (não "fatiado"), "construção em
   assembly" nas Conclusões, "kernel" quando a frase inclui a réplica.
+- Mais termos fixados (8ª rodada): "comparação ingênua"; "varredura" só para o
+  padrão de acesso (a campanha é a "segunda campanha"); "política de
+  substituição"; "construção" (não "barreira de otimização") na 5.1; os cinco
+  são "cenários" e a réplica é um sexto "kernel"; SLC=1 sem \texttt.
 
 ## Pendências
 
