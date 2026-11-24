@@ -1227,5 +1227,37 @@ explicava por que o "cenário 3" roda antes do 2.
 - Custo zero: mesmas quebras de página. Uma versão mais longa ("entre os dois não
   há diferença real a detectar") derrubava a folga para ~1,6 linha.
 
+## Sétima rodada da revisão externa (mesmo dia)
+
+Revisão da reescrita da réplica e da coerência de termos na Metodologia. Todos os
+itens aceitos; custo zero (mesmas quebras de página).
+
+- P1 (4.2): o piso "mede a repetibilidade entre blocos adjacentes, como 2 → 4 e
+  4 → 5". Pela ordem 1, 3, réplica, 2, 4, 5, as comparações das flags são entre
+  blocos adjacentes; o slc (1,9%) fica abaixo do limite de deriva de 2% e depende
+  do piso. Compensação no mesmo parágrafo: saiu "sob carga sustentada" e "Todos os
+  resultados são verificados" passou a "Todas as saídas são conferidas".
+- P2 (5.1, variante escolhida pelo aluno): "têm ISA idêntica instrução a instrução
+  e só podem diferir por ruído", logo antes de "o controle negativo passa". A
+  variante do revisor (na 4.2) exigia tirar "sem alterar o caminho de memória" da
+  definição do controle, que sustenta a comparação 1 → 2.
+- P3 (4.2): "Cada kernel é executado 1.000 vezes" (a réplica não é "cenário"; o log
+  mostra 1000/1000 no Kernel 3).
+- P4 (5.1): "o controle é a réplica descrita a seguir" -> "o critério é o piso de
+  ruído, medido a seguir" (a linha 2 da Tabela 2 se chama "Controle").
+- P5: "lançamentos fatiados" -> "lançamento(s) em lotes", o termo definido na 4.4
+  (abertura da Seção 4 e 4.5); "somam-se os lotes" -> "somam-se os tempos".
+- P6 (4.3): "o segundo repete o caso de 1 MB em dez buffers distintos" -> "o segundo
+  mede a variação entre alocações, com dez buffers distintos" (finalidade do item D
+  no cabeçalho do `teto_vram.cpp`).
+- P7 (Conclusões): "construção de controle" -> "construção em assembly", como na 4.5.
+  Não era erro: os 2,3 a 2,5× foram medidos sem flag.
+- Perguntas respondidas pelo log: a réplica passou na validação (diferença máxima
+  zero), com deriva de -0,38% e 1.000 execuções.
+- Para a defesa: código e log do Exp. 1 entraram no mesmo commit (8c04dc6); o log
+  imprime o piso, então o critério estava no programa daquela campanha. No Exp. 3
+  (`matmul_sweep.csv`, 100 execuções) o par idêntico difere 0,9% em N=1024
+  (medianas), daí a 5.3 só afirmar o slc em problemas grandes.
+
 Estado: **16 páginas** (~7,5 linhas de folga), 0 erros, 0 Overfull, 21
 referências; resumo e abstract com 10 linhas cada.

@@ -228,6 +228,8 @@ g++ -Wall -Wextra -O2 experimentos/<prog>.cpp -o output/<prog> -lOpenCL
 - Réplica do cenário 3: na 4.2 entra à parte dos cinco kernels, como controle
   negativo; a numeração dos cenários segue o desenho, não a execução (no log,
   cenário 3 = Kernel 2, réplica = Kernel 3, controle = Kernel 4).
+- Termos uniformizados: "lançamento em lotes" (não "fatiado"), "construção em
+  assembly" nas Conclusões, "kernel" quando a frase inclui a réplica.
 
 ## Pendências
 
