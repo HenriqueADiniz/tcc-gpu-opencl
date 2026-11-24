@@ -1289,5 +1289,20 @@ e um nome para duas coisas. Todos os itens aceitos.
 - Para a defesa: as duas remedições do Exp. 4 cobriram só a dispersa, N=8192 e
   16384, nas três configurações (`linha_coluna_remedicao*.csv`).
 
+## Nona rodada da revisão externa (mesmo dia)
+
+Números da 5.4 conferidos contra `tab_loc_*.tex`, `tab_layout.tex` e os CSVs.
+
+- N1: a maior razão da Tabela 6 é 3,376 (glc slc, dispersa, N=8192), não 2,190.
+  "o ponto de maior razão, dispersa com glc em N=1024" -> "o ponto de maior razão
+  com glc, dispersa em N=1024".
+- N2: o slc isolado (glc slc / glc) também cai em coluna (1,059 -> 1,038, N=1024 ->
+  2048) e em linha (1,019 -> 1,015, N=2048 -> 16384). "a única queda do conjunto"
+  -> "a única queda expressiva do conjunto".
+- N3 (sem mudança): slc isolado na dispersa, três campanhas. N=8192: 2,077, 1,863 e
+  2,115 (mediana 2,077, a própria primeira campanha). N=16384: 1,409, 1,669 e 1,689
+  (mediana 1,669). O 2,08× e o 1,67× vêm da mesma base.
+- Mesmas quebras de página.
+
 Estado: **16 páginas** (~7,5 linhas de folga), 0 erros, 0 Overfull, 21
 referências; resumo e abstract com 10 linhas cada.

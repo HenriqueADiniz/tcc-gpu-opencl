@@ -537,7 +537,7 @@ passa de 64~KB em $N=1024$ a 1~MB em $N=16384$.
 Os 45 pontos (três padrões, três configurações de \textit{flag} e cinco
 tamanhos) passaram na validação (ver Seção~\ref{sec:conclusao}), com $cv$ entre 0,02\% e 4,1\% em
 \textit{linha} e \textit{coluna} e de até 19,4\% em \textit{dispersa}; o ponto de
-maior razão, \textit{dispersa} com \texttt{glc} em $N=1024$, tem 78 execuções e
+maior razão com \texttt{glc}, \textit{dispersa} em $N=1024$, tem 78 execuções e
 $cv$ de 12,9\%.
 
 \begin{table}[ht]
@@ -583,7 +583,7 @@ de 1\% a 2\% em todos os tamanhos: o reúso ocorre em 16 iterações consecutiva
 antes que a linha seja expulsa. Em \textit{coluna}, custa de 4\% a 6\% até
 $N=4096$ e chega a 13\% e 22\% nos dois tamanhos maiores. Em \textit{dispersa},
 que mantém 19 linhas vivas por instrução, cresce de 1,22$\times$ em $N=1024$ a
-2,08$\times$ em $N=8192$ e recua a 1,67$\times$ em $N=16384$, a única queda do
+2,08$\times$ em $N=8192$ e recua a 1,67$\times$ em $N=16384$, a única queda expressiva do
 conjunto, pela mediana de três campanhas (na primeira, a da
 Tabela~\ref{tab:localidade}, o recuo vai a 1,41$\times$). As remedições
 reproduzem o custo do \texttt{glc} a menos de 2,5\%, mas não o de \texttt{glc
